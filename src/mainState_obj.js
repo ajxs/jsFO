@@ -47,8 +47,6 @@ mainState.prototype.createMapObject = function(source) {
 				break;
 		} 
 		
-
-		
 	}
 
 	newObject.itemFlags = source.itemFlags;
@@ -101,22 +99,19 @@ mainState.prototype.createMapObject = function(source) {
 
 };
 
-mainState.prototype.object_playAnim = function(obj, newAnim, actionFrame, dir, loop, actionCallback, endCallback) {
-	
+mainState.prototype.object_playAnim = function(obj, newAnim, frame, actionFrame, dir, loop, actionCallback, endCallback) {
+	// playAnim differs from setAnim in that behaviors can be set here, this calls setAnim where the img var is generated, and offsets computed.
 	if(!dir) dir = 0;
 	if(!newAnim) newAnim = "idle";
 	if(!actionFrame) actionFrame = 0;
+	if(!frame) {
+		frame = 0;
+	}
 	if(!loop) loop = false;
 	
-	this.object_setAnim(obj, newAnim);
-	
-	obj.anim.animDirection = dir;
+	this.object_setAnim(obj, newAnim, frame, dir, loop, true);
+
 	obj.anim.actionFrame = actionFrame;
-	
-	obj.anim.animDirection = dir;
-	obj.anim.animLoop = loop;
-	
-	obj.anim.animActive = true;
 	
 	if(isFunction(actionCallback)) {
 		obj.anim.actionFrameCallback = actionCallback;
@@ -133,15 +128,20 @@ mainState.prototype.object_playAnim = function(obj, newAnim, actionFrame, dir, l
 };
 
 
-mainState.prototype.object_setAnim = function(obj, newAnim, frame, dir) {
-	if(!frame) frame = 0;
+mainState.prototype.object_setAnim = function(obj, newAnim, frame, dir, loop, active) {
+	if(!frame) {
+		frame = 0;
+	}
 	if(!dir) dir = 0;
 	if(!newAnim) newAnim = "idle";
+	if(!loop) loop = false;
+	if(!active) active = false;
 	
 	obj.anim.currentAnim = newAnim;
+	obj.anim.animActive = active;
+	obj.anim.animLoop = loop;
 	obj.anim.animDirection = dir;
 	obj.anim.actionFrame = 0;
-	
 	
 	obj.anim.img = this.generateFRMstring(obj);	
 	this.object_setFrame(obj,frame);	// reset frame and offset
@@ -150,35 +150,33 @@ mainState.prototype.object_setAnim = function(obj, newAnim, frame, dir) {
 
 mainState.prototype.object_setFrame = function(obj,frame) {
 	if(!frame) frame = 0;
-	if(frame == -1) frame = _assets[obj.anim.img].nFrames-1;	// last frame
+	if(frame == -1) {
+		frame = _assets[obj.anim.img].nFrames-1;	// last frame
+	}
 	
 	obj.anim.frameNumber = frame;
 	obj.anim.shiftX = _assets[obj.anim.img].shift[obj.orientation].x;
 	obj.anim.shiftY = _assets[obj.anim.img].shift[obj.orientation].y;
 	
-	if(frame > 0) {
-		for(var f = 0; f < frame; f++) {
-			obj.anim.shiftX += _assets[obj.anim.img].frameInfo[obj.orientation][f].offsetX;
-			obj.anim.shiftY += _assets[obj.anim.img].frameInfo[obj.orientation][f].offsetY;			
-		}
+	for(var f = 0; f < frame; f++) {	// set offsets
+		obj.anim.shiftX += _assets[obj.anim.img].frameInfo[obj.orientation][f].offsetX;
+		obj.anim.shiftY += _assets[obj.anim.img].frameInfo[obj.orientation][f].offsetY;			
 	}
 	
 };
 
-mainState.prototype.actor_beginMoveState = function(actor,dest,runState,complete) {
+mainState.prototype.actor_beginMoveState = function(actor, dest, runState, pathCompleteCallback) {
 	var mState = this;
-	actor.anim.animLoop = true;	
-	
+
 	if(actor.ai.moveState) {		// if already in anim
 		var newMoveState = function() {
 			mState.actor_moveStep(actor);
 			mState.actor_endMoveState(actor);
-			mState.actor_beginMoveState(actor,dest,this.inputRunState);			
+			mState.actor_beginMoveState(actor,dest,mState.inputRunState);			
 		};
 		
 		actor.anim.actionFrameCallback = newMoveState;
 		actor.anim.animEndCallback = newMoveState;
-
 		return;
 	}
 	
@@ -192,11 +190,8 @@ mainState.prototype.actor_beginMoveState = function(actor,dest,runState,complete
 	actor.ai.moveNext = actor.ai.pathQ.shift();
 	actor.orientation = this.mapGeometry.findOrientation(actor.hexPosition,actor.ai.moveNext);
 	
-	actor.anim.frameNumber = 0;
-	actor.anim.animActive = true;
-	
-	if(isFunction(complete)) {
-		actor.anim.moveEndCallback = complete;
+	if(isFunction(pathCompleteCallback)) {
+		actor.anim.moveEndCallback = pathCompleteCallback;
 	} else {
 		actor.anim.moveEndCallback = 0;
 	}
@@ -204,16 +199,11 @@ mainState.prototype.actor_beginMoveState = function(actor,dest,runState,complete
 	var callback = function() {
 		mState.actor_moveStep(actor);
 	};
-	
-	actor.anim.actionFrameCallback = callback;
-	actor.anim.animEndCallback = callback;
 
-	if(actor.ai.runState) {
-		this.object_setAnim(actor,"run");
-		actor.anim.actionFrame = 2;
-	} else {
-		this.object_setAnim(actor,"walk");
-		actor.anim.actionFrame = 4;
+	if(actor.ai.runState) {	// run
+		this.object_playAnim(actor,"run",0,2,0,true,callback,callback);
+	} else {	// walk
+		this.object_playAnim(actor,"walk",0,4,0,true,callback,callback);
 	}
 };
 
@@ -226,7 +216,7 @@ mainState.prototype.actor_moveStep = function(actor) {
 		this.actor_endMoveState(actor);		
 		if(isFunction(actor.anim.moveEndCallback)) {	// moveEndCallback
 			var cb = actor.anim.moveEndCallback;
-			cb();
+			cb.call(actor);
 			actor.anim.moveEndCallback = 0;
 		}
 		return;
@@ -268,41 +258,28 @@ mainState.prototype.actor_moveStep = function(actor) {
 
 mainState.prototype.actor_endMoveState = function(actor) {
 	if(!actor.ai.moveState) return;
-
 	actor.ai.moveState = false;
 
-	this.object_setAnim(actor,"idle");
-	actor.anim.animActive = false;
-	actor.anim.animLoop = false;
+	this.object_setAnim(actor,"idle",0,0,false,false);
 	actor.anim.actionFrameCallback = 0;
 	actor.anim.animEndCallback = 0;
 
 };
 
 
-
 mainState.prototype.object_openDoor = function(obj) {
 	var mState = this;
-	this.object_setFrame(obj,0);	// reset
-	obj.anim.animActive = true;
-	obj.anim.animLoop = false;
-	obj.anim.animDirection = 0;
-	
-	obj.anim.animEndCallback = function() {
+	mState.object_playAnim(obj,0,0,0,0,false,0,function() {
 		obj.openState = 1;
-		mState.map.hexMap[0][obj.hexPosition].blocked = false;	// FIX FOR ELEVATION
-	}
+		mState.map.hexMap[mState.player.currentElevation][obj.hexPosition].blocked = false;	// FIX FOR ELEVATION
+	});
 };
 
-mainState.prototype.object_closeDoor = function(obj) {
-	var mState = this;
-	this.object_setFrame(obj,-1);	// reset
-	obj.anim.animActive = true;
-	obj.anim.animLoop = false;
-	obj.anim.animDirection = 1;
-	
-	obj.anim.animEndCallback = function() {
+mainState.prototype.object_closeDoor = function(obj) {		// BUGGED
+	var mState = this;		
+	mState.object_playAnim(obj,0,-1,0,1,false,0,function() {
 		obj.openState = 0;
-		mState.map.hexMap[0][obj.hexPosition].blocked = true;	// FIX FOR ELEVATION
-	}
+		mState.map.hexMap[mState.player.currentElevation][obj.hexPosition].blocked = true;	// FIX FOR ELEVATION
+	});
+	
 };

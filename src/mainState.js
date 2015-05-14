@@ -572,110 +572,112 @@ mainState.prototype.input = function(e) {
 		return;	// alter to account for inventory etc
 	}
 
-	if(_mouse.x > this.interfaceRect.x && _mouse.x < (this.interfaceRect.x + this.interfaceRect.width)) {
-		if(_mouse.y > this.interfaceRect.y) {
-			this.interfaceState = true;
+	if(!this.contextMenuActive) {	// prevent losing cursor
+		if(_mouse.x > this.interfaceRect.x && _mouse.x < (this.interfaceRect.x + this.interfaceRect.width)) {
+			if(_mouse.y > this.interfaceRect.y) {
+				this.interfaceState = true;
+			} else this.interfaceState = false;
 		} else this.interfaceState = false;
-	} else this.interfaceState = false;
-
-	this.scrollState = false;
-	if((_mouse.y > 0 && _mouse.y < _screenHeight) && (_mouse.x > 0 && _mouse.x < _screenWidth)) {	// if mouse onscreen
-		if(_mouse.y < (_screenHeight * 0.05)) {
-			this.scrollStates.yNeg = true;
-			this.scrollState = true;
-		}
-		else this.scrollStates.yNeg = false;
-
-		if(_mouse.y > (_screenHeight * 0.95)) {
-			this.scrollStates.yPos = true;
-			this.scrollState = true;
-		}
-		else this.scrollStates.yPos = false;
-
-		if(_mouse.x < (_screenWidth * 0.05)) {
-			this.scrollStates.xNeg = true;
-			this.scrollState = true;
-		}
-		else this.scrollStates.xNeg = false;
-
-		if(_mouse.x > (_screenWidth * 0.95)) {
-			this.scrollStates.xPos = true;
-			this.scrollState = true;
-		}
-		else this.scrollStates.xPos = false;
-
-	} else {
-		this.scrollStates.xPos = false;
-		this.scrollStates.xNeg = false;
-		this.scrollStates.yPos = false;
-		this.scrollStates.yNeg = false;
-	}
-
-
-	if(e.type == 'mousemove') {
-
-		if(this.inputState == "move") {
-
-		} else if(this.inputState == "object") {
-
-		}
-	}
-
-	if(e.type == 'keydown') {	// ESC
-		if(_keyboardStates[27]) {
-			main_ingameMenu();
-			return;
-		}
-	}
-
-	if(e.type == 'mousedown') {
 		
-		if(this.interfaceState) {
-			console.log("interface md");
-			return;
-		}
-		
-		if(this.inputState == "object" && _mouse.c1) {
-			this.objectIndex = this.getObjectIndex();
-			if(this.objectIndex != -1) {
-				this.contextMenu.mouseX = _mouse.x;
-				this.contextMenu.mouseY = _mouse.y;
-				this.contextMenuActive = true;
-
+		this.scrollState = false;
+		if((_mouse.y > 0 && _mouse.y < _screenHeight) && (_mouse.x > 0 && _mouse.x < _screenWidth)) {	// if mouse onscreen
+			if(_mouse.y < (_screenHeight * 0.05)) {
+				this.scrollStates.yNeg = true;
+				this.scrollState = true;
 			}
-		}
-	} else if(e.type == 'mouseup') {
-		if(this.contextMenuActive) {
-			this.contextMenuAction(this.contextMenu.menuItems[this.contextMenu.targetItem].action, this.objectIndex );	// context menu action
-		}
+			else this.scrollStates.yNeg = false;
 
-		_mouse.x = this.contextMenu.mouseX;	// reset to previous stored mouse location
-		_mouse.y = this.contextMenu.mouseY;
+			if(_mouse.y > (_screenHeight * 0.95)) {
+				this.scrollStates.yPos = true;
+				this.scrollState = true;
+			}
+			else this.scrollStates.yPos = false;
 
-		this.contextMenuActive = false;
+			if(_mouse.x < (_screenWidth * 0.05)) {
+				this.scrollStates.xNeg = true;
+				this.scrollState = true;
+			}
+			else this.scrollStates.xNeg = false;
+
+			if(_mouse.x > (_screenWidth * 0.95)) {
+				this.scrollStates.xPos = true;
+				this.scrollState = true;
+			}
+			else this.scrollStates.xPos = false;
+
+		} else {
+			this.scrollStates.xPos = false;
+			this.scrollStates.xNeg = false;
+			this.scrollStates.yPos = false;
+			this.scrollStates.yNeg = false;
+		}
 	}
+	
+	switch(e.type) {
+		case "mousemove":
+			break;
+			
+		case "keydown":
+			if(_keyboardStates[27]) {
+				main_ingameMenu();
+				return;
+			}
+			
+			break;
+			
+		case "keyup":
+			break;	
+			
+		case "mousedown":
+			if(this.interfaceState) {
+				console.log("interface md");
+				return;
+			}
+			
+			if(this.inputState == "object" && _mouse.c1) {
+				this.objectIndex = this.getObjectIndex();
+				if(this.objectIndex != -1) {
+					this.contextMenu.mouseX = _mouse.x;
+					this.contextMenu.mouseY = _mouse.y;
+					this.contextMenuActive = true;
 
-	if(e.type == 'click') {
-		if(this.scrollState) return;
+				}
+			}
 		
-		if(this.interfaceState) {
-			console.log("interface click");
-			return;
-		}
-		
-		if(this.inputState == "move") {
-			this.actor_beginMoveState(this.player,this.hIndex,this.inputRunState);
-		} else if(this.inputState == "object") {
+			break;
+			
+		case "mouseup":
+			if(this.contextMenuActive) {
+				this.contextMenuAction(this.contextMenu.menuItems[this.contextMenu.targetItem].action, this.objectIndex );	// context menu action
+			}
 
-		
-		}
+			_mouse.x = this.contextMenu.mouseX;	// reset to previous stored mouse location
+			_mouse.y = this.contextMenu.mouseY;
 
-	}
+			this.contextMenuActive = false;
+			break;
+			
+		case "click":
+			if(this.scrollState) return;
+			
+			if(this.interfaceState) {
+				console.log("interface click");
+				return;
+			}
+			
+			if(this.inputState == "move") {
+				this.actor_beginMoveState(this.player,this.hIndex,this.inputRunState);
+			} else if(this.inputState == "object") {
 
-	if(e.type =='contextmenu') {	// switch input modes on mouse2
-		if(this.inputState == "move") this.inputState = "object";
-		else if(this.inputState == "object") this.inputState = "move";
-	}
+			
+			}		
+			break;
+			
+		case 'contextmenu':	// switch input modes on mouse2
+			if(this.inputState == "move") this.inputState = "object";
+			else if(this.inputState == "object") this.inputState = "move";
+			break;
+	};
 
 };
 
@@ -735,21 +737,18 @@ mainState.prototype.contextMenuAction = function(action,target) {		// make sure 
 				case "door":
 					if(this.mapObjects[this.player.currentElevation][target].openState == 0) {	// door is closed
 						useFunction = function() {
-							var endCallback = function() {
-								mState.object_openDoor(mState.mapObjects[mState.player.currentElevation][target]);
-							};
 							mState.player.orientation = mState.mapGeometry.findOrientation(mState.player.hexPosition,mState.mapObjects[mState.player.currentElevation][target].hexPosition);
-							mState.object_playAnim(mState.player,"use",0,0,false,0,endCallback);
+							mState.object_playAnim(mState.player,"use",0,0,0,false,0,function() {
+								mState.object_openDoor(mState.mapObjects[mState.player.currentElevation][target]);
+							});
 						};
 					} else {
 						useFunction = function() {
-							var endCallback = function() {
-								mState.object_closeDoor(mState.mapObjects[mState.player.currentElevation][target]);
-							};
 							mState.player.orientation = mState.mapGeometry.findOrientation(mState.player.hexPosition,mState.mapObjects[mState.player.currentElevation][target].hexPosition);
-							mState.object_playAnim(mState.player,"use",0,0,false,0,endCallback);
+							mState.object_playAnim(mState.player,"use",0,0,0,false,0,function() {
+								mState.object_closeDoor(mState.mapObjects[mState.player.currentElevation][target]);
+							});
 						};
-						
 					}
 					break;
 			}
@@ -869,7 +868,7 @@ mainState.prototype.update = function() {
 	}
 
 	if(this.contextMenuActive) {
-		this.contextMenu.targetItem = Math.min( ((_mouse.y - this.contextMenu.mouseY)/10)|0, this.contextMenu.menuItems.length-1);	// context menu action
+		this.contextMenu.targetItem = Math.max(0,Math.min( ((_mouse.y - this.contextMenu.mouseY)/10)|0, this.contextMenu.menuItems.length-1));	// context menu action
 		return;
 	}
 
@@ -974,16 +973,16 @@ mainState.prototype.update = function() {
 						}
 					} else {	// if anim ended
 						if(this.currentRenderObject.anim.animLoop) {
+							this.currentRenderObject.anim.shiftX = this.currentRenderImg.shift[this.currentRenderObject.orientation].x;	// reset shift
+							this.currentRenderObject.anim.shiftY = this.currentRenderImg.shift[this.currentRenderObject.orientation].y;
 							if(this.currentRenderObject.anim.animDirection == 0) {
 								this.currentRenderObject.anim.frameNumber = 0;
-								this.currentRenderObject.anim.shiftX = this.currentRenderImg.shift[this.currentRenderObject.orientation].x;
-								this.currentRenderObject.anim.shiftY = this.currentRenderImg.shift[this.currentRenderObject.orientation].y;
 							} else {	// reverse
 								this.currentRenderObject.anim.frameNumber = this.currentRenderImg.nFrames-1;
-								for(var f = 0; f < this.currentRenderImg.nFrames; f++) {	// reset shift to final
+								/* for(var f = 0; f < this.currentRenderObject.anim.frameNumber; f++) {	// reset shift to final
 									this.currentRenderObject.anim.shiftX += this.currentRenderImg.frameInfo[this.currentRenderObject.orientation][f].offsetX;
 									this.currentRenderObject.anim.shiftY += this.currentRenderImg.frameInfo[this.currentRenderObject.orientation][f].offsetY;
-								}								
+								} */						
 							}
 						} else {
 							this.currentRenderObject.anim.animActive = false;

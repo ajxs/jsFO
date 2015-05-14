@@ -65,7 +65,7 @@ function SpriteObject() {		// REMEMBER TO INIT EVERYTHING
 		shiftX: 0,
 		shiftY: 0,
 		
-		animLoop : true,
+		animLoop : false,
 		animDirection : 0,	// forward
 		
 	}
