@@ -8,12 +8,13 @@ function LoadState() {
 LoadState.prototype = new GameState();
 LoadState.prototype.constructor = LoadState;
 LoadState.prototype.loadImage = 0;
+LoadState.prototype.overlay = 0;
 
 LoadState.prototype.loadPercentage = 0;
 
 LoadState.prototype.init = function(_saveState) {		// use arguments here to pass saved state data.
 	
-	this.loadImage = document.getElementById("LoadState_loadScreen");
+	this.overlay = document.getElementById("loadState_overlay");
 	var LoadStatePtr = this;
 	
 	if(_debug.remoteLoading) {
@@ -116,6 +117,10 @@ LoadState.prototype.render = function() {
 	var barX = fullWidth - (fullWidth/2)|0;
 	var barY = _screenHeight - 128;
 	
+	_context.drawImage(this.overlay,0,0,1024,768,0,0,_screenWidth,_screenHeight);
+	
+	_context.fillStyle = "rgb(0,10,0)";
+	_context.fillRect(barX,barY,fullWidth,72);
 	
 	_context.beginPath();
 	_context.moveTo(barX-6, barY-6);
