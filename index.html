@@ -1,0 +1,50 @@
+<html>
+<head>
+
+
+	<link rel="stylesheet" href="inc/main.css">
+
+	<script src="src/browser.js"></script>
+
+	<script src="src/mapObjects.js"></script>
+
+	<script src="src/global.js"></script>
+
+	<script src="src/GameState.js"></script>
+
+	<script src="src/GameMap.js"></script>
+	<script src="src/MainState.js"></script>
+	<script src="src/MainState_obj.js"></script>
+	<script src="src/LoadState.js"></script>
+	<script src="src/MenuState.js"></script>
+	<script src="src/IngameMenuState.js"></script>
+	
+	<script src="src/bitmapFont.js"></script>
+
+	<script src="src/main.js"></script>
+
+	<title>jsFallout</title>
+</head>
+
+
+<body onLoad="main_init()">
+	<div id="main">
+		<div id="main_header">
+			<img src="inc/main_topLogo.png"/>
+			<div id="main_header_info">
+				<a href="#">Info</a>
+				<a href="#">Help</a>
+				<a href="#">About</a>
+			</div>
+		</div>
+		<canvas id="mainCanvas" oncontextmenu="javascript: return false;"></canvas>
+	</div>
+	
+	<div id="mainStorage">
+		<img id="loadState_loadScreen" src="inc/loadState_loadScreen.png"/>
+		<img id="mse_overlay" src="inc/mse_overlay.gif"/>
+		<img id="mse_overlay_blocked" src="inc/mse_overlay_blocked.gif"/>
+		<img id="trans_egg" src="inc/egg.png"/>
+	</div>
+	
+</body>
