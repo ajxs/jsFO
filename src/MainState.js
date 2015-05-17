@@ -590,7 +590,6 @@ MainState.prototype.input = function(e) {
 
 		case "mousedown":
 			if(this.interfaceState) {
-				console.log("interface md");
 				return;
 			}
 
@@ -600,7 +599,6 @@ MainState.prototype.input = function(e) {
 					this.contextMenu.mouseX = _mouse.x;
 					this.contextMenu.mouseY = _mouse.y;
 					this.contextMenuActive = true;
-
 				}
 			}
 
@@ -618,7 +616,7 @@ MainState.prototype.input = function(e) {
 			break;
 
 		case "click":
-			if(this.scrollState) return;
+			//if(this.scrollState) return;
 
 			if(this.interfaceState) {
 				console.log("interface click");
@@ -724,7 +722,7 @@ MainState.prototype.contextMenuAction = function(action,target) {		// make sure 
 					this.actor_beginMoveState(this.player, useDest, this.inputRunState, useFunction);
 				}
 			} else {
-				console.log("useFunction error");
+				console.log("no useFunction definiton");
 			}
 
 			break;
@@ -872,12 +870,15 @@ MainState.prototype.update = function() {
 		else if(_keyboardStates[68]) this.camera.x += this.scrollDelta;
 	}
 
-	if(this.scrollState) {		// consider changing this
-		if(this.scrollStates.yNeg && !this.scrollStates.yNegBlocked) this.camera.y -= this.scrollDelta;
-		if(this.scrollStates.yPos && !this.scrollStates.yPosBlocked) this.camera.y += this.scrollDelta;
-		if(this.scrollStates.xNeg && !this.scrollStates.xNegBlocked) this.camera.x -= this.scrollDelta;
-		if(this.scrollStates.xPos && !this.scrollStates.xPosBlocked) this.camera.x += this.scrollDelta;
+	if(intersectTest(_mouse.x,_mouse.y,0,0, 0,0,_screenWidth,_screenHeight)) {
+		if(this.scrollState) {		// consider changing this
+			if(this.scrollStates.yNeg && !this.scrollStates.yNegBlocked) this.camera.y -= this.scrollDelta;
+			if(this.scrollStates.yPos && !this.scrollStates.yPosBlocked) this.camera.y += this.scrollDelta;
+			if(this.scrollStates.xNeg && !this.scrollStates.xNegBlocked) this.camera.x -= this.scrollDelta;
+			if(this.scrollStates.xPos && !this.scrollStates.xPosBlocked) this.camera.x += this.scrollDelta;
+		}		
 	}
+
 
 	if(_keyboardStates[16]) {	// SHIFT control input for running
 		this.inputRunState = true;
