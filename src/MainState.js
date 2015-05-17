@@ -563,44 +563,14 @@ MainState.prototype.findPath = function(start,dest) {
 
 MainState.prototype.input = function(e) {
 	if(!this.contextMenuActive) {	// prevent losing cursor
-		if(_mouse.x > this.interfaceRect.x && _mouse.x < (this.interfaceRect.x + this.interfaceRect.width)) {
-			if(_mouse.y > this.interfaceRect.y) {
-				this.interfaceState = true;
-			} else this.interfaceState = false;
-		} else this.interfaceState = false;
+		if(intersectTest(_mouse.x,_mouse.y,0,0, this.interfaceRect.x,this.interfaceRect.y,this.interfaceRect.width,this.interfaceRect.height)) this.interfaceState = true;
+		else this.interfaceState = false;
 
-		this.scrollState = false;
-		if((_mouse.y > 0 && _mouse.y < _screenHeight) && (_mouse.x > 0 && _mouse.x < _screenWidth)) {	// if mouse onscreen
-			if(_mouse.y < (_screenHeight * 0.05)) {
-				this.scrollStates.yNeg = true;
-				this.scrollState = true;
-			}
-			else this.scrollStates.yNeg = false;
-
-			if(_mouse.y > (_screenHeight * 0.95)) {
-				this.scrollStates.yPos = true;
-				this.scrollState = true;
-			}
-			else this.scrollStates.yPos = false;
-
-			if(_mouse.x < (_screenWidth * 0.05)) {
-				this.scrollStates.xNeg = true;
-				this.scrollState = true;
-			}
-			else this.scrollStates.xNeg = false;
-
-			if(_mouse.x > (_screenWidth * 0.95)) {
-				this.scrollStates.xPos = true;
-				this.scrollState = true;
-			}
-			else this.scrollStates.xPos = false;
-
-		} else {
-			this.scrollStates.xPos = false;
-			this.scrollStates.xNeg = false;
-			this.scrollStates.yPos = false;
-			this.scrollStates.yNeg = false;
-		}
+		this.scrollStates.yNeg = (_mouse.y < (_screenHeight * 0.05));
+		this.scrollStates.yPos = (_mouse.y > (_screenHeight * 0.95));
+		this.scrollStates.xNeg = (_mouse.x < (_screenWidth * 0.05));
+		this.scrollStates.xPos = (_mouse.x > (_screenWidth * 0.95));
+		this.scrollState = (this.scrollStates.yNeg || this.scrollStates.yPos || this.scrollStates.xNeg || this.scrollStates.xPos);
 	}
 
 	switch(e.type) {
@@ -773,7 +743,12 @@ MainState.prototype.console = {
 	fontColor: "rgb(0,255,0)",
 
 	print: function() {	// accepts n arguments, pushes all to console
-		for (var i = 0; i < arguments.length; i++) this.consoleData.push("\x95" + arguments[i]);
+		for(var i = 0; i < arguments.length; i++) {
+			var string = "\x95" + arguments[i];
+			var split = string.match(/.{1,22}/g);
+			for(var k = 0; k < split.length; k++) this.consoleData.push(split[k]);
+			
+		}
 	},
 
 	clear: function() {
@@ -836,16 +811,12 @@ MainState.prototype.getObjectIndex = function() {
 			this.objectBufferRect.x, this.objectBufferRect.y,
 			this.objectBufferRect.width, this.objectBufferRect.height)) continue;
 
-		var r = Math.floor(i/1000);
-		var g = Math.floor((i%1000)/100);
-		var b = i%100;
-
 		this.objectBufferContext2.globalCompositeOperation = "source-over";
 		this.objectBuffer2.width = this.objectBufferRect.width;	// hack clear
 
 		this.objectBufferContext2.drawImage(this.currentRenderImg.img, 0, 0, this.currentRenderImg.width, this.currentRenderImg.height, 0, 0, this.currentRenderImg.width, this.currentRenderImg.height);
 		this.objectBufferContext2.globalCompositeOperation = "source-in";
-		this.objectBufferContext2.fillStyle = "rgb("+r+","+g+","+b+")";
+		this.objectBufferContext2.fillStyle = "rgb("+ Math.floor(i/1000) +","+ Math.floor((i%1000)/100) +","+ i%100 +")";
 		this.objectBufferContext2.fillRect(0,0,this.currentRenderImg.width,this.currentRenderImg.height);
 
 		this.objectBufferContext.drawImage(this.objectBuffer2, destX - this.objectBufferRect.x, destY - this.objectBufferRect.y);
@@ -889,18 +860,10 @@ MainState.prototype.update = function() {
 	};
 
 	// do scrollcheck
-	this.scrollCheckIndex = this.mapGeometry.s2h( ((_screenWidth/2)|0) + this.camera.x, ((_screenHeight*0.25)|0) + this.camera.y);	// top
-	this.scrollStates.yNegBlocked = scrollCheck.call(this,this.scrollCheckIndex);
-
-	this.scrollCheckIndex = this.mapGeometry.s2h( ((_screenWidth/2)|0) + this.camera.x, ((_screenHeight*0.75)|0) + this.camera.y);	// bottom
-	this.scrollStates.yPosBlocked = scrollCheck.call(this,this.scrollCheckIndex);
-
-	this.scrollCheckIndex = this.mapGeometry.s2h( ((_screenWidth*0.25)|0) + this.camera.x, ((_screenHeight/2)|0) + this.camera.y);	// left
-	this.scrollStates.xNegBlocked = scrollCheck.call(this,this.scrollCheckIndex);
-
-	this.scrollCheckIndex = this.mapGeometry.s2h( ((_screenWidth*0.75)|0) + this.camera.x, ((_screenHeight/2)|0) + this.camera.y);	// right
-	this.scrollStates.xPosBlocked = scrollCheck.call(this,this.scrollCheckIndex);
-
+	this.scrollStates.yNegBlocked = scrollCheck.call(this, this.mapGeometry.s2h( ((_screenWidth/2)|0) + this.camera.x, ((_screenHeight*0.25)|0) + this.camera.y));		// top
+	this.scrollStates.yPosBlocked = scrollCheck.call(this, this.mapGeometry.s2h( ((_screenWidth/2)|0) + this.camera.x, ((_screenHeight*0.75)|0) + this.camera.y));		// bottom
+	this.scrollStates.xNegBlocked = scrollCheck.call(this, this.mapGeometry.s2h( ((_screenWidth*0.25)|0) + this.camera.x, ((_screenHeight/2)|0) + this.camera.y));		// left
+	this.scrollStates.xPosBlocked = scrollCheck.call(this, this.mapGeometry.s2h( ((_screenWidth*0.75)|0) + this.camera.x, ((_screenHeight/2)|0) + this.camera.y));		// right
 
 	if(_debug.enableKeyboardScroll) {
 		if(_keyboardStates[87]) this.camera.y -= this.scrollDelta;
@@ -909,14 +872,12 @@ MainState.prototype.update = function() {
 		else if(_keyboardStates[68]) this.camera.x += this.scrollDelta;
 	}
 
-
 	if(this.scrollState) {		// consider changing this
 		if(this.scrollStates.yNeg && !this.scrollStates.yNegBlocked) this.camera.y -= this.scrollDelta;
 		if(this.scrollStates.yPos && !this.scrollStates.yPosBlocked) this.camera.y += this.scrollDelta;
 		if(this.scrollStates.xNeg && !this.scrollStates.xNegBlocked) this.camera.x -= this.scrollDelta;
 		if(this.scrollStates.xPos && !this.scrollStates.xPosBlocked) this.camera.x += this.scrollDelta;
 	}
-
 
 	if(_keyboardStates[16]) {	// SHIFT control input for running
 		this.inputRunState = true;
