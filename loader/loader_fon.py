@@ -8,9 +8,7 @@ import base64
 import io
 import json
 
-def loadFON(src):
-
-	fonFile = open(src,"rb")
+def loadFON(fonFile):
 	fontInfo = {}
 	
 	fontInfo['type'] = "fon"

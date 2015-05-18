@@ -7,13 +7,7 @@ import numpy
 import base64
 import io
 
-def loadFRM(src,pal):
-
-	try:
-		frmFile = open(src,"rb")
-	except (OSError, IOError):
-		return None
-
+def loadFRM(frmFile,pal):
 	frmInfo = {}
 	
 	temp = struct.unpack('>I3H', frmFile.read(10))

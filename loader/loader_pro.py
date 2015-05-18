@@ -17,9 +17,8 @@ def getFiletype(typeID):
 		return "none"	# can't find type
 
 
-def loadPRO(src):
+def loadPRO(proFile):
 	proInfo = {}
-	proFile = open(src,"rb")
 
 	temp = struct.unpack('>3i3I',proFile.read(6*4))	#common header
 	proInfo['PID'] = temp[0]

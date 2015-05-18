@@ -10,8 +10,7 @@ import numpy
 import json
 
 
-def loadAAF(src):
-	aafFile = open(src,"rb")
+def loadAAF(aafFile):
 	fontInfo = {}
 	
 	fontInfo['type'] = "aaf"

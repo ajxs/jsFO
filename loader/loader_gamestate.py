@@ -1,182 +1,193 @@
 import sys
 
+import loader_dat
 import loader_map
 import loader_frm
 import loader_pal
 import loader_fon
 import loader_aaf
 
-urlprefix = "../data/"	# use this to point to the directory with the undat'd Fallout2 data
+#urlprefix = "../data/"	# use this to point to the directory with the undat'd Fallout2 data
+urlprefix = ""	# use this to point to the directory with the undat'd Fallout2 data
 
-color = loader_pal.loadPAL("".join([urlprefix,"color.pal"]))
 loadData = {}
-
-def loadFRM(filename):
-	if(filename not in loadData):
-		loadItem = loader_frm.loadFRM( "".join( [urlprefix, filename] ) ,color)	
-		if(loadItem is not None):
-			loadData[filename] = loadItem
-
-
-def loadCritter(frmindex):
-	loadFRM("".join(["art/critters/",frmindex,"aa.frm"]))
-	loadFRM("".join(["art/critters/",frmindex,"ab.frm"]))
-	#loadFRM("".join(["art/critters/",frmindex,"ae.frm"]))
-	#loadFRM("".join(["art/critters/",frmindex,"ag.frm"]))
-	#loadFRM("".join(["art/critters/",frmindex,"ah.frm"]))
-	#loadFRM("".join(["art/critters/",frmindex,"ai.frm"]))
-	#loadFRM("".join(["art/critters/",frmindex,"aj.frm"]))
-	#loadFRM("".join(["art/critters/",frmindex,"ak.frm"]))
-	loadFRM("".join(["art/critters/",frmindex,"al.frm"]))
-	#loadFRM("".join(["art/critters/",frmindex,"an.frm"]))
-	#loadFRM("".join(["art/critters/",frmindex,"ao.frm"]))
-	#loadFRM("".join(["art/critters/",frmindex,"ap.frm"]))
-	#loadFRM("".join(["art/critters/",frmindex,"aq.frm"]))
-	#loadFRM("".join(["art/critters/",frmindex,"ar.frm"]))
-	#loadFRM("".join(["art/critters/",frmindex,"as.frm"]))
-	loadFRM("".join(["art/critters/",frmindex,"at.frm"]))
-
-
-	#loadFRM("".join(["art/critters/",frmindex,"ba.frm"]))
-	#loadFRM("".join(["art/critters/",frmindex,"bb.frm"]))
-	#loadFRM("".join(["art/critters/",frmindex,"bc.frm"]))
-	
-	#loadFRM("".join(["art/critters/",frmindex,"bd.frm"]))
-	#loadFRM("".join(["art/critters/",frmindex,"bd.fr0"]))
-	#loadFRM("".join(["art/critters/",frmindex,"bd.fr1"]))
-	#loadFRM("".join(["art/critters/",frmindex,"bd.fr2"]))
-	#loadFRM("".join(["art/critters/",frmindex,"bd.fr3"]))
-	#loadFRM("".join(["art/critters/",frmindex,"bd.fr4"]))
-	#loadFRM("".join(["art/critters/",frmindex,"bd.fr5"]))			
-	
-	#loadFRM("".join(["art/critters/",frmindex,"be.frm"]))
-	#loadFRM("".join(["art/critters/",frmindex,"bf.frm"]))
-	#loadFRM("".join(["art/critters/",frmindex,"bg.frm"]))
-	#loadFRM("".join(["art/critters/",frmindex,"bh.frm"]))
-	#loadFRM("".join(["art/critters/",frmindex,"bi.frm"]))
-	#loadFRM("".join(["art/critters/",frmindex,"bj.frm"]))
-	#loadFRM("".join(["art/critters/",frmindex,"bk.frm"]))
-	#loadFRM("".join(["art/critters/",frmindex,"bl.frm"]))
-	#loadFRM("".join(["art/critters/",frmindex,"bm.frm"]))
-	#loadFRM("".join(["art/critters/",frmindex,"bn.frm"]))
-	#loadFRM("".join(["art/critters/",frmindex,"bo.frm"]))
-	#loadFRM("".join(["art/critters/",frmindex,"bp.frm"]))
-	
-	#loadFRM("".join(["art/critters/",frmindex,"ch.frm"]))
-	#loadFRM("".join(["art/critters/",frmindex,"cj.frm"]))
-	
-	for r in range(9):	# D-M
-		loadFRM("".join(["art/critters/",frmindex,chr(97 + 3 + r) + "a.frm"]))
-		loadFRM("".join(["art/critters/",frmindex,chr(97 + 3 + r) + "b.frm"]))
-		#loadFRM("".join(["art/critters/",frmindex,chr(97 + 3 + r) + "c.frm"]))
-		#loadFRM("".join(["art/critters/",frmindex,chr(97 + 3 + r) + "d.frm"]))
-		#loadFRM("".join(["art/critters/",frmindex,chr(97 + 3 + r) + "e.frm"]))
-
-	
-	#loadFRM("".join(["art/critters/",frmindex,"df.frm"]))
-	#loadFRM("".join(["art/critters/",frmindex,"ef.frm"]))		
-	#loadFRM("".join(["art/critters/",frmindex,"ff.frm"]))		
-	#loadFRM("".join(["art/critters/",frmindex,"gf.frm"]))
-	
-	#loadFRM("".join(["art/critters/",frmindex,"dg.frm"]))	
-	#loadFRM("".join(["art/critters/",frmindex,"eg.frm"]))		
-	#loadFRM("".join(["art/critters/",frmindex,"fg.frm"]))
-
-	#for r in range(5):
-		#loadFRM("".join(["art/critters/",frmindex,chr(97 + 7 + r) + "h.frm"]))
-		#loadFRM("".join(["art/critters/",frmindex,chr(97 + 7 + r) + "i.frm"]))
-		#loadFRM("".join(["art/critters/",frmindex,chr(97 + 7 + r) + "j.frm"]))
-		#loadFRM("".join(["art/critters/",frmindex,chr(97 + 7 + r) + "k.frm"]))
-		#loadFRM("".join(["art/critters/",frmindex,chr(97 + 7 + r) + "l.frm"]))	
-
 		
 
+	
 def loadGameState(loadVars):
 
+	master_dat_file = "".join([urlprefix,"master.dat"])
+	master_dat = loader_dat.loadDAT(master_dat_file)
+
+	critter_dat_file = "".join([urlprefix,"critter.dat"])
+	critter_dat = loader_dat.loadDAT(critter_dat_file)
+	
+	color = loader_pal.loadPAL(loader_dat.getFile(master_dat_file, master_dat["fileEntries"]["color.pal"]))
+	
+	def loadFRM(datname, datfile, filename):		#these functions look hideous, I'll fix this one day
+		if(filename not in datfile["fileEntries"]):
+			return
+	
+		if(filename not in loadData):
+			loadItem =  loader_frm.loadFRM(loader_dat.getFile(datname,datfile["fileEntries"][filename]),color)
+			if(loadItem is not None):
+				loadData[filename] = loadItem
+
+
+	def loadCritter(frmindex):
+		loadFRM(critter_dat_file,critter_dat,"".join(["art/critters/",frmindex,"aa.frm"]))
+		loadFRM(critter_dat_file,critter_dat,"".join(["art/critters/",frmindex,"ab.frm"]))
+		#loadFRM(critter_dat_file,critter_dat,"".join(["art/critters/",frmindex,"ae.frm"]))
+		#loadFRM(critter_dat_file,critter_dat,"".join(["art/critters/",frmindex,"ag.frm"]))
+		#loadFRM(critter_dat_file,critter_dat,"".join(["art/critters/",frmindex,"ah.frm"]))
+		#loadFRM(critter_dat_file,critter_dat,"".join(["art/critters/",frmindex,"ai.frm"]))
+		#loadFRM(critter_dat_file,critter_dat,"".join(["art/critters/",frmindex,"aj.frm"]))
+		#loadFRM(critter_dat_file,critter_dat,"".join(["art/critters/",frmindex,"ak.frm"]))
+		loadFRM(critter_dat_file,critter_dat,"".join(["art/critters/",frmindex,"al.frm"]))
+		#loadFRM(critter_dat_file,critter_dat,"".join(["art/critters/",frmindex,"an.frm"]))
+		#loadFRM(critter_dat_file,critter_dat,"".join(["art/critters/",frmindex,"ao.frm"]))
+		#loadFRM(critter_dat_file,critter_dat,"".join(["art/critters/",frmindex,"ap.frm"]))
+		#loadFRM(critter_dat_file,critter_dat,"".join(["art/critters/",frmindex,"aq.frm"]))
+		#loadFRM(critter_dat_file,critter_dat,"".join(["art/critters/",frmindex,"ar.frm"]))
+		#loadFRM(critter_dat_file,critter_dat,"".join(["art/critters/",frmindex,"as.frm"]))
+		loadFRM(critter_dat_file,critter_dat,"".join(["art/critters/",frmindex,"at.frm"]))
+
+
+		#loadFRM(critter_dat_file,critter_dat,"".join(["art/critters/",frmindex,"ba.frm"]))
+		#loadFRM(critter_dat_file,critter_dat,"".join(["art/critters/",frmindex,"bb.frm"]))
+		#loadFRM(critter_dat_file,critter_dat,"".join(["art/critters/",frmindex,"bc.frm"]))
+		
+		#loadFRM(critter_dat_file,critter_dat,"".join(["art/critters/",frmindex,"bd.frm"]))
+		#loadFRM(critter_dat_file,critter_dat,"".join(["art/critters/",frmindex,"bd.fr0"]))
+		#loadFRM(critter_dat_file,critter_dat,"".join(["art/critters/",frmindex,"bd.fr1"]))
+		#loadFRM(critter_dat_file,critter_dat,"".join(["art/critters/",frmindex,"bd.fr2"]))
+		#loadFRM(critter_dat_file,critter_dat,"".join(["art/critters/",frmindex,"bd.fr3"]))
+		#loadFRM(critter_dat_file,critter_dat,"".join(["art/critters/",frmindex,"bd.fr4"]))
+		#loadFRM(critter_dat_file,critter_dat,"".join(["art/critters/",frmindex,"bd.fr5"]))			
+		
+		#loadFRM(critter_dat_file,critter_dat,"".join(["art/critters/",frmindex,"be.frm"]))
+		#loadFRM(critter_dat_file,critter_dat,"".join(["art/critters/",frmindex,"bf.frm"]))
+		#loadFRM(critter_dat_file,critter_dat,"".join(["art/critters/",frmindex,"bg.frm"]))
+		#loadFRM(critter_dat_file,critter_dat,"".join(["art/critters/",frmindex,"bh.frm"]))
+		#loadFRM(critter_dat_file,critter_dat,"".join(["art/critters/",frmindex,"bi.frm"]))
+		#loadFRM(critter_dat_file,critter_dat,"".join(["art/critters/",frmindex,"bj.frm"]))
+		#loadFRM(critter_dat_file,critter_dat,"".join(["art/critters/",frmindex,"bk.frm"]))
+		#loadFRM(critter_dat_file,critter_dat,"".join(["art/critters/",frmindex,"bl.frm"]))
+		#loadFRM(critter_dat_file,critter_dat,"".join(["art/critters/",frmindex,"bm.frm"]))
+		#loadFRM(critter_dat_file,critter_dat,"".join(["art/critters/",frmindex,"bn.frm"]))
+		#loadFRM(critter_dat_file,critter_dat,"".join(["art/critters/",frmindex,"bo.frm"]))
+		#loadFRM(critter_dat_file,critter_dat,"".join(["art/critters/",frmindex,"bp.frm"]))
+		
+		#loadFRM(critter_dat_file,critter_dat,"".join(["art/critters/",frmindex,"ch.frm"]))
+		#loadFRM(critter_dat_file,critter_dat,"".join(["art/critters/",frmindex,"cj.frm"]))
+		
+		for r in range(9):	# D-M
+			loadFRM(critter_dat_file,critter_dat,"".join(["art/critters/",frmindex,chr(97 + 3 + r) + "a.frm"]))
+			loadFRM(critter_dat_file,critter_dat,"".join(["art/critters/",frmindex,chr(97 + 3 + r) + "b.frm"]))
+			#loadFRM(critter_dat_file,critter_dat,"".join(["art/critters/",frmindex,chr(97 + 3 + r) + "c.frm"]))
+			#loadFRM(critter_dat_file,critter_dat,"".join(["art/critters/",frmindex,chr(97 + 3 + r) + "d.frm"]))
+			#loadFRM(critter_dat_file,critter_dat,"".join(["art/critters/",frmindex,chr(97 + 3 + r) + "e.frm"]))
+		
+		#loadFRM(critter_dat_file,critter_dat,"".join(["art/critters/",frmindex,"df.frm"]))
+		#loadFRM(critter_dat_file,critter_dat,"".join(["art/critters/",frmindex,"ef.frm"]))		
+		#loadFRM(critter_dat_file,critter_dat,"".join(["art/critters/",frmindex,"ff.frm"]))		
+		#loadFRM(critter_dat_file,critter_dat,"".join(["art/critters/",frmindex,"gf.frm"]))
+		
+		#loadFRM(critter_dat_file,critter_dat,"".join(["art/critters/",frmindex,"dg.frm"]))	
+		#loadFRM(critter_dat_file,critter_dat,"".join(["art/critters/",frmindex,"eg.frm"]))		
+		#loadFRM(critter_dat_file,critter_dat,"".join(["art/critters/",frmindex,"fg.frm"]))
+
+		#for r in range(5):
+			#loadFRM(critter_dat_file,critter_dat,"".join(["art/critters/",frmindex,chr(97 + 7 + r) + "h.frm"]))
+			#loadFRM(critter_dat_file,critter_dat,"".join(["art/critters/",frmindex,chr(97 + 7 + r) + "i.frm"]))
+			#loadFRM(critter_dat_file,critter_dat,"".join(["art/critters/",frmindex,chr(97 + 7 + r) + "j.frm"]))
+			#loadFRM(critter_dat_file,critter_dat,"".join(["art/critters/",frmindex,chr(97 + 7 + r) + "k.frm"]))
+			#loadFRM(critter_dat_file,critter_dat,"".join(["art/critters/",frmindex,chr(97 + 7 + r) + "l.frm"]))	
+
+	
+	
 	mapIndex = "".join( ['maps/', loadVars['map'] ] )
 	loadData[mapIndex] = loader_map.loadMAP("".join([urlprefix,mapIndex]) )
 	
-	loadData["font0.aaf"] = loader_aaf.loadAAF("".join([urlprefix,"font0.aaf"]))	# fonts
-	loadData["font1.aaf"] = loader_aaf.loadAAF("".join([urlprefix,"font1.aaf"]))	# fonts
-	loadData["font2.aaf"] = loader_aaf.loadAAF("".join([urlprefix,"font2.aaf"]))	# fonts
-	loadData["font3.aaf"] = loader_aaf.loadAAF("".join([urlprefix,"font3.aaf"]))	# fonts
-	loadData["font4.aaf"] = loader_aaf.loadAAF("".join([urlprefix,"font4.aaf"]))	# fonts
+	loadData["font0.aaf"] = loader_aaf.loadAAF(loader_dat.getFile(master_dat_file, master_dat["fileEntries"]["font0.aaf"]))	# fonts
+	loadData["font1.aaf"] = loader_aaf.loadAAF(loader_dat.getFile(master_dat_file, master_dat["fileEntries"]["font1.aaf"]))	# fonts
+	loadData["font2.aaf"] = loader_aaf.loadAAF(loader_dat.getFile(master_dat_file, master_dat["fileEntries"]["font2.aaf"]))	# fonts
+	loadData["font3.aaf"] = loader_aaf.loadAAF(loader_dat.getFile(master_dat_file, master_dat["fileEntries"]["font3.aaf"]))	# fonts
+	loadData["font4.aaf"] = loader_aaf.loadAAF(loader_dat.getFile(master_dat_file, master_dat["fileEntries"]["font4.aaf"]))	# fonts
 
 	
-	loadData["font0.fon"] = loader_fon.loadFON("".join([urlprefix,"font0.fon"]))
-	loadData["font0.fon"] = loader_fon.loadFON("".join([urlprefix,"font1.fon"]))
-	loadData["font0.fon"] = loader_fon.loadFON("".join([urlprefix,"font2.fon"]))
-	loadData["font0.fon"] = loader_fon.loadFON("".join([urlprefix,"font3.fon"]))
-	loadData["font0.fon"] = loader_fon.loadFON("".join([urlprefix,"font5.fon"]))
+	loadData["font0.fon"] = loader_fon.loadFON(loader_dat.getFile(master_dat_file, master_dat["fileEntries"]["font0.fon"]))	# fonts
+	loadData["font0.fon"] = loader_fon.loadFON(loader_dat.getFile(master_dat_file, master_dat["fileEntries"]["font1.fon"]))	# fonts
+	loadData["font0.fon"] = loader_fon.loadFON(loader_dat.getFile(master_dat_file, master_dat["fileEntries"]["font2.fon"]))	# fonts
+	loadData["font0.fon"] = loader_fon.loadFON(loader_dat.getFile(master_dat_file, master_dat["fileEntries"]["font3.fon"]))	# fonts
+	loadData["font0.fon"] = loader_fon.loadFON(loader_dat.getFile(master_dat_file, master_dat["fileEntries"]["font5.fon"]))	# fonts
 
-	
-	msgFile = open("".join([urlprefix,"text/english/game/pro_crit.msg"]),"r")
+	msgFile = loader_dat.getFile(master_dat_file,master_dat["fileEntries"]["text/english/game/pro_crit.msg"])
 	loadData["text/english/game/pro_crit.msg"] = {}
 	loadData["text/english/game/pro_crit.msg"]["data"] = []
 	for line in msgFile:
-		loadData["text/english/game/pro_crit.msg"]["data"].append(line.strip().lower())	
+		loadData["text/english/game/pro_crit.msg"]["data"].append(line.decode("utf-8").strip().lower())	
 	
-	msgFile = open("".join([urlprefix,"text/english/game/pro_item.msg"]),"r")
+	msgFile = loader_dat.getFile(master_dat_file,master_dat["fileEntries"]["text/english/game/pro_item.msg"])
 	loadData["text/english/game/pro_item.msg"] = {}
 	loadData["text/english/game/pro_item.msg"]["data"] = []
 	for line in msgFile:
-		loadData["text/english/game/pro_item.msg"]["data"].append(line.strip().lower())	
+		loadData["text/english/game/pro_item.msg"]["data"].append(line.decode("utf-8").strip().lower())	
 	
-	msgFile = open("".join([urlprefix,"text/english/game/pro_scen.msg"]),"r")
+	msgFile = loader_dat.getFile(master_dat_file,master_dat["fileEntries"]["text/english/game/pro_scen.msg"])
 	loadData["text/english/game/pro_scen.msg"] = {}
 	loadData["text/english/game/pro_scen.msg"]["data"] = []
 	for line in msgFile:
-		loadData["text/english/game/pro_scen.msg"]["data"].append(line.strip().lower())	
+		loadData["text/english/game/pro_scen.msg"]["data"].append(line.decode("utf-8").strip().lower())	
 
-	msgFile = open("".join([urlprefix,"text/english/game/pro_misc.msg"]),"r")
+	msgFile = loader_dat.getFile(master_dat_file,master_dat["fileEntries"]["text/english/game/pro_misc.msg"])
 	loadData["text/english/game/pro_misc.msg"] = {}
 	loadData["text/english/game/pro_misc.msg"]["data"] = []
 	for line in msgFile:
-		loadData["text/english/game/pro_misc.msg"]["data"].append(line.strip().lower())	
+		loadData["text/english/game/pro_misc.msg"]["data"].append(line.decode("utf-8").strip().lower())	
 
-	msgFile = open("".join([urlprefix,"text/english/game/pro_wall.msg"]),"r")
+	msgFile = loader_dat.getFile(master_dat_file,master_dat["fileEntries"]["text/english/game/pro_wall.msg"])
 	loadData["text/english/game/pro_wall.msg"] = {}
 	loadData["text/english/game/pro_wall.msg"]["data"] = []
 	for line in msgFile:
-		loadData["text/english/game/pro_wall.msg"]["data"].append(line.strip().lower())	
+		loadData["text/english/game/pro_wall.msg"]["data"].append(line.decode("utf-8").strip().lower())	
 
-	msgFile = open("".join([urlprefix,"text/english/game/pro_tile.msg"]),"r")
+	msgFile = loader_dat.getFile(master_dat_file,master_dat["fileEntries"]["text/english/game/pro_tile.msg"])
 	loadData["text/english/game/pro_tile.msg"] = {}
 	loadData["text/english/game/pro_tile.msg"]["data"] = []
 	for line in msgFile:
-		loadData["text/english/game/pro_tile.msg"]["data"].append(line.strip().lower())	
+		loadData["text/english/game/pro_tile.msg"]["data"].append(line.decode("utf-8").strip().lower())	
 
 
-	
-	lstFile = open("".join([urlprefix,"art/items/items.lst"]),"r")
+	lstFile = loader_dat.getFile(master_dat_file,master_dat["fileEntries"]["art/items/items.lst"])
 	loadData["art/items/items.lst"] = []
 	for line in lstFile:
-		loadData["art/items/items.lst"].append(line.strip().lower())
-		
-	lstFile = open("".join([urlprefix,"art/walls/walls.lst"]),"r")
+		loadData["art/items/items.lst"].append(line.decode("utf-8").strip().lower())
+
+	lstFile = loader_dat.getFile(master_dat_file,master_dat["fileEntries"]["art/walls/walls.lst"])
 	loadData["art/walls/walls.lst"] = []
 	for line in lstFile:
-		loadData["art/walls/walls.lst"].append(line.strip().lower())
+		loadData["art/walls/walls.lst"].append(line.decode("utf-8").strip().lower())
 
-	lstFile = open("".join([urlprefix,"art/tiles/tiles.lst"]),"r")
+	lstFile = loader_dat.getFile(master_dat_file,master_dat["fileEntries"]["art/tiles/tiles.lst"])
 	loadData["art/tiles/tiles.lst"] = []
 	for line in lstFile:
-		loadData["art/tiles/tiles.lst"].append(line.strip().lower())
+		loadData["art/tiles/tiles.lst"].append(line.decode("utf-8").strip().lower())
 
-	lstFile = open("".join([urlprefix,"art/scenery/scenery.lst"]),"r")		
+	lstFile = loader_dat.getFile(master_dat_file,master_dat["fileEntries"]["art/scenery/scenery.lst"])	
 	loadData["art/scenery/scenery.lst"] = []
 	for line in lstFile:
-		loadData["art/scenery/scenery.lst"].append(line.strip().lower())
+		loadData["art/scenery/scenery.lst"].append(line.decode("utf-8").strip().lower())
 
-	lstFile = open("".join([urlprefix,"art/misc/misc.lst"]),"r")
+	lstFile = loader_dat.getFile(master_dat_file,master_dat["fileEntries"]["art/misc/misc.lst"])	
 	loadData["art/misc/misc.lst"] = []
 	for line in lstFile:
-		loadData["art/misc/misc.lst"].append(line.strip().lower())
+		loadData["art/misc/misc.lst"].append(line.decode("utf-8").strip().lower())
 		
-	lstFile = open("".join([urlprefix,"art/critters/critters.lst"]),"r")
+	lstFile = loader_dat.getFile(critter_dat_file,critter_dat["fileEntries"]["art/critters/critters.lst"])	
 	loadData["art/critters/critters.lst"] = []
 	for line in lstFile:
-		line = line.strip().lower()
+		line = line.decode("utf-8").strip().lower()
 		split = line.split(',')
 		
 		if(len(split) > 1):
@@ -190,57 +201,57 @@ def loadGameState(loadVars):
 		
 		loadData["art/critters/critters.lst"].append(critter)
 
-		
-	loadFRM("art/intrface/msef000.frm")		#hex cursors
-	loadFRM("art/intrface/msef003.frm")
+
+	loadFRM(master_dat_file,master_dat,"art/intrface/msef000.frm")		#hex cursors
+	loadFRM(master_dat_file,master_dat,"art/intrface/msef003.frm")
 	
-	loadFRM("art/intrface/screast.frm")		#scroll cursors
-	loadFRM("art/intrface/screx.frm")
-	loadFRM("art/intrface/scrneast.frm")
-	loadFRM("art/intrface/scrnex.frm")
-	loadFRM("art/intrface/scrnorth.frm")
+	loadFRM(master_dat_file,master_dat,"art/intrface/screast.frm")		#scroll cursors
+	loadFRM(master_dat_file,master_dat,"art/intrface/screx.frm")
+	loadFRM(master_dat_file,master_dat,"art/intrface/scrneast.frm")
+	loadFRM(master_dat_file,master_dat,"art/intrface/scrnex.frm")
+	loadFRM(master_dat_file,master_dat,"art/intrface/scrnorth.frm")
 	
-	loadFRM("art/intrface/scrnwest.frm")
-	loadFRM("art/intrface/scrnwx.frm")
-	loadFRM("art/intrface/scrseast.frm")
-	loadFRM("art/intrface/scrnx.frm")
+	loadFRM(master_dat_file,master_dat,"art/intrface/scrnwest.frm")
+	loadFRM(master_dat_file,master_dat,"art/intrface/scrnwx.frm")
+	loadFRM(master_dat_file,master_dat,"art/intrface/scrseast.frm")
+	loadFRM(master_dat_file,master_dat,"art/intrface/scrnx.frm")
 	
-	loadFRM("art/intrface/scrsex.frm")
-	loadFRM("art/intrface/scrsouth.frm")
-	loadFRM("art/intrface/scrswest.frm")
-	loadFRM("art/intrface/scrswx.frm")
+	loadFRM(master_dat_file,master_dat,"art/intrface/scrsex.frm")
+	loadFRM(master_dat_file,master_dat,"art/intrface/scrsouth.frm")
+	loadFRM(master_dat_file,master_dat,"art/intrface/scrswest.frm")
+	loadFRM(master_dat_file,master_dat,"art/intrface/scrswx.frm")
 	
-	loadFRM("art/intrface/scrsx.frm")
-	loadFRM("art/intrface/scrwest.frm")
-	loadFRM("art/intrface/scrwx.frm")
+	loadFRM(master_dat_file,master_dat,"art/intrface/scrsx.frm")
+	loadFRM(master_dat_file,master_dat,"art/intrface/scrwest.frm")
+	loadFRM(master_dat_file,master_dat,"art/intrface/scrwx.frm")
 	
 	
-	loadFRM("art/intrface/actarrow.frm")
+	loadFRM(master_dat_file,master_dat,"art/intrface/actarrow.frm")
 	
-	loadFRM("art/intrface/iface.frm")
-	loadFRM("art/intrface/stdarrow.frm")
+	loadFRM(master_dat_file,master_dat,"art/intrface/iface.frm")
+	loadFRM(master_dat_file,master_dat,"art/intrface/stdarrow.frm")
 
 	
-	loadFRM("art/intrface/usegetn.frm")
-	loadFRM("art/intrface/usegeth.frm")
-	loadFRM("art/intrface/talkn.frm")
-	loadFRM("art/intrface/talkh.frm")
-	loadFRM("art/intrface/skilln.frm")
-	loadFRM("art/intrface/skillh.frm")
-	loadFRM("art/intrface/rotaten.frm")
-	loadFRM("art/intrface/rotateh.frm")
-	loadFRM("art/intrface/pushn.frm")
-	loadFRM("art/intrface/pushh.frm")
-	loadFRM("art/intrface/lookn.frm")
-	loadFRM("art/intrface/lookh.frm")
-	loadFRM("art/intrface/invenn.frm")
-	loadFRM("art/intrface/invenh.frm")
-	loadFRM("art/intrface/canceln.frm")
-	loadFRM("art/intrface/cancelh.frm")
+	loadFRM(master_dat_file,master_dat,"art/intrface/usegetn.frm")
+	loadFRM(master_dat_file,master_dat,"art/intrface/usegeth.frm")
+	loadFRM(master_dat_file,master_dat,"art/intrface/talkn.frm")
+	loadFRM(master_dat_file,master_dat,"art/intrface/talkh.frm")
+	loadFRM(master_dat_file,master_dat,"art/intrface/skilln.frm")
+	loadFRM(master_dat_file,master_dat,"art/intrface/skillh.frm")
+	loadFRM(master_dat_file,master_dat,"art/intrface/rotaten.frm")
+	loadFRM(master_dat_file,master_dat,"art/intrface/rotateh.frm")
+	loadFRM(master_dat_file,master_dat,"art/intrface/pushn.frm")
+	loadFRM(master_dat_file,master_dat,"art/intrface/pushh.frm")
+	loadFRM(master_dat_file,master_dat,"art/intrface/lookn.frm")
+	loadFRM(master_dat_file,master_dat,"art/intrface/lookh.frm")
+	loadFRM(master_dat_file,master_dat,"art/intrface/invenn.frm")
+	loadFRM(master_dat_file,master_dat,"art/intrface/invenh.frm")
+	loadFRM(master_dat_file,master_dat,"art/intrface/canceln.frm")
+	loadFRM(master_dat_file,master_dat,"art/intrface/cancelh.frm")
 		
-	loadFRM("art/intrface/opbase.frm")
-	loadFRM("art/intrface/opbtnoff.frm")
-	loadFRM("art/intrface/opbtnon.frm")
+	loadFRM(master_dat_file,master_dat,"art/intrface/opbase.frm")
+	loadFRM(master_dat_file,master_dat,"art/intrface/opbtnoff.frm")
+	loadFRM(master_dat_file,master_dat,"art/intrface/opbtnon.frm")
 
 		
 	loadCritter("hmjmps")
@@ -266,12 +277,12 @@ def loadGameState(loadVars):
 			index = loadData[mapIndex]['tileInfo'][e]['floorTiles'][i]
 			filename = "".join(["art/tiles/", loadData['art/tiles/tiles.lst'][index] ]).lower()
 		
-			loadFRM(filename)
+			loadFRM(master_dat_file,master_dat,filename)
 
 			index = loadData[mapIndex]['tileInfo'][e]['roofTiles'][i]
 			filename = "".join(["art/tiles/", loadData['art/tiles/tiles.lst'][index] ]).lower()
 		
-			loadFRM(filename)
+			loadFRM(master_dat_file,master_dat,filename)
 	
 
 		for i in range(len(loadData[mapIndex]['objectInfo'][e])):
@@ -283,7 +294,7 @@ def loadGameState(loadVars):
 			else:	
 				lstname = "".join(["art/",filetype,"/",filetype,".lst"])
 				filename = "".join(["art/",filetype,"/", loadData[lstname][index] ]).lower()
-				loadFRM(filename)
+				loadFRM(master_dat_file,master_dat,filename)
 			
 			for k in range(loadData[mapIndex]['objectInfo'][e][i]['inventorySize']):
 				invfiletype = getFiletype(loadData[mapIndex]['objectInfo'][e][i]['inventory'][k]['frmTypeID'])
@@ -294,7 +305,7 @@ def loadGameState(loadVars):
 				else:
 					lstname = "".join(["art/",invfiletype,"/",invfiletype,".lst"])
 					filename = "".join(["art/",invfiletype,"/", loadData[lstname][invindex] ]).lower()
-					loadFRM(filename)
+					loadFRM(master_dat_file,master_dat,filename)
 			
 			
 	return loadData

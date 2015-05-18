@@ -1,9 +1,6 @@
 import struct
 
-def loadPAL(src):
-
-	palFile = open(src,"rb")
-
+def loadPAL(palFile):
 	palInfo = []
 
 	for i in range(256):

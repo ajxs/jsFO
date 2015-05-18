@@ -1,42 +1,50 @@
 import struct
 import loader_pro
+import loader_dat
 import sys
 
-urlprefix = "../data/"
+#urlprefix = "../data/"
+urlprefix = ""
 
-def loadMAP(src):
+def loadMAP(mapIndex):
+
+	master_dat_file = "".join([urlprefix,"master.dat"])
+	master_dat = loader_dat.loadDAT(master_dat_file)
 
 	try:
-		mapFile = open(src,"rb")
+		mapFile = loader_dat.getFile(master_dat_file,master_dat["fileEntries"][mapIndex])
 	except (OSError, IOError):
 		print("MAP file not found")
 		sys.exit(2)	
 
+	mapFile = loader_dat.getFile(master_dat_file,master_dat["fileEntries"][mapIndex])
+	
+		
 	lst_pro = {"items":[], "walls":[], "tiles":[], "scenery":[], "critters":[], "misc":[]}
 
-	lstFile = open("".join([urlprefix,"proto/items/items.lst"]),"r")
+	lstFile = loader_dat.getFile(master_dat_file,master_dat["fileEntries"]["proto/items/items.lst"])
 	for line in lstFile:
-		lst_pro["items"].append(line.strip())
+		lst_pro["items"].append(line.decode("utf-8").strip())
 
-	lstFile = open("".join([urlprefix,"proto/walls/walls.lst"]),"r")
+	lstFile = lstFile = loader_dat.getFile(master_dat_file,master_dat["fileEntries"]["proto/walls/walls.lst"])
 	for line in lstFile:
-		lst_pro["walls"].append(line.strip())
+		lst_pro["walls"].append(line.decode("utf-8").strip())
 
-	lstFile = open("".join([urlprefix,"proto/tiles/tiles.lst"]),"r")
+	lstFile = lstFile = loader_dat.getFile(master_dat_file,master_dat["fileEntries"]["proto/tiles/tiles.lst"])
 	for line in lstFile:
-		lst_pro["tiles"].append(line.strip())
+		lst_pro["tiles"].append(line.decode("utf-8").strip())
 
-	lstFile = open("".join([urlprefix,"proto/scenery/scenery.lst"]),"r")
+	lstFile = lstFile = loader_dat.getFile(master_dat_file,master_dat["fileEntries"]["proto/scenery/scenery.lst"])
 	for line in lstFile:
-		lst_pro["scenery"].append(line.strip())
+		lst_pro["scenery"].append(line.decode("utf-8").strip())
 
-	lstFile = open("".join([urlprefix,"proto/critters/critters.lst"]),"r")
+	lstFile = lstFile = loader_dat.getFile(master_dat_file,master_dat["fileEntries"]["proto/critters/critters.lst"])
 	for line in lstFile:
-		lst_pro["critters"].append(line.strip())
+		lst_pro["critters"].append(line.decode("utf-8").strip())
 
-	lstFile = open("".join([urlprefix,"proto/misc/misc.lst"]),"r")
+	lstFile = lstFile = loader_dat.getFile(master_dat_file,master_dat["fileEntries"]["proto/misc/misc.lst"])
 	for line in lstFile:
-		lst_pro["misc"].append(line.strip())
+		lst_pro["misc"].append(line.decode("utf-8").strip())
 		
 	proCache = {}
 
@@ -183,14 +191,15 @@ def loadMAP(src):
 		else:
 			sys.exit("".join(["unrecognized filetype: ",str(object['objectTypeID'])]))
 
-		filename = "".join([urlprefix,"proto/",filetype,"/",lst_pro[filetype][object['objectID']-1].lower()])	# caching
+		#filename = "".join([urlprefix,"proto/",filetype,"/",lst_pro[filetype][object['objectID']-1].lower()])	# caching
+		filename = "".join(["proto/",filetype,"/",lst_pro[filetype][object['objectID']-1].lower()])	# caching
 		if filename in proCache:
 			proto = proCache[filename]
 		else:
-			proCache[filename] = loader_pro.loadPRO(filename)
+			proCache[filename] = loader_pro.loadPRO(loader_dat.getFile(master_dat_file, master_dat["fileEntries"][filename]) )
 			proto = proCache[filename]
 			
-
+			
 		if('subtypeID' in proto):
 			object['subtypeID'] = proto['subtypeID']
 		
