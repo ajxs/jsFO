@@ -913,38 +913,33 @@ MainState.prototype.update = function() {
 							this.currentRenderObject.anim.shiftX += this.currentRenderImg.frameInfo[this.currentRenderObject.orientation][this.currentRenderObject.anim.frameNumber].offsetX;
 							this.currentRenderObject.anim.shiftY += this.currentRenderImg.frameInfo[this.currentRenderObject.orientation][this.currentRenderObject.anim.frameNumber].offsetY;
 						} else {	// reverse
-							this.currentRenderObject.anim.frameNumber--;
 							this.currentRenderObject.anim.shiftX -= this.currentRenderImg.frameInfo[this.currentRenderObject.orientation][this.currentRenderObject.anim.frameNumber].offsetX;
 							this.currentRenderObject.anim.shiftY -= this.currentRenderImg.frameInfo[this.currentRenderObject.orientation][this.currentRenderObject.anim.frameNumber].offsetY;
+							this.currentRenderObject.anim.frameNumber--;
 						}
 
 						if(this.currentRenderObject.anim.frameNumber == this.currentRenderObject.anim.actionFrame) {	// if action frame
 							if(isFunction(this.currentRenderObject.anim.actionFrameCallback)) {
-								var callback = this.currentRenderObject.anim.actionFrameCallback;	// pop callback
-								this.currentRenderObject.anim.actionFrameCallback = 0;	// function is removed after being called.
+								var callback = this.currentRenderObject.anim.actionFrameCallback;	
+								this.currentRenderObject.anim.actionFrameCallback = 0;	// pop callback
 								callback.call(this.currentRenderObject);
 							}
 						}
 					} else {	// if anim ended
 						if(this.currentRenderObject.anim.animLoop) {
-							this.currentRenderObject.anim.shiftX = this.currentRenderImg.shift[this.currentRenderObject.orientation].x;	// reset shift
-							this.currentRenderObject.anim.shiftY = this.currentRenderImg.shift[this.currentRenderObject.orientation].y;
 							if(this.currentRenderObject.anim.animDirection == 0) {
-								this.currentRenderObject.anim.frameNumber = 0;
+								this.object_setFrame(this.currentRenderObject,0)
 							} else {	// reverse
-								this.currentRenderObject.anim.frameNumber = this.currentRenderImg.nFrames-1;
-								/* for(var f = 0; f < this.currentRenderObject.anim.frameNumber; f++) {	// reset shift to final
-									this.currentRenderObject.anim.shiftX += this.currentRenderImg.frameInfo[this.currentRenderObject.orientation][f].offsetX;
-									this.currentRenderObject.anim.shiftY += this.currentRenderImg.frameInfo[this.currentRenderObject.orientation][f].offsetY;
-								} */
+								this.object_setFrame(this.currentRenderObject,-1)
 							}
+
 						} else {
 							this.currentRenderObject.anim.animActive = false;
 						}
 
 						if(isFunction(this.currentRenderObject.anim.animEndCallback)) {		// end anim callback
 							var callback = this.currentRenderObject.anim.animEndCallback;	// pop callback
-							this.currentRenderObject.anim.animEndCallback = 0;	// function is removed after being called.
+							this.currentRenderObject.anim.animEndCallback = 0;
 							callback.call(this.currentRenderObject);
 						}
 

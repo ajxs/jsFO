@@ -93,7 +93,7 @@ MainState.prototype.createMapObject = function(source) {
 
 	newObject.anim.frameNumber = source.frameNumber;
 
-	this.object_setAnim(newObject,"idle");
+	this.object_setAnim(newObject,"idle",newObject.anim.frameNumber);
 
 	return newObject;
 
@@ -109,7 +109,6 @@ MainState.prototype.object_playAnim = function(obj, newAnim, frame, actionFrame,
 	}
 	if(!loop) loop = false;
 	
-	//console.log("Setting frame: " + frame);
 	this.object_setAnim(obj, newAnim, frame, dir, loop, true);
 
 	obj.anim.actionFrame = actionFrame;
@@ -137,9 +136,7 @@ MainState.prototype.object_setAnim = function(obj, newAnim, frame, dir, loop, ac
 	if(!newAnim) newAnim = "idle";
 	if(!loop) loop = false;
 	if(!active) active = false;
-	
-	
-	//console.log("Setting frame --: " + frame);
+
 	obj.anim.currentAnim = newAnim;
 	obj.anim.animActive = active;
 	obj.anim.animLoop = loop;
@@ -148,6 +145,8 @@ MainState.prototype.object_setAnim = function(obj, newAnim, frame, dir, loop, ac
 	
 	obj.anim.img = this.generateFRMstring(obj);	
 	this.object_setFrame(obj,frame);	// reset frame and offset
+		
+	
 	
 };
 
@@ -155,17 +154,16 @@ MainState.prototype.object_setFrame = function(obj,frame) {
 	if(!frame) frame = 0;
 	if(frame == -1) {
 		frame = _assets[obj.anim.img].nFrames-1;	// last frame
+		return;		// bug lies here
 	}
 	
-	
-	//console.log("Setting frame ----: " + frame);
-	obj.anim.frameNumber = frame;
+	obj.anim.frameNumber = frame;	
 	obj.anim.shiftX = _assets[obj.anim.img].shift[obj.orientation].x;
 	obj.anim.shiftY = _assets[obj.anim.img].shift[obj.orientation].y;
 	
-	for(var f = 0; f < frame; f++) {	// set offsets
+	for(var f = 0; f < obj.anim.frameNumber; f++) {	// set offsets
 		obj.anim.shiftX += _assets[obj.anim.img].frameInfo[obj.orientation][f].offsetX;
-		obj.anim.shiftY += _assets[obj.anim.img].frameInfo[obj.orientation][f].offsetY;			
+		obj.anim.shiftY += _assets[obj.anim.img].frameInfo[obj.orientation][f].offsetY;
 	}
 	
 };
