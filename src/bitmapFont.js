@@ -17,15 +17,19 @@ var bitmapFontRenderer = {
 		_font["img_" + _colour].width = _font.img.width;
 		_font["img_" + _colour].height = _font.img.height;
 		
-		_fontContext.globalCompositeOperation = "source-over";
-		_fontContext.fillStyle = _colour;
-		_fontContext.fillRect(0,0,_font["img_" + _colour].width,_font["img_" + _colour].height);
-		
-		if(_font.type == "fon") {	
+		if(_font.type == "fon") {
+			_fontContext.globalCompositeOperation = "source-over";
+			_fontContext.fillStyle = _colour;
+			_fontContext.fillRect(0,0,_font["img_" + _colour].width,_font["img_" + _colour].height);
+			
 			_fontContext.globalCompositeOperation = "destination-in";
 			_fontContext.drawImage(_font.img,0,0);
 
 		} else {
+			_fontContext.globalCompositeOperation = "source-over";
+			_fontContext.fillStyle = _colour;
+			_fontContext.fillRect(0,0,_font["img_" + _colour].width,_font["img_" + _colour].height);			
+			
 			_fontContext.globalCompositeOperation = "destination-in";
 			_fontContext.drawImage(_font.img,0,0);			
 

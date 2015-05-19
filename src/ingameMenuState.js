@@ -23,7 +23,7 @@ IngameMenuState.prototype.init = function() {
 			text: "INFO",
 			textX: 0, textY: 0,
 			action: function() {
-				console.log("Quit to main menu");
+				//console.log("Quit to main menu");
 			},
 			
 		},{		// Quit to Main Menu
@@ -33,7 +33,7 @@ IngameMenuState.prototype.init = function() {
 			text: "HELP",
 			textX: 0, textY: 0,
 			action: function() {
-				console.log("2");
+				//console.log("2");
 			},
 			
 		},{		// Quit to Main Menu
@@ -43,7 +43,7 @@ IngameMenuState.prototype.init = function() {
 			text: "ABOUT",
 			textX: 0, textY: 0,
 			action: function() {
-				console.log("3");
+				//console.log("3");
 			},
 			
 		},{		// Quit to Main Menu
@@ -53,7 +53,7 @@ IngameMenuState.prototype.init = function() {
 			text: "RETURN",
 			textX: 0, textY: 0,
 			action: function() {
-				console.log("4");
+				//console.log("4");
 			},
 			
 		},{		// Quit to Main Menu
@@ -63,59 +63,63 @@ IngameMenuState.prototype.init = function() {
 			text: "QUIT",
 			textX: 0, textY: 0,
 			action: function() {
-				console.log("4");
+				//console.log("4");
 			},
 			
 		}],
 		
 		activeIndex: -1,
-		
-		addElement:function(_uiItem) {
-			this.elements.push(_uiItem);
-		},
-		
-		mouseCheck:function(_x,_y) {
-			for(var i = 0; i < this.elements.length; i++) {
-				if(_x > this.x + this.elements[i].x && _x < this.x + this.elements[i].x + this.elements[i].width) {
-					if(_y > this.y + this.elements[i].y && _y < this.y + this.elements[i].y + this.elements[i].height) return i;
-				}
-			}
-			return -1;	// no element
-		},
 	};
 }
 
 
 IngameMenuState.prototype.input = function(e) {
-	if(e.type == 'keydown') {
-		if(_keyboardStates[27]) {
-			main_ingameMenu_close();
-			return;
-		}
-	}
-	
-	this.menu.activeIndex = this.menu.mouseCheck(_mouse.x,_mouse.y);
-	if(this.menu.activeIndex != -1) {
-		this.menu.elements[this.menu.activeIndex].mouseState = 1;
-	}
-	
-	if(e.type == 'mousedown') {
-		if(this.menu.activeIndex != -1) {
-			this.menu.elements[this.menu.activeIndex].mouseState = 2;
-		}
-	} else if(e.type == 'mouseup') {
-		if(this.menu.activeIndex != -1) {
-			if(isFunction(this.menu.elements[this.menu.activeIndex].action)) {
-				this.menu.elements[this.menu.activeIndex].action();
+	switch(e.type) {
+		case "mousemove":
+			break;
+
+		case "keydown":
+			if(_keyboardStates[27]) {
+				main_ingameMenu_close();
 				return;
 			}
-			this.menu.elements[this.menu.activeIndex].mouseState = 1;
-		}
-	}	
+
+			break;
+
+		case "mousedown":
+			break;
+
+		case "mouseup":
+			if(this.menu.activeIndex != -1) {
+				if(isFunction(this.menu.elements[this.menu.activeIndex].action)) {
+					this.menu.elements[this.menu.activeIndex].action();
+					return;
+				}
+			}
+			break;
+
+		case "click":
+			break;
+
+		case 'contextmenu':	// switch input modes on mouse2
+			break;
+	};
+	
 	
 }
 
-IngameMenuState.prototype.update = function() {}
+IngameMenuState.prototype.update = function() {
+	
+	this.menu.activeIndex = -1;
+	for(var i = 0; i < this.menu.elements.length; i++) {
+		this.menu.elements[i].mouseState = 0;
+		if(intersectTest(_mouse.x,_mouse.y,0,0, this.menu.x + this.menu.elements[i].x, this.menu.y + this.menu.elements[i].y, this.menu.elements[i].width, this.menu.elements[i].height)) {
+			this.menu.activeIndex = i;
+			if(_mouse.c1) this.menu.elements[this.menu.activeIndex].mouseState = 1;
+		}			
+	}
+	
+}
 
 
 IngameMenuState.prototype.render = function() {	
@@ -124,21 +128,13 @@ IngameMenuState.prototype.render = function() {
 	_context.drawImage(_assets["art/intrface/opbase.frm"].frameInfo[0][0].img, this.menu.x, this.menu.y);	// bg
 		
 	for(var i = 0; i < this.menu.elements.length; i++) {
-		switch(this.menu.elements[i].mouseState) {
-			case 0:
-			case 1:
-				_context.drawImage(_assets["art/intrface/opbtnoff.frm"].frameInfo[0][0].img, this.menu.x + this.menu.elements[i].x, this.menu.y + this.menu.elements[i].y);
-				bitmapFontRenderer.renderString(_assets["font3.aaf"], this.menu.elements[i].text ,
-					this.menu.x + this.menu.elements[i].x + this.menu.elements[i].textX,
-					this.menu.y + this.menu.elements[i].y + this.menu.elements[i].textY, "#907824");
-				break;
-			case 2:
-				_context.drawImage(_assets["art/intrface/opbtnon.frm"].frameInfo[0][0].img, this.menu.x + this.menu.elements[i].x, this.menu.y + this.menu.elements[i].y);
-				bitmapFontRenderer.renderString(_assets["font3.aaf"], this.menu.elements[i].text ,
-					this.menu.x + this.menu.elements[i].x + this.menu.elements[i].textX,
-					this.menu.y + this.menu.elements[i].y + this.menu.elements[i].textY, "#806814");
-				break;			
-		}
+		_context.drawImage( (this.menu.elements[i].mouseState == 0) ? _assets["art/intrface/opbtnoff.frm"].frameInfo[0][0].img : _assets["art/intrface/opbtnon.frm"].frameInfo[0][0].img,
+			this.menu.x + this.menu.elements[i].x, this.menu.y + this.menu.elements[i].y);
+			
+		bitmapFontRenderer.renderString(_assets["font3.aaf"], this.menu.elements[i].text ,
+			this.menu.x + this.menu.elements[i].x + this.menu.elements[i].textX,
+			this.menu.y + this.menu.elements[i].y + this.menu.elements[i].textY,
+			(this.menu.elements[i].mouseState == 0) ? "#907824" : "#806814");
 	}
 
 	_context.drawImage(_assets["art/intrface/stdarrow.frm"].frameInfo[0][0].img, _mouse.x, _mouse.y);		// cursor

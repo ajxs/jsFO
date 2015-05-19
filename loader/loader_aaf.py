@@ -20,21 +20,41 @@ def loadAAF(aafFile):
 	pal.append(0)	#0 = transparent
 	pal.append(0)
 	pal.append(0)
+
+	pal.append(30)	#1
+	pal.append(30)
+	pal.append(30)	
 	
-	for i in range(8):
-		col = 120 + min(17 * i,155)
-		pal.append(col)
-		pal.append(col)
-		pal.append(col)
+	pal.append(66)	#2
+	pal.append(66)
+	pal.append(66)	
+	
+	pal.append(116)	#3
+	pal.append(116)
+	pal.append(116)	
 		
-	pal.append(255)
-	pal.append(255)
-	pal.append(255)
+	pal.append(116)	#4
+	pal.append(116)
+	pal.append(116)	
 		
-	for i in range(246):
+	pal.append(169) #5
+	pal.append(169)
+	pal.append(169)
+	
+	pal.append(219) #6
+	pal.append(219)
+	pal.append(219)
+	
+	pal.append(255) #7
+	pal.append(255)
+	pal.append(255)
+	
+	for i in range(247):
 		pal.append(0)
 		pal.append(0)
 		pal.append(0)
+		
+	
 	
 	temp = struct.unpack('>4c', aafFile.read(4))
 	
