@@ -7,8 +7,7 @@ import loader_pal
 import loader_fon
 import loader_aaf
 
-#urlprefix = "../data/"	# use this to point to the directory with the undat'd Fallout2 data
-urlprefix = ""	# use this to point to the directory with the undat'd Fallout2 data
+urlprefix = "../data/"	# use this to point to the directory with the undat'd Fallout2 data
 
 loadData = {}
 		
@@ -107,7 +106,7 @@ def loadGameState(loadVars):
 	
 	
 	mapIndex = "".join( ['maps/', loadVars['map'] ] )
-	loadData[mapIndex] = loader_map.loadMAP("".join([urlprefix,mapIndex]) )
+	loadData[mapIndex] = loader_map.loadMAP(mapIndex)
 	
 	loadData["font0.aaf"] = loader_aaf.loadAAF(loader_dat.getFile(master_dat_file, master_dat["fileEntries"]["font0.aaf"]))	# fonts
 	loadData["font1.aaf"] = loader_aaf.loadAAF(loader_dat.getFile(master_dat_file, master_dat["fileEntries"]["font1.aaf"]))	# fonts

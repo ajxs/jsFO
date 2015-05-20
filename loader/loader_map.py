@@ -3,8 +3,7 @@ import loader_pro
 import loader_dat
 import sys
 
-#urlprefix = "../data/"
-urlprefix = ""
+urlprefix = "../data/"
 
 def loadMAP(mapIndex):
 
@@ -191,7 +190,6 @@ def loadMAP(mapIndex):
 		else:
 			sys.exit("".join(["unrecognized filetype: ",str(object['objectTypeID'])]))
 
-		#filename = "".join([urlprefix,"proto/",filetype,"/",lst_pro[filetype][object['objectID']-1].lower()])	# caching
 		filename = "".join(["proto/",filetype,"/",lst_pro[filetype][object['objectID']-1].lower()])	# caching
 		if filename in proCache:
 			proto = proCache[filename]
@@ -202,11 +200,16 @@ def loadMAP(mapIndex):
 			
 		if('subtypeID' in proto):
 			object['subtypeID'] = proto['subtypeID']
+						
 		
 		object['textID'] = proto['textID']
 		
 		if object['objectTypeID'] == 0:        #items
-			if proto['subtypeID'] == 3:
+			if proto['subtypeID'] == 0:
+				object['armorMaleFID'] = proto['armorMaleFID']
+				object['armorFemaleFID'] = proto['armorFemaleFID']
+			elif proto['subtypeID'] == 3:
+				object['animCode'] = proto['animCode']
 				mapFile.seek(4*2,1)
 			elif (proto['subtypeID'] == 4 or proto['subtypeID'] == 5 or proto['subtypeID'] == 6):
 				mapFile.seek(4,1)

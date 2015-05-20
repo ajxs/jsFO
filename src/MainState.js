@@ -425,12 +425,12 @@ MainState.prototype.generateFRMstring = function(object) {	// generates FRM stri
 
 		var frmBase = _assets["art/critters/critters.lst"][frmID].base;
 
-		if(object.armor) {
-			frmBase = FIDtoFRM(object.armor.armorMaleFID);
+		if(object.armorMaleFID || object.armorFemaleFID) {
+			frmBase = FIDtoFRM(object.armorMaleFID);
 		}
 
-		if(object.leftHand) {	// ?
-			switch(object.leftHand.proto.animCode) {
+		if(object.slot2) {	// ?
+			switch(object.slot2.weaponAnimCode) {
 				case 1: // knife
 					weaponString = "d";
 					break;
@@ -681,6 +681,8 @@ MainState.prototype.contextMenuAction = function(action,target) {		// make sure 
 			var targetItem = mState.mapObjects[mState.player.currentElevation][target];
 			var useAdj = this.mapGeometry.findAdj(targetItem.hexPosition);
 			
+			console.log(targetItem);
+			
 			for(var a = 0; a < 6; a++ ) {
 				if(useAdj[a] == this.player.hexPosition) {	// if player next to item
 					useDest = useAdj[a];
@@ -692,8 +694,6 @@ MainState.prototype.contextMenuAction = function(action,target) {		// make sure 
 					break;
 				}
 			}
-			
-			//console.log("useItem: " + targetItem.hexPosition + " / " +  useDest);
 
 			switch(targetItem.objectType) {
 				case "door":

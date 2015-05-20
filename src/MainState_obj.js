@@ -20,7 +20,13 @@ MainState.prototype.createMapObject = function(source) {
 				newObject = new SpriteObject();
 				
 				switch(source.subtypeID) {			
-					
+					case 0:		//armor
+						newObject.armorMaleFID = source.armorMaleFID;
+						newObject.armorFemaleFID = source.armorFemaleFID;
+						break;
+					case 3:		//weapons
+						newObject.weaponAnimCode = source.animCode;
+						break;
 				}
 				
 				break;
@@ -47,7 +53,10 @@ MainState.prototype.createMapObject = function(source) {
 				break;
 		} 
 		
+		
+		newObject.subtypeID = source.subtypeID;
 	}
+
 
 	newObject.itemFlags = source.itemFlags;
 	newObject.PID = source.PID;
@@ -59,6 +68,7 @@ MainState.prototype.createMapObject = function(source) {
 	newObject.frmID = source.frmID;
 
 	newObject.textID = source.textID;
+
 
 	newObject.inventory = new Array(source.inventorySize);
 	for(var m = 0; m < source.inventorySize; m++) {
@@ -73,11 +83,11 @@ MainState.prototype.createMapObject = function(source) {
 					break;
 				case 3:		// weapon
 					if(newObject.inventory[m].itemFlags & 0x01000000) {	// right hand
-						newObject.rightHand = newObject.inventory[m];
+						newObject.slot1 = newObject.inventory[m];
 					}
 
 					if(newObject.inventory[m].itemFlags & 0x02000000) {	// left hand
-						newObject.leftHand = newObject.inventory[m];
+						newObject.slot2 = newObject.inventory[m];
 					}
 
 					break;
@@ -154,14 +164,13 @@ MainState.prototype.object_setFrame = function(obj,frame) {
 	if(!frame) frame = 0;
 	if(frame == -1) {
 		frame = _assets[obj.anim.img].nFrames-1;	// last frame
-		return;		// bug lies here
 	}
 	
 	obj.anim.frameNumber = frame;	
 	obj.anim.shiftX = _assets[obj.anim.img].shift[obj.orientation].x;
 	obj.anim.shiftY = _assets[obj.anim.img].shift[obj.orientation].y;
 	
-	for(var f = 0; f < obj.anim.frameNumber; f++) {	// set offsets
+	for(var f = 0; f < obj.anim.frameNumber+1; f++) {	// set offsets
 		obj.anim.shiftX += _assets[obj.anim.img].frameInfo[obj.orientation][f].offsetX;
 		obj.anim.shiftY += _assets[obj.anim.img].frameInfo[obj.orientation][f].offsetY;
 	}
