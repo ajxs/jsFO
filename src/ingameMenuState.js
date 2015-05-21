@@ -21,9 +21,9 @@ IngameMenuState.prototype.init = function() {
 			width: 137, height: 34,
 			mouseState: 0,
 			text: "INFO",
-			textX: 0, textY: 0,
+			textX: 51, textY: 8,
 			action: function() {
-				//console.log("Quit to main menu");
+				console.log("info");
 			},
 			
 		},{		// Quit to Main Menu
@@ -31,9 +31,9 @@ IngameMenuState.prototype.init = function() {
 			width: 137, height: 34,
 			mouseState: 0,
 			text: "HELP",
-			textX: 0, textY: 0,
+			textX: 49, textY: 8,
 			action: function() {
-				//console.log("2");
+				console.log("help");
 			},
 			
 		},{		// Quit to Main Menu
@@ -41,9 +41,9 @@ IngameMenuState.prototype.init = function() {
 			width: 137, height: 34,
 			mouseState: 0,
 			text: "ABOUT",
-			textX: 0, textY: 0,
+			textX: 41, textY: 8,
 			action: function() {
-				//console.log("3");
+				console.log("about");
 			},
 			
 		},{		// Quit to Main Menu
@@ -51,9 +51,9 @@ IngameMenuState.prototype.init = function() {
 			width: 137, height: 34,
 			mouseState: 0,
 			text: "RETURN",
-			textX: 0, textY: 0,
+			textX: 36, textY: 8,
 			action: function() {
-				//console.log("4");
+				console.log("return");
 			},
 			
 		},{		// Quit to Main Menu
@@ -61,9 +61,9 @@ IngameMenuState.prototype.init = function() {
 			width: 137, height: 34,
 			mouseState: 0,
 			text: "QUIT",
-			textX: 0, textY: 0,
+			textX: 49, textY: 8,
 			action: function() {
-				//console.log("4");
+				console.log("quit");
 			},
 			
 		}],

@@ -27,15 +27,19 @@ var bitmapFontRenderer = {
 
 		} else {
 			_fontContext.globalCompositeOperation = "source-over";
+			_fontContext.drawImage(_font.img,0,0);			
+			var imgData1 = _fontContext.getImageData(0,0,_font.img.width,_font.img.height);
+			
+			_fontContext.globalCompositeOperation = "source-in";
 			_fontContext.fillStyle = _colour;
-			_fontContext.fillRect(0,0,_font["img_" + _colour].width,_font["img_" + _colour].height);			
+			_fontContext.fillRect(0,0,_font["img_" + _colour].width,_font["img_" + _colour].height);					
+			var imgData2 = _fontContext.getImageData(0,0,_font.img.width,_font.img.height);
 			
-			_fontContext.globalCompositeOperation = "destination-in";
-			_fontContext.drawImage(_font.img,0,0);			
-
-			_fontContext.globalCompositeOperation = "multiply";
-			_fontContext.drawImage(_font.img,0,0);			
+			for(var i=0; i < imgData2.data.length; i+=4) {	// AAF 0-9 values act as alpha blend
+				imgData2.data[i+3] = imgData1.data[i];
+			}
 			
+			_fontContext.putImageData(imgData2,0,0);
 		}
 		
 	},
@@ -46,13 +50,12 @@ var bitmapFontRenderer = {
 		this.rF_baseline = _y + _font.height;
 
 		if(_colour) {
-			if(!_font.hasOwnProperty("img_" + _colour)) {
+			if(!_font.hasOwnProperty("img_" + _colour)) {	// if no colourized img, create one.
 				this.createColourImg(_font, _colour);
 				this.rF_img = _font["img_" + _colour];
 			}
 			this.rF_img = _font["img_" + _colour];
 		} else this.rF_img = _font.img;
-		
 		
 		for(var i = 0; i < this.rF_stringlength; i++) {
 			this.rF_symbolIndex = _string.charCodeAt(i);

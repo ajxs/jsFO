@@ -642,6 +642,7 @@ MainState.prototype.input = function(e) {
 MainState.prototype.contextMenuAction = function(action,target) {		// make sure elevations fixed
 	switch(action) {
 		case "look":
+			if(target == 0) return;		// black false-positive
 			var itemDesc = "";
 			var msgFile = 0;
 			var type = this.getObjectType(this.mapObjects[this.player.currentElevation][target].objectTypeID);
@@ -797,7 +798,7 @@ MainState.prototype.getObjectIndex = function() {
 
 	for(var i=0; i < mapObjectsLength; i++) {
 		this.currentRenderObject = this.mapObjects[this.player.currentElevation][i];
-
+		
 		var c = this.mapGeometry.h2s(this.currentRenderObject.hexPosition,this.player.currentElevation);
 		this.currentRenderImg = _assets[this.currentRenderObject.anim.img].frameInfo[this.currentRenderObject.orientation][this.currentRenderObject.anim.frameNumber];
 
