@@ -7,6 +7,10 @@ import loader_pal
 import loader_fon
 import loader_aaf
 
+import json
+import gzip
+import getopt
+
 urlprefix = "../data/"	# use this to point to the directory with the undat'd Fallout2 data
 
 loadData = {}
@@ -22,6 +26,7 @@ def loadGameState(loadVars):
 	critter_dat = loader_dat.loadDAT(critter_dat_file)
 	
 	color = loader_pal.loadPAL(loader_dat.getFile(master_dat_file, master_dat["fileEntries"]["color.pal"]))
+	
 	
 	def loadFRM(datname, datfile, filename):		#these functions look hideous, I'll fix this one day
 		if(filename not in datfile["fileEntries"]):
@@ -102,60 +107,10 @@ def loadGameState(loadVars):
 			#loadFRM(critter_dat_file,critter_dat,"".join(["art/critters/",frmindex,chr(97 + 7 + r) + "j.frm"]))
 			#loadFRM(critter_dat_file,critter_dat,"".join(["art/critters/",frmindex,chr(97 + 7 + r) + "k.frm"]))
 			#loadFRM(critter_dat_file,critter_dat,"".join(["art/critters/",frmindex,chr(97 + 7 + r) + "l.frm"]))	
-
 	
 	
 	mapIndex = "".join( ['maps/', loadVars['map'] ] )
 	loadData[mapIndex] = loader_map.loadMAP(mapIndex)
-	
-	loadData["font0.aaf"] = loader_aaf.loadAAF(loader_dat.getFile(master_dat_file, master_dat["fileEntries"]["font0.aaf"]))	# fonts
-	loadData["font1.aaf"] = loader_aaf.loadAAF(loader_dat.getFile(master_dat_file, master_dat["fileEntries"]["font1.aaf"]))	# fonts
-	loadData["font2.aaf"] = loader_aaf.loadAAF(loader_dat.getFile(master_dat_file, master_dat["fileEntries"]["font2.aaf"]))	# fonts
-	loadData["font3.aaf"] = loader_aaf.loadAAF(loader_dat.getFile(master_dat_file, master_dat["fileEntries"]["font3.aaf"]))	# fonts
-	loadData["font4.aaf"] = loader_aaf.loadAAF(loader_dat.getFile(master_dat_file, master_dat["fileEntries"]["font4.aaf"]))	# fonts
-
-	
-	loadData["font0.fon"] = loader_fon.loadFON(loader_dat.getFile(master_dat_file, master_dat["fileEntries"]["font0.fon"]))	# fonts
-	loadData["font0.fon"] = loader_fon.loadFON(loader_dat.getFile(master_dat_file, master_dat["fileEntries"]["font1.fon"]))	# fonts
-	loadData["font0.fon"] = loader_fon.loadFON(loader_dat.getFile(master_dat_file, master_dat["fileEntries"]["font2.fon"]))	# fonts
-	loadData["font0.fon"] = loader_fon.loadFON(loader_dat.getFile(master_dat_file, master_dat["fileEntries"]["font3.fon"]))	# fonts
-	loadData["font0.fon"] = loader_fon.loadFON(loader_dat.getFile(master_dat_file, master_dat["fileEntries"]["font5.fon"]))	# fonts
-
-	msgFile = loader_dat.getFile(master_dat_file,master_dat["fileEntries"]["text/english/game/pro_crit.msg"])
-	loadData["text/english/game/pro_crit.msg"] = {}
-	loadData["text/english/game/pro_crit.msg"]["data"] = []
-	for line in msgFile:
-		loadData["text/english/game/pro_crit.msg"]["data"].append(line.decode("utf-8").strip().lower())	
-	
-	msgFile = loader_dat.getFile(master_dat_file,master_dat["fileEntries"]["text/english/game/pro_item.msg"])
-	loadData["text/english/game/pro_item.msg"] = {}
-	loadData["text/english/game/pro_item.msg"]["data"] = []
-	for line in msgFile:
-		loadData["text/english/game/pro_item.msg"]["data"].append(line.decode("utf-8").strip().lower())	
-	
-	msgFile = loader_dat.getFile(master_dat_file,master_dat["fileEntries"]["text/english/game/pro_scen.msg"])
-	loadData["text/english/game/pro_scen.msg"] = {}
-	loadData["text/english/game/pro_scen.msg"]["data"] = []
-	for line in msgFile:
-		loadData["text/english/game/pro_scen.msg"]["data"].append(line.decode("utf-8").strip().lower())	
-
-	msgFile = loader_dat.getFile(master_dat_file,master_dat["fileEntries"]["text/english/game/pro_misc.msg"])
-	loadData["text/english/game/pro_misc.msg"] = {}
-	loadData["text/english/game/pro_misc.msg"]["data"] = []
-	for line in msgFile:
-		loadData["text/english/game/pro_misc.msg"]["data"].append(line.decode("utf-8").strip().lower())	
-
-	msgFile = loader_dat.getFile(master_dat_file,master_dat["fileEntries"]["text/english/game/pro_wall.msg"])
-	loadData["text/english/game/pro_wall.msg"] = {}
-	loadData["text/english/game/pro_wall.msg"]["data"] = []
-	for line in msgFile:
-		loadData["text/english/game/pro_wall.msg"]["data"].append(line.decode("utf-8").strip().lower())	
-
-	msgFile = loader_dat.getFile(master_dat_file,master_dat["fileEntries"]["text/english/game/pro_tile.msg"])
-	loadData["text/english/game/pro_tile.msg"] = {}
-	loadData["text/english/game/pro_tile.msg"]["data"] = []
-	for line in msgFile:
-		loadData["text/english/game/pro_tile.msg"]["data"].append(line.decode("utf-8").strip().lower())	
 
 
 	lstFile = loader_dat.getFile(master_dat_file,master_dat["fileEntries"]["art/items/items.lst"])
@@ -199,61 +154,6 @@ def loadGameState(loadVars):
 			critter = line
 		
 		loadData["art/critters/critters.lst"].append(critter)
-
-
-	loadFRM(master_dat_file,master_dat,"art/intrface/msef000.frm")		#hex cursors
-	loadFRM(master_dat_file,master_dat,"art/intrface/msef003.frm")
-	
-	loadFRM(master_dat_file,master_dat,"art/intrface/screast.frm")		#scroll cursors
-	loadFRM(master_dat_file,master_dat,"art/intrface/screx.frm")
-	loadFRM(master_dat_file,master_dat,"art/intrface/scrneast.frm")
-	loadFRM(master_dat_file,master_dat,"art/intrface/scrnex.frm")
-	loadFRM(master_dat_file,master_dat,"art/intrface/scrnorth.frm")
-	
-	loadFRM(master_dat_file,master_dat,"art/intrface/scrnwest.frm")
-	loadFRM(master_dat_file,master_dat,"art/intrface/scrnwx.frm")
-	loadFRM(master_dat_file,master_dat,"art/intrface/scrseast.frm")
-	loadFRM(master_dat_file,master_dat,"art/intrface/scrnx.frm")
-	
-	loadFRM(master_dat_file,master_dat,"art/intrface/scrsex.frm")
-	loadFRM(master_dat_file,master_dat,"art/intrface/scrsouth.frm")
-	loadFRM(master_dat_file,master_dat,"art/intrface/scrswest.frm")
-	loadFRM(master_dat_file,master_dat,"art/intrface/scrswx.frm")
-	
-	loadFRM(master_dat_file,master_dat,"art/intrface/scrsx.frm")
-	loadFRM(master_dat_file,master_dat,"art/intrface/scrwest.frm")
-	loadFRM(master_dat_file,master_dat,"art/intrface/scrwx.frm")
-	
-	
-	loadFRM(master_dat_file,master_dat,"art/intrface/actarrow.frm")
-	
-	loadFRM(master_dat_file,master_dat,"art/intrface/iface.frm")
-	loadFRM(master_dat_file,master_dat,"art/intrface/stdarrow.frm")
-
-	
-	loadFRM(master_dat_file,master_dat,"art/intrface/usegetn.frm")
-	loadFRM(master_dat_file,master_dat,"art/intrface/usegeth.frm")
-	loadFRM(master_dat_file,master_dat,"art/intrface/talkn.frm")
-	loadFRM(master_dat_file,master_dat,"art/intrface/talkh.frm")
-	loadFRM(master_dat_file,master_dat,"art/intrface/skilln.frm")
-	loadFRM(master_dat_file,master_dat,"art/intrface/skillh.frm")
-	loadFRM(master_dat_file,master_dat,"art/intrface/rotaten.frm")
-	loadFRM(master_dat_file,master_dat,"art/intrface/rotateh.frm")
-	loadFRM(master_dat_file,master_dat,"art/intrface/pushn.frm")
-	loadFRM(master_dat_file,master_dat,"art/intrface/pushh.frm")
-	loadFRM(master_dat_file,master_dat,"art/intrface/lookn.frm")
-	loadFRM(master_dat_file,master_dat,"art/intrface/lookh.frm")
-	loadFRM(master_dat_file,master_dat,"art/intrface/invenn.frm")
-	loadFRM(master_dat_file,master_dat,"art/intrface/invenh.frm")
-	loadFRM(master_dat_file,master_dat,"art/intrface/canceln.frm")
-	loadFRM(master_dat_file,master_dat,"art/intrface/cancelh.frm")
-		
-	loadFRM(master_dat_file,master_dat,"art/intrface/opbase.frm")
-	loadFRM(master_dat_file,master_dat,"art/intrface/opbtnoff.frm")
-	loadFRM(master_dat_file,master_dat,"art/intrface/opbtnon.frm")
-
-		
-	loadCritter("hmjmps")
 	
 		
 	def getFiletype(typeID):
@@ -308,3 +208,34 @@ def loadGameState(loadVars):
 			
 			
 	return loadData
+	
+	
+if __name__ == "__main__":
+	loadVars = {}
+	loadVars["map"] = None
+	output = None
+	
+	try:
+		opts, args = getopt.getopt(sys.argv[1:], "mo", ["map=", "output="])
+	except getopt.GetoptError as err:
+		print(err)
+		sys.exit(2)
+	for o, a in opts:	
+		if o in "--map":
+			loadVars["map"] = a
+		elif o in ("--output"):
+			output = a
+	if(loadVars["map"] == None or output == None):
+		print("Insufficient arguments, No map, or no output file provided.\nUsage: --map <mapfile> --output <outfile>")
+		sys.exit(2)
+	
+	outfile = open(output, 'w')
+	
+	loadData = loadGameState(loadVars)
+	response = json.JSONEncoder().encode(loadData)
+	#response = gzip.compress(response.encode())
+	outfile.flush()
+	#outfile.buffer.write(response)
+	outfile.write(response)
+
+

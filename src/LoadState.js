@@ -19,9 +19,7 @@ LoadState.prototype.init = function(_saveState) {		// use arguments here to pass
 	
 	if(_debug.remoteLoading) {
 		console.log("LoadState: loading remotely");
-
 		var mainLoader = new XMLHttpRequest();
-		//var loadURL = "http://code.ht/ml/jsf/loader/loader_main.cgi";
 		
 		switch(_saveState.map) {
 			case "geckpwpl.map":
@@ -152,15 +150,5 @@ LoadState.prototype.render = function() {
 	
 	}
 
-	_context.globalAlpha = 1;	
-	
-	/*_context.drawImage(this.loadImage,0,0);
-	
-	_context.fillStyle = "rgb(130,240,170)";	// optional clear
-	
-	var barWidth = 640 * this.loadPercentage;
-	
-	_context.fillRect(192,600,barWidth,64); */
-	
-	
+	_context.globalAlpha = 1;
 }

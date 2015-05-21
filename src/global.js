@@ -35,8 +35,10 @@ var stateQ = [];		// states
 
 var loadState;
 var mainState;
+var mainLoadState;
 var ingameMenuState;
-var menuState;
+var mainMenuState;
+
 
 
 function getTicks() {

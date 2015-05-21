@@ -28,7 +28,9 @@ function main_init() {
 	}
 
 	mainState = new MainState();
-	loadState = new LoadState();	
+	loadState = new LoadState();
+	mainLoadState = new MainLoadState();
+	mainMenuState = new MainMenuState();
 	ingameMenuState = new IngameMenuState();	// init in mainState
 	
 	main_setResolution(640,480);	// set after init states
@@ -36,26 +38,59 @@ function main_init() {
 	callFrame(main_loop);	// init loop	
 	_canvas.focus();
 	
-	main_loadGame(newGame);
+	//main_loadGame(newGame);
+	main_loadMain();
+}
+
+
+function main_loadMain() {
+	stateQ.push(mainLoadState);
+	mainLoadState.init();
+}
+
+function main_menu() {
+	main_ingameMenu_close();
+	
+	var mainLoadState_index = stateQ.indexOf(mainLoadState);
+	if(mainLoadState_index > -1) {	//	remove mainState
+		stateQ.splice(mainLoadState_index,1);			
+	}
+	
+	var loadState_index = stateQ.indexOf(loadState);
+	if(loadState_index > -1) {	//	remove mainState
+		stateQ.splice(loadState_index,1);			
+	}
+	
+	var mainState_index = stateQ.indexOf(mainState);
+	if(mainState_index > -1) {	//	remove mainState
+		stateQ.splice(mainState_index,1);			
+	}
+	
+	stateQ.push(mainMenuState);	
 }
 
 var newGame = {
 	map: "geckpwpl.map",
 	playerStartPos: "default",
 	playerStartOrientation: "default",
-	
+	// player info here
 };
 
 function main_loadGame(_saveState) {
 	main_ingameMenu_close();
 	
+	var mainMenuState_index = stateQ.indexOf(mainMenuState);
+	if(mainMenuState_index > -1) {	//	remove mainState
+		stateQ.splice(mainMenuState_index,1);			
+	}
+	
 	var mainState_index = stateQ.indexOf(mainState);
-	if(mainState_index > 0) {	//	remove mainState
+	if(mainState_index > -1) {	//	remove mainState
 		stateQ.splice(mainState_index,1);			
 	}
 	
 	var loadState_index = stateQ.indexOf(loadState);
-	if(loadState_index > 0) {	//	remove mainState
+	if(loadState_index > -1) {	//	remove mainState
 		stateQ.splice(loadState_index,1);			
 	}
 	
@@ -75,7 +110,7 @@ function main_ingameMenu_close() {
 	if(mainState.statePause) mainState.statePause = false;
 	
 	var ingameMenuState_index = stateQ.indexOf(ingameMenuState);
-	if(ingameMenuState_index > 0) {	//	remove mainState
+	if(ingameMenuState_index > -1) {	//	remove mainState
 		stateQ.splice(ingameMenuState_index,1);
 	}
 };
@@ -155,6 +190,9 @@ function main_setResolution(width,height) {		// realtime resolution change
 	
 	ingameMenuState.menu.x = ((_screenWidth/2)|0) - 82;
 	ingameMenuState.menu.y = ((_screenHeight/2)|0) - 108;
+	
+	mainMenuState.menu.x = (_screenWidth*0.05)|0;
+	mainMenuState.menu.y = (_screenWidth*0.185)|0;
 	
 	mainState.camera.trackToCoords(mainState.mapGeometry.h2s(mainState.player.hexPosition));
 	
