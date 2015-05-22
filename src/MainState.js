@@ -193,9 +193,7 @@ MainState.prototype.camera = {
 
 MainState.prototype.init = function(_saveState) {		// use arguments here to pass saved state data.
 	console.log("MainState: Loading");
-
-	// RESET MAP AND MAPOBJECT VARS
-
+	
 	var loadMap = "maps/" + _saveState.map;
 	this.map.defaultElevation = _assets[loadMap].defaultElevation;		// copy map vars
 	this.map.elevationAt0 = _assets[loadMap].elevationAt0;
@@ -211,10 +209,11 @@ MainState.prototype.init = function(_saveState) {		// use arguments here to pass
 
 	this.map.tileInfo = _assets[loadMap].tileInfo;
 
+	
 
 	console.log("MainState: creating hexGrid");
 
-	this.map.hexMap = new Array(this.map.nElevations);		// init hexmap
+	this.map.hexMap = new Array(this.map.nElevations);		// init/reset hexmap
 	for(var n = 0; n < this.map.nElevations; n++) {
 		this.map.hexMap[n] = new Array(40000);
 		for(var h = 0; h < 40000; h++) {
@@ -236,31 +235,38 @@ MainState.prototype.init = function(_saveState) {		// use arguments here to pass
 		for(var i = 0; i < objectInfoLength; i++) {
 
 			this.mapObjects[n][i] = this.createMapObject(_assets[loadMap].objectInfo[n][i]);
-			this.map.hexMap[n][this.mapObjects[n][i].hexPosition].blocked = true;
-
-			if(this.mapObjects[n][i].hasOwnProperty("itemFlags")) {
-				if(!this.mapObjects[n][i].itemFlags & 0x00000010) {	// if can be walked through
-					this.map.hexMap[n][this.mapObjects[n][i].hexPosition].blocked = false;
-				}
-			}
-
-			if(this.getObjectType(this.mapObjects[n][i].frmTypeID) == "misc" && this.mapObjects[n][i].frmID == 1) {
-				this.map.hexMap[n][this.mapObjects[n][i].hexPosition].scrollBlock = true;
-			}
+			
+			if(this.mapObjects[n][i].itemFlags & 0x00000010) {	// if can be walked through
+				//this.map.hexMap[n][this.mapObjects[n][i].hexPosition].blocked = false;				
+			} else this.map.hexMap[n][this.mapObjects[n][i].hexPosition].blocked = true;
+			
+			switch(this.getObjectType(this.mapObjects[n][i].frmTypeID)) {
+				case "walls":
+					break;
+				case "misc":
+					switch(this.mapObjects[n][i].frmID) {
+						case 1:		// scroll blockers
+							this.map.hexMap[n][this.mapObjects[n][i].hexPosition].scrollBlock = true;
+							break;
+						case 16:	// exit grids
+						case 17:
+						case 18:
+						case 19:
+						case 20:
+						case 21:
+						case 22:
+						case 23:						
+							this.map.hexMap[n][this.mapObjects[n][i].hexPosition].exitGrid = true;
+							break;
+					}				
+					break;
+			};
 		}
 	}
 
 	console.log("MainState: creating player");
 
-	this.player = new Actor();
-
-	this.player.PID = 0;
-	this.player.objectTypeID = 1;
-	this.player.objectID = 0;
-
-	this.player.FID = 16777227;		// hmjmpsaa
-	this.player.frmTypeID = 0;
-	this.player.frmID = 0;
+	this.player = _saveState.player;
 
 	if(_saveState.playerStartPos == "default") this.player.hexPosition = this.map.playerStartPos;
 	else this.player.hexPosition = _saveState.playerStartPos;
@@ -268,120 +274,12 @@ MainState.prototype.init = function(_saveState) {		// use arguments here to pass
 	if(_saveState.playerStartOrientation == "default") this.player.orientation = this.map.playerStartDir;
 	else this.player.orientation = _saveState.playerStartOrientation;
 
-	this.player.currentElevation = this.map.defaultElevation;
-
-	this.player.anim.frameNumber = 0;
+	if(_saveState.playerStartOrientation == "default") this.player.currentElevation = this.map.defaultElevation;
+	else this.player.currentElevation = _saveState.playerStartElevation;
 
 	this.object_setAnim(this.player,"idle");
 
 	this.mapObjects[this.player.currentElevation].push(this.player);
-
-	this.contextMenu = {
-		menuItems: [{
-				img: _assets["art/intrface/usegetn.frm"].frameInfo[0][0].img,
-				hoverImg: _assets["art/intrface/usegeth.frm"].frameInfo[0][0].img,
-				action: "use",
-				active: true,
-			}, {
-				img: _assets["art/intrface/talkn.frm"].frameInfo[0][0].img,
-				hoverImg: _assets["art/intrface/talkh.frm"].frameInfo[0][0].img,
-				action: "talk",
-				active: true,
-			}, {
-				img: _assets["art/intrface/lookn.frm"].frameInfo[0][0].img,
-				hoverImg: _assets["art/intrface/lookh.frm"].frameInfo[0][0].img,
-				action: "look",
-				active: true,
-			}, {
-				img: _assets["art/intrface/pushn.frm"].frameInfo[0][0].img,
-				hoverImg: _assets["art/intrface/pushh.frm"].frameInfo[0][0].img,
-				action: "push",
-				active: false,
-			},  {
-				img: _assets["art/intrface/rotaten.frm"].frameInfo[0][0].img,
-				hoverImg: _assets["art/intrface/rotateh.frm"].frameInfo[0][0].img,
-				action: "rotate",
-				active: false,
-			}, {
-				img: _assets["art/intrface/skilln.frm"].frameInfo[0][0].img,
-				hoverImg: _assets["art/intrface/skillh.frm"].frameInfo[0][0].img,
-				action: "skill",
-				active: true,
-			}, {
-				img: _assets["art/intrface/invenn.frm"].frameInfo[0][0].img,
-				hoverImg: _assets["art/intrface/invenh.frm"].frameInfo[0][0].img,
-				action: "cancel",
-				active: true,
-			}, {
-				img: _assets["art/intrface/canceln.frm"].frameInfo[0][0].img,
-				hoverImg: _assets["art/intrface/cancelh.frm"].frameInfo[0][0].img,
-				action: "cancel",
-				active: true,
-			}],
-
-		x: 0,
-		y: 0,
-		mouseX: 0,
-		mouseY: 0,
-
-		targetItem: 0,
-
-	}
-
-	console.log("MainState: init text assets");
-	_assets["text/english/game/pro_crit.msg"].msg = new Array();		// init textIDs
-	for(var l = 0; l < _assets["text/english/game/pro_crit.msg"].data.length; l++) {
-		var split = _assets["text/english/game/pro_crit.msg"].data[l].split("{");
-		for(var k = 0; k < split.length; k++) split[k] = split[k].replace(/({|})/,"");
-		_assets["text/english/game/pro_crit.msg"].msg[split[1]] = {
-			soundID : split[2], text : split[3],
-		}
-	}
-
-	_assets["text/english/game/pro_item.msg"].msg = new Array();
-	for(var l = 0; l < _assets["text/english/game/pro_item.msg"].data.length; l++) {
-		var split = _assets["text/english/game/pro_item.msg"].data[l].split("{");
-		for(var k = 0; k < split.length; k++) split[k] = split[k].replace(/({|})/,"");
-		_assets["text/english/game/pro_item.msg"].msg[split[1]] = {
-			soundID : split[2], text : split[3],
-		}
-	}
-
-	_assets["text/english/game/pro_wall.msg"].msg = new Array();
-	for(var l = 0; l < _assets["text/english/game/pro_wall.msg"].data.length; l++) {
-		var split = _assets["text/english/game/pro_wall.msg"].data[l].split("{");
-		for(var k = 0; k < split.length; k++) split[k] = split[k].replace(/({|})/,"");
-		_assets["text/english/game/pro_wall.msg"].msg[split[1]] = {
-			soundID : split[2], text : split[3],
-		}
-	}
-
-	_assets["text/english/game/pro_misc.msg"].msg = new Array();
-	for(var l = 0; l < _assets["text/english/game/pro_misc.msg"].data.length; l++) {
-		var split = _assets["text/english/game/pro_misc.msg"].data[l].split("{");
-		for(var k = 0; k < split.length; k++) split[k] = split[k].replace(/({|})/,"");
-		_assets["text/english/game/pro_misc.msg"].msg[split[1]] = {
-			soundID : split[2], text : split[3],
-		}
-	}
-
-	_assets["text/english/game/pro_tile.msg"].msg = new Array();
-	for(var l = 0; l < _assets["text/english/game/pro_tile.msg"].data.length; l++) {
-		var split = _assets["text/english/game/pro_tile.msg"].data[l].split("{");
-		for(var k = 0; k < split.length; k++) split[k] = split[k].replace(/({|})/,"");
-		_assets["text/english/game/pro_tile.msg"].msg[split[1]] = {
-			soundID : split[2], text : split[3],
-		}
-	}
-
-	_assets["text/english/game/pro_scen.msg"].msg = new Array();
-	for(var l = 0; l < _assets["text/english/game/pro_scen.msg"].data.length; l++) {
-		var split = _assets["text/english/game/pro_scen.msg"].data[l].split("{");
-		for(var k = 0; k < split.length; k++) split[k] = split[k].replace(/({|})/,"");
-		_assets["text/english/game/pro_scen.msg"].msg[split[1]] = {
-			soundID : split[2], text : split[3],
-		}
-	}
 
 	console.log("MainState: loading finished");
 
@@ -392,6 +290,24 @@ MainState.prototype.init = function(_saveState) {		// use arguments here to pass
 	return true;
 
 };
+
+MainState.prototype.createSaveState = function(_map,_pos,_elev,_orientation) {
+	var saveState = {}
+	
+	if(!_startPos) _startPos == "default";		// fix this to track '0'
+	if(!_orientation) _startPos == "default";
+	if(!_elev) _elev == "default";
+	
+	saveState.map = "geckpwpl.map",
+	
+	saveState.playerStartPos = _pos,
+	saveState.playerStartOrientation = _orientation,
+	
+	saveState.player = this.player;		// save player
+	
+	return saveState;
+}
+
 
 MainState.prototype.getObjectType = function(_id) {		// returns type from typeID
 	switch(_id) {
@@ -676,13 +592,15 @@ MainState.prototype.contextMenuAction = function(action,target) {		// make sure 
 			break;
 
 		case "use":
+	
 			var mState = this;
 			var useDest = -1;		// find adj hexes
 			var useFunction = 0;
 			var targetItem = mState.mapObjects[mState.player.currentElevation][target];
-			var useAdj = this.mapGeometry.findAdj(targetItem.hexPosition);
 			
 			console.log(targetItem);
+			
+			var useAdj = this.mapGeometry.findAdj(targetItem.hexPosition);
 			
 			for(var a = 0; a < 6; a++ ) {
 				if(useAdj[a] == this.player.hexPosition) {	// if player next to item
@@ -763,7 +681,15 @@ MainState.prototype.scrollCheckIndex = 0;
 
 MainState.prototype.scrollCheckAdj = 0;
 
-MainState.prototype.contextMenu = 0;
+MainState.prototype.contextMenu = {
+	menuItems: [],
+	x: 0,
+	y: 0,
+	mouseX: 0,
+	mouseY: 0,
+
+	targetItem: 0,
+};
 
 
 MainState.prototype.hIndex_time = 0;
@@ -1028,6 +954,13 @@ MainState.prototype.render = function() {
 			_context.drawImage(_assets["art/intrface/msef000.frm"].frameInfo[0][0].img, this.hsIndex.x - this.camera.x, this.hsIndex.y - this.camera.y);
 			this.eggContext.drawImage(_assets["art/intrface/msef000.frm"].frameInfo[0][0].img, this.hsIndex.x - this.camera.x - this.eggBufferRect.x, this.hsIndex.y - this.camera.y - this.eggBufferRect.y);
 		}
+		
+		/* for(var h = 0; h < 40000; h++) {
+			var cx = this.mapGeometry.h2s(h);
+			if(this.map.hexMap[e][h].exitGrid) drawHex(cx.x - this.camera.x,cx.y - this.camera.y, "","#00FF00");
+			if(this.map.hexMap[e][h].blocked) drawHex(cx.x - this.camera.x,cx.y - this.camera.y, "","#FF0000");	
+		} */
+		
 		
 		var mapObjectsLength = this.mapObjects[e].length;
 		for(var i = 0; i < mapObjectsLength; i++) {

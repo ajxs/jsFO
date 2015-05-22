@@ -14,8 +14,10 @@ MainState.prototype.createMapObject = function(source) {
 
 	} else {		// static
 		
-		switch(source.objectTypeID) {
-			case 0: 	// items
+		var newObjectType = this.getObjectType(source.objectTypeID);
+		
+		switch(newObjectType) {
+			case "items": 	// items
 			
 				newObject = new SpriteObject();
 				
@@ -30,7 +32,7 @@ MainState.prototype.createMapObject = function(source) {
 				}
 				
 				break;
-			case 2:		//scenery
+			case "scenery":		//scenery
 				switch(source.subtypeID) {
 					case 0:		// door
 						newObject = new SpriteObject_Door();
@@ -47,13 +49,35 @@ MainState.prototype.createMapObject = function(source) {
 						break;
 				}			
 				break;
+			case "misc":
+				newObject = new SpriteObject();
+					switch(source.frmID) {
+						case 16:	// exit grids
+						case 17:
+						case 18:
+						case 19:
+						case 20:
+						case 21:
+						case 22:
+						case 23:						
+							newObject.exitGrid_map = source.exitMap;
+							newObject.exitGrid_pos = source.exitPosition;
+							newObject.exitGrid_elev = source.exitElevation;
+							newObject.exitGrid_orientation = source.exitOrientation;
+							break;
+						default:
+							break;
+					}				
+				
+				break;
 				
 			default:
 				newObject = new SpriteObject();
 				break;
+				
 		} 
-		
-		
+
+			
 		newObject.subtypeID = source.subtypeID;
 	}
 
@@ -72,8 +96,7 @@ MainState.prototype.createMapObject = function(source) {
 
 	newObject.inventory = new Array(source.inventorySize);
 	for(var m = 0; m < source.inventorySize; m++) {
-		newObject.inventory[m] = this.createMapObject(source.inventory[m]);
-
+		newObject.inventory[m] = this.createMapObject(source.inventory[m]);		
 		if(newObject.inventory[m].objectTypeID == 0) {		// item
 			switch(newObject.inventory[m].subtypeID) {
 				case 0:		// armor
@@ -89,11 +112,10 @@ MainState.prototype.createMapObject = function(source) {
 					if(newObject.inventory[m].itemFlags & 0x02000000) {	// left hand
 						newObject.slot2 = newObject.inventory[m];
 					}
-
 					break;
 				default:
 					break;
-
+					
 			}
 		}
 	}
@@ -266,6 +288,11 @@ MainState.prototype.actor_moveStep = function(actor) {
 
 	actor.anim.actionFrameCallback = moveStep;
 	actor.anim.animEndCallback = moveStep;
+	
+	if(actor == mState.player) {
+		if(mState.map.hexMap[actor.currentElevation][actor.hexPosition].exitGrid) console.log("EXIT");
+	}
+	
 };
 
 MainState.prototype.actor_endMoveState = function(actor) {

@@ -38,7 +38,16 @@ function main_init() {
 	callFrame(main_loop);	// init loop	
 	_canvas.focus();
 	
-	//main_loadGame(newGame);
+	newGame.player = new Actor();
+	newGame.player.PID = 0;
+	newGame.player.objectTypeID = 1;
+	newGame.player.objectID = 0;
+
+	newGame.player.FID = 16777227;		// hmjmpsaa
+	newGame.player.frmTypeID = 0;
+	newGame.player.frmID = 0;	
+
+	
 	main_loadMain();
 }
 
@@ -73,7 +82,10 @@ var newGame = {
 	map: "geckpwpl.map",
 	playerStartPos: "default",
 	playerStartOrientation: "default",
-	// player info here
+	playerStartElevation: "default",
+	
+	player: 0,	// populate this on game init
+	
 };
 
 function main_loadGame(_saveState) {

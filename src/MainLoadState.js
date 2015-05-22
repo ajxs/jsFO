@@ -41,6 +41,104 @@ MainLoadState.prototype.init = function() {		// use arguments here to pass saved
 					_assets[key].img.src = _assets[key].imgdata;
 				}
 			}
+				
+			console.log("MainLoadState: init text assets");
+			_assets["text/english/game/pro_crit.msg"].msg = new Array();		// init textIDs
+			for(var l = 0; l < _assets["text/english/game/pro_crit.msg"].data.length; l++) {
+				var split = _assets["text/english/game/pro_crit.msg"].data[l].split("{");
+				for(var k = 0; k < split.length; k++) split[k] = split[k].replace(/({|})/,"");
+				_assets["text/english/game/pro_crit.msg"].msg[split[1]] = {
+					soundID : split[2], text : split[3],
+				}
+			}
+
+			_assets["text/english/game/pro_item.msg"].msg = new Array();
+			for(var l = 0; l < _assets["text/english/game/pro_item.msg"].data.length; l++) {
+				var split = _assets["text/english/game/pro_item.msg"].data[l].split("{");
+				for(var k = 0; k < split.length; k++) split[k] = split[k].replace(/({|})/,"");
+				_assets["text/english/game/pro_item.msg"].msg[split[1]] = {
+					soundID : split[2], text : split[3],
+				}
+			}
+
+			_assets["text/english/game/pro_wall.msg"].msg = new Array();
+			for(var l = 0; l < _assets["text/english/game/pro_wall.msg"].data.length; l++) {
+				var split = _assets["text/english/game/pro_wall.msg"].data[l].split("{");
+				for(var k = 0; k < split.length; k++) split[k] = split[k].replace(/({|})/,"");
+				_assets["text/english/game/pro_wall.msg"].msg[split[1]] = {
+					soundID : split[2], text : split[3],
+				}
+			}
+
+			_assets["text/english/game/pro_misc.msg"].msg = new Array();
+			for(var l = 0; l < _assets["text/english/game/pro_misc.msg"].data.length; l++) {
+				var split = _assets["text/english/game/pro_misc.msg"].data[l].split("{");
+				for(var k = 0; k < split.length; k++) split[k] = split[k].replace(/({|})/,"");
+				_assets["text/english/game/pro_misc.msg"].msg[split[1]] = {
+					soundID : split[2], text : split[3],
+				}
+			}
+
+			_assets["text/english/game/pro_tile.msg"].msg = new Array();
+			for(var l = 0; l < _assets["text/english/game/pro_tile.msg"].data.length; l++) {
+				var split = _assets["text/english/game/pro_tile.msg"].data[l].split("{");
+				for(var k = 0; k < split.length; k++) split[k] = split[k].replace(/({|})/,"");
+				_assets["text/english/game/pro_tile.msg"].msg[split[1]] = {
+					soundID : split[2], text : split[3],
+				}
+			}
+
+			_assets["text/english/game/pro_scen.msg"].msg = new Array();
+			for(var l = 0; l < _assets["text/english/game/pro_scen.msg"].data.length; l++) {
+				var split = _assets["text/english/game/pro_scen.msg"].data[l].split("{");
+				for(var k = 0; k < split.length; k++) split[k] = split[k].replace(/({|})/,"");
+				_assets["text/english/game/pro_scen.msg"].msg[split[1]] = {
+					soundID : split[2], text : split[3],
+				}
+			}			
+				
+			console.log("MainLoadState: mainState context menuItems init");
+			mainState.contextMenu.menuItems = [{
+					img: _assets["art/intrface/usegetn.frm"].frameInfo[0][0].img,
+					hoverImg: _assets["art/intrface/usegeth.frm"].frameInfo[0][0].img,
+					action: "use",
+					active: true,
+				}, {
+					img: _assets["art/intrface/talkn.frm"].frameInfo[0][0].img,
+					hoverImg: _assets["art/intrface/talkh.frm"].frameInfo[0][0].img,
+					action: "talk",
+					active: true,
+				}, {
+					img: _assets["art/intrface/lookn.frm"].frameInfo[0][0].img,
+					hoverImg: _assets["art/intrface/lookh.frm"].frameInfo[0][0].img,
+					action: "look",
+					active: true,
+				}, {
+					img: _assets["art/intrface/pushn.frm"].frameInfo[0][0].img,
+					hoverImg: _assets["art/intrface/pushh.frm"].frameInfo[0][0].img,
+					action: "push",
+					active: false,
+				},  {
+					img: _assets["art/intrface/rotaten.frm"].frameInfo[0][0].img,
+					hoverImg: _assets["art/intrface/rotateh.frm"].frameInfo[0][0].img,
+					action: "rotate",
+					active: false,
+				}, {
+					img: _assets["art/intrface/skilln.frm"].frameInfo[0][0].img,
+					hoverImg: _assets["art/intrface/skillh.frm"].frameInfo[0][0].img,
+					action: "skill",
+					active: true,
+				}, {
+					img: _assets["art/intrface/invenn.frm"].frameInfo[0][0].img,
+					hoverImg: _assets["art/intrface/invenh.frm"].frameInfo[0][0].img,
+					action: "cancel",
+					active: true,
+				}, {
+					img: _assets["art/intrface/canceln.frm"].frameInfo[0][0].img,
+					hoverImg: _assets["art/intrface/cancelh.frm"].frameInfo[0][0].img,
+					action: "cancel",
+					active: true,
+				}];
 			
 			console.log("MainLoadState: load complete");
 			main_menu();	// launch main menu
@@ -94,9 +192,6 @@ MainLoadState.prototype.render = function() {
 	
 	_context.drawImage(this.backgroundImage,0,0,1024,768,0,0,_screenWidth,_screenHeight);
 	
-	_context.fillStyle = "#931912";
-	_context.fillRect(barX,barY,fullWidth,72);
-	
 	_context.beginPath();
 	_context.moveTo(barX-6, barY-6);
 	_context.lineTo((barX-6) + fullWidth + 12, barY-6);
@@ -105,10 +200,10 @@ MainLoadState.prototype.render = function() {
 	_context.lineTo(barX-6, barY-6);
 	_context.closePath();
 	_context.lineWidth = 4;
-	_context.strokeStyle = "#f8f49c";	
+	_context.strokeStyle = "#afb1a7";	
 	_context.stroke();
 	
-	_context.fillStyle = "#f8f49c";
+	_context.fillStyle = "#afb1a7";
 	_context.fillRect(barX,barY,barWidth,64);
 
 	_context.globalAlpha = 1;	

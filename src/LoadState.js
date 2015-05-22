@@ -118,7 +118,7 @@ LoadState.prototype.render = function() {
 	_context.drawImage(this.overlay,0,0,1024,768,0,0,_screenWidth,_screenHeight);
 	
 	_context.fillStyle = "rgb(0,10,0)";
-	_context.fillRect(barX,barY,fullWidth,72);
+	_context.fillRect(barX,barY,fullWidth,64);
 	
 	_context.beginPath();
 	_context.moveTo(barX-6, barY-6);
