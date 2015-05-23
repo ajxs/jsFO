@@ -10,12 +10,6 @@ def loadMAP(mapIndex):
 	master_dat_file = "".join([urlprefix,"master.dat"])
 	master_dat = loader_dat.loadDAT(master_dat_file)
 
-	try:
-		mapFile = loader_dat.getFile(master_dat_file,master_dat["fileEntries"][mapIndex])
-	except (OSError, IOError):
-		print("MAP file not found")
-		sys.exit(2)	
-
 	mapFile = loader_dat.getFile(master_dat_file,master_dat["fileEntries"][mapIndex])
 	
 		

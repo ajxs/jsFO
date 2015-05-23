@@ -2,7 +2,7 @@
 
 function LoadState() {
 	GameState.call(this);
-
+	this.overlay = document.getElementById("loadState_overlay");
 }
 
 LoadState.prototype = new GameState();
@@ -13,8 +13,7 @@ LoadState.prototype.overlay = 0;
 LoadState.prototype.loadPercentage = 0;
 
 LoadState.prototype.init = function(_saveState) {		// use arguments here to pass saved state data.
-	
-	this.overlay = document.getElementById("loadState_overlay");
+
 	var LoadStatePtr = this;
 	
 	if(_debug.remoteLoading) {
@@ -24,6 +23,9 @@ LoadState.prototype.init = function(_saveState) {		// use arguments here to pass
 		switch(_saveState.map) {
 			case "geckpwpl.map":
 				var loadURL = "jsfdata/geckpwpl.jsf"
+				break;
+			case "gecksetl.map":
+				var loadURL = "jsfdata/gecksetl.jsf"
 				break;
 			case "city1.map":
 				var loadURL = "jsfdata/city1.jsf"

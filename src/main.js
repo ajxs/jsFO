@@ -79,7 +79,7 @@ function main_menu() {
 }
 
 var newGame = {
-	map: "geckpwpl.map",
+	map: "gecksetl.map",
 	playerStartPos: "default",
 	playerStartOrientation: "default",
 	playerStartElevation: "default",

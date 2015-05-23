@@ -257,6 +257,12 @@ MainState.prototype.init = function(_saveState) {		// use arguments here to pass
 						case 22:
 						case 23:						
 							this.map.hexMap[n][this.mapObjects[n][i].hexPosition].exitGrid = true;
+							
+							this.map.hexMap[n][this.mapObjects[n][i].hexPosition].exitGrid_map = this.mapObjects[n][i].exitGrid_map;
+							this.map.hexMap[n][this.mapObjects[n][i].hexPosition].exitGrid_pos = this.mapObjects[n][i].exitGrid_pos;
+							this.map.hexMap[n][this.mapObjects[n][i].hexPosition].exitGrid_elev = this.mapObjects[n][i].exitGrid_elev;
+							this.map.hexMap[n][this.mapObjects[n][i].hexPosition].exitGrid_orientation = this.mapObjects[n][i].exitGrid_orientation;
+							
 							break;
 					}				
 					break;
@@ -274,7 +280,7 @@ MainState.prototype.init = function(_saveState) {		// use arguments here to pass
 	if(_saveState.playerStartOrientation == "default") this.player.orientation = this.map.playerStartDir;
 	else this.player.orientation = _saveState.playerStartOrientation;
 
-	if(_saveState.playerStartOrientation == "default") this.player.currentElevation = this.map.defaultElevation;
+	if(_saveState.playerStartElevation == "default") this.player.currentElevation = this.map.defaultElevation;
 	else this.player.currentElevation = _saveState.playerStartElevation;
 
 	this.object_setAnim(this.player,"idle");
@@ -294,19 +300,29 @@ MainState.prototype.init = function(_saveState) {		// use arguments here to pass
 MainState.prototype.createSaveState = function(_map,_pos,_elev,_orientation) {
 	var saveState = {}
 	
-	if(!_startPos) _startPos == "default";		// fix this to track '0'
-	if(!_orientation) _startPos == "default";
+	if(!_pos) _pos == "default";		// fix this to track '0'
+	if(!_orientation) _orientation == "default";
 	if(!_elev) _elev == "default";
 	
-	saveState.map = "geckpwpl.map",
+	
+	saveState.map = _assets["data/maps.txt"][_map].mapName + ".map";
 	
 	saveState.playerStartPos = _pos,
 	saveState.playerStartOrientation = _orientation,
+	saveState.playerStartElevation = _elev,
 	
 	saveState.player = this.player;		// save player
-	
 	return saveState;
 }
+
+
+MainState.prototype.exitMap = function(_map,_pos,_elev,_orientation) {
+	this.player.ai.moveState = false;		// reset movement vars so player doesn't get stuck in an unfinishable moveState when switching maps
+	this.player.ai.moveDest = 0;
+	this.player.ai.moveNext = 0;
+	
+	main_loadGame(this.createSaveState(_map,_pos,_elev,_orientation))	//function(_map,_pos,_elev,_orientation)
+};
 
 
 MainState.prototype.getObjectType = function(_id) {		// returns type from typeID
@@ -676,7 +692,7 @@ MainState.prototype.console = {
 MainState.prototype.currentRenderObject = 0;
 MainState.prototype.currentRenderImg = 0;
 
-MainState.prototype.scrollDelta = 10;	// scroll handler
+MainState.prototype.scrollDelta = 5;	// scroll handler
 MainState.prototype.scrollCheckIndex = 0;
 
 MainState.prototype.scrollCheckAdj = 0;

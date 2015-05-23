@@ -10,6 +10,7 @@ import loader_frm
 import loader_pal
 import loader_fon
 import loader_aaf
+import loader_txt
 	
 	
 urlprefix = "../data/"	# use this to point to the directory with the undat'd Fallout2 data
@@ -26,6 +27,8 @@ def loadMain():
 	critter_dat = loader_dat.loadDAT(critter_dat_file)
 	
 	color = loader_pal.loadPAL(loader_dat.getFile(master_dat_file, master_dat["fileEntries"]["color.pal"]))
+	
+	loadData["data/maps.txt"] = loader_txt.loadTxt_maps(loader_dat.getFile(master_dat_file,master_dat["fileEntries"]["data/maps.txt"]))
 	
 	def loadFRM(datname, datfile, filename):		#these functions look hideous, I'll fix this one day
 		if(filename not in datfile["fileEntries"]):

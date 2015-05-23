@@ -290,7 +290,12 @@ MainState.prototype.actor_moveStep = function(actor) {
 	actor.anim.animEndCallback = moveStep;
 	
 	if(actor == mState.player) {
-		if(mState.map.hexMap[actor.currentElevation][actor.hexPosition].exitGrid) console.log("EXIT");
+		if(mState.map.hexMap[actor.currentElevation][actor.hexPosition].exitGrid) {		// exit map
+			mState.exitMap(mState.map.hexMap[actor.currentElevation][actor.hexPosition].exitGrid_map,
+				mState.map.hexMap[actor.currentElevation][actor.hexPosition].exitGrid_pos,
+				mState.map.hexMap[actor.currentElevation][actor.hexPosition].exitGrid_elev,
+				mState.map.hexMap[actor.currentElevation][actor.hexPosition].exitGrid_orientation);
+		}
 	}
 	
 };
