@@ -52,7 +52,7 @@ MainState.prototype.mapGeometry = {	// struct for map geometry vars/functions
 	m_width: 100,	// nTiles in row
 	h_width: 200,
 
-	m_elevHeight: 96,
+	m_roofHeight: 96,
 
 	m_origin: {
 		x: 0, y: 0
@@ -67,9 +67,7 @@ MainState.prototype.mapGeometry = {	// struct for map geometry vars/functions
 	},
 
 
-	h2s: function(i,e) {
-		if(!e) e = 0;
-
+	h2s: function(i) {
 		var q = (i%this.h_width)|0;
 		var r = (i/this.h_width)|0;
 
@@ -80,17 +78,17 @@ MainState.prototype.mapGeometry = {	// struct for map geometry vars/functions
 
 		return {
 			x: px + qx,
-			y: py + qy + (e*this.m_elevHeight),
+			y: py + qy,
 		}
 	},
 
-	c2s: function(i,e) {	// maptile index to screen coords
+	c2s: function(i) {	// maptile index to screen coords
 		var tx = 49, ty = -3;
 
 		var tCol = i%this.m_width, tRow = (i/this.m_width)|0;
 		return {
 			x: this.m_origin.x - tx - (tCol*48) + (tRow*32),
-			y: this.m_origin.y + ty + tCol*12 + (tRow*24) - (e*this.m_elevHeight)|0,
+			y: this.m_origin.y + ty + tCol*12 + (tRow*24),
 		}
 	},
 
@@ -135,8 +133,8 @@ MainState.prototype.mapGeometry = {	// struct for map geometry vars/functions
 	},
 
 	hDistance: function(_a,_b) {	// pythagorean distance
-		var ha = this.h2s(_a,0);
-		var hb = this.h2s(_b,0);
+		var ha = this.h2s(_a);
+		var hb = this.h2s(_b);
 
 		var dx = Math.abs(hb.x - ha.x);
 		var dy = Math.abs(hb.y - ha.y);
@@ -181,6 +179,8 @@ MainState.prototype.contextMenuActive = false;
 MainState.prototype.brightmap = 0;
 MainState.prototype.brightmapContext = 0;
 
+MainState.prototype.roofRenderState = 0;
+
 MainState.prototype.camera = {
 	x:0, y: 0,
 
@@ -192,7 +192,7 @@ MainState.prototype.camera = {
 
 
 MainState.prototype.init = function(_saveState) {		// use arguments here to pass saved state data.
-	console.log("MainState: Loading");
+	console.log("MainState: init: " + _saveState.map);
 	
 	var loadMap = "maps/" + _saveState.map;
 	this.map.defaultElevation = _assets[loadMap].defaultElevation;		// copy map vars
@@ -210,9 +210,7 @@ MainState.prototype.init = function(_saveState) {		// use arguments here to pass
 	this.map.tileInfo = _assets[loadMap].tileInfo;
 
 	
-
-	console.log("MainState: creating hexGrid");
-
+	console.log("MainState: init: initializing hexGrid");
 	this.map.hexMap = new Array(this.map.nElevations);		// init/reset hexmap
 	for(var n = 0; n < this.map.nElevations; n++) {
 		this.map.hexMap[n] = new Array(40000);
@@ -225,7 +223,7 @@ MainState.prototype.init = function(_saveState) {		// use arguments here to pass
 		}
 	}
 
-	console.log("MainState: creating mapObjects");
+	console.log("MainState: init: loading mapObjects");
 	this.mapObjects = new Array(this.map.nElevations);		// create / instantiate mapObjects
 	for(var n = 0; n < this.map.nElevations; n++) {
 
@@ -248,6 +246,9 @@ MainState.prototype.init = function(_saveState) {		// use arguments here to pass
 						case 1:		// scroll blockers
 							this.map.hexMap[n][this.mapObjects[n][i].hexPosition].scrollBlock = true;
 							break;
+					}
+
+					switch(this.mapObjects[n][i].objectID) {		// this needs massive fixing, need to figure out what value this is meant to be
 						case 16:	// exit grids
 						case 17:
 						case 18:
@@ -255,7 +256,7 @@ MainState.prototype.init = function(_saveState) {		// use arguments here to pass
 						case 20:
 						case 21:
 						case 22:
-						case 23:						
+						case 23:
 							this.map.hexMap[n][this.mapObjects[n][i].hexPosition].exitGrid = true;
 							
 							this.map.hexMap[n][this.mapObjects[n][i].hexPosition].exitGrid_map = this.mapObjects[n][i].exitGrid_map;
@@ -263,14 +264,15 @@ MainState.prototype.init = function(_saveState) {		// use arguments here to pass
 							this.map.hexMap[n][this.mapObjects[n][i].hexPosition].exitGrid_elev = this.mapObjects[n][i].exitGrid_elev;
 							this.map.hexMap[n][this.mapObjects[n][i].hexPosition].exitGrid_orientation = this.mapObjects[n][i].exitGrid_orientation;
 							
-							break;
-					}				
+							break;						
+					}
+					
 					break;
 			};
 		}
 	}
 
-	console.log("MainState: creating player");
+	console.log("MainState: init: creating player");
 
 	this.player = _saveState.player;
 
@@ -287,11 +289,9 @@ MainState.prototype.init = function(_saveState) {		// use arguments here to pass
 
 	this.mapObjects[this.player.currentElevation].push(this.player);
 
-	console.log("MainState: loading finished");
+	console.log("MainState: init: loading finished");
 
 	this.camera.trackToCoords(this.mapGeometry.h2s(this.player.hexPosition));
-
-	this.console.print("Welcome to jsFO!");
 
 	return true;
 
@@ -317,10 +317,7 @@ MainState.prototype.createSaveState = function(_map,_pos,_elev,_orientation) {
 
 
 MainState.prototype.exitMap = function(_map,_pos,_elev,_orientation) {
-	this.player.ai.moveState = false;		// reset movement vars so player doesn't get stuck in an unfinishable moveState when switching maps
-	this.player.ai.moveDest = 0;
-	this.player.ai.moveNext = 0;
-	
+	this.actor_endMoveState(this.player);	// reset movement vars so player doesn't get stuck in an unfinishable moveState when switching maps
 	main_loadGame(this.createSaveState(_map,_pos,_elev,_orientation))	//function(_map,_pos,_elev,_orientation)
 };
 
@@ -471,7 +468,7 @@ MainState.prototype.findPath = function(start,dest) {
 
 			if(this.path_next < 0 || this.path_next > 40000) continue;	// if out of bounds
 			if(this.path_closedSet.indexOf(this.path_next) != -1) continue;	// if in closedList
-			if(this.map.hexMap[0][this.path_next].blocked) {	// if blocked
+			if(this.map.hexMap[this.player.currentElevation][this.path_next].blocked) {	// if blocked
 				this.path_closedSet.push(this.path_next);
 				continue;
 			}
@@ -732,16 +729,15 @@ MainState.prototype.objectBufferRect = {
 };
 
 MainState.prototype.getObjectIndex = function() {
-	var mapObjectsLength = this.mapObjects[this.player.currentElevation].length;
-
 	this.objectBuffer.width = this.objectBufferRect.width;	// hack clear
 	this.objectBufferRect.x = _mouse.x - this.objectBufferRect.width/2;
 	this.objectBufferRect.y = _mouse.y - this.objectBufferRect.height/2;
 
+	var mapObjectsLength = this.mapObjects[this.player.currentElevation].length;
 	for(var i=0; i < mapObjectsLength; i++) {
 		this.currentRenderObject = this.mapObjects[this.player.currentElevation][i];
 		
-		var c = this.mapGeometry.h2s(this.currentRenderObject.hexPosition,this.player.currentElevation);
+		var c = this.mapGeometry.h2s(this.currentRenderObject.hexPosition);
 		this.currentRenderImg = _assets[this.currentRenderObject.anim.img].frameInfo[this.currentRenderObject.orientation][this.currentRenderObject.anim.frameNumber];
 
 		var destX = (c.x + 16 - ((this.currentRenderImg.width/2)|0)) + this.currentRenderObject.anim.shiftX - this.camera.x;
@@ -792,20 +788,14 @@ MainState.prototype.update = function() {
 
 	this.hsIndex = this.mapGeometry.h2s(this.hIndex);
 
-	var scrollCheck = function(i) {
-		this.scrollCheckAdj = this.mapGeometry.findAdj(i);
-		for(var j = 0; j < 6; j++) {
-			if(this.map.hexMap[0][this.scrollCheckAdj[j]].scrollBlock) return true;	// is blocked
-		}
-		return false;
-	};
-
-	// do scrollcheck
-	this.scrollStates.yNegBlocked = scrollCheck.call(this, this.mapGeometry.s2h( ((_screenWidth/2)|0) + this.camera.x, ((_screenHeight*0.25)|0) + this.camera.y));		// top
-	this.scrollStates.yPosBlocked = scrollCheck.call(this, this.mapGeometry.s2h( ((_screenWidth/2)|0) + this.camera.x, ((_screenHeight*0.75)|0) + this.camera.y));		// bottom
-	this.scrollStates.xNegBlocked = scrollCheck.call(this, this.mapGeometry.s2h( ((_screenWidth*0.25)|0) + this.camera.x, ((_screenHeight/2)|0) + this.camera.y));		// left
-	this.scrollStates.xPosBlocked = scrollCheck.call(this, this.mapGeometry.s2h( ((_screenWidth*0.75)|0) + this.camera.x, ((_screenHeight/2)|0) + this.camera.y));		// right
-
+	this.scrollCheckAdj = this.mapGeometry.findAdj(this.mapGeometry.s2h( 320 + this.camera.x, 190 + this.camera.y));
+	
+	this.scrollStates.xPosBlocked = (this.map.hexMap[this.player.currentElevation][this.scrollCheckAdj[1]].scrollBlock);
+	this.scrollStates.yNegBlocked = (this.map.hexMap[this.player.currentElevation][this.scrollCheckAdj[0]].scrollBlock && this.map.hexMap[this.player.currentElevation][this.scrollCheckAdj[5]].scrollBlock);
+	this.scrollStates.yNegBlocked = (this.map.hexMap[this.player.currentElevation][this.scrollCheckAdj[0]].scrollBlock && this.map.hexMap[this.player.currentElevation][this.scrollCheckAdj[5]].scrollBlock);
+	this.scrollStates.yPosBlocked = (this.map.hexMap[this.player.currentElevation][this.scrollCheckAdj[2]].scrollBlock && this.map.hexMap[this.player.currentElevation][this.scrollCheckAdj[3]].scrollBlock);	
+	this.scrollStates.xNegBlocked = (this.map.hexMap[this.player.currentElevation][this.scrollCheckAdj[4]].scrollBlock);
+	
 	if(_debug.enableKeyboardScroll) {
 		if(_keyboardStates[87]) this.camera.y -= this.scrollDelta;
 		else if(_keyboardStates[83]) this.camera.y += this.scrollDelta;
@@ -829,72 +819,92 @@ MainState.prototype.update = function() {
 
 	var MainStatePtr = this;	// ffs
 
-	for(var e = 0; e < this.map.nElevations; e++) {		// animation
-		var mapObjectsLength = this.mapObjects[e].length;
+	// animation
+	var e = this.player.currentElevation;
+	
+	var mapObjectsLength = this.mapObjects[e].length;
 
-		this.mapObjects[e].sort( function(a, b) {
-			var ret = a.hexPosition - b.hexPosition;
-			if(ret != 0) return ret;
-			else {
-				var hp = MainStatePtr.mapGeometry.h2s(a.hexPosition,e);
-				return (hp.y + a.anim.shiftY) - (hp.y + b.anim.shiftY);
-			}
-		});
+	this.mapObjects[e].sort( function(a, b) {
+		var ret = a.hexPosition - b.hexPosition;
+		if(ret != 0) return ret;
+		else {
+			var hp = MainStatePtr.mapGeometry.h2s(a.hexPosition);
+			return (hp.y + a.anim.shiftY) - (hp.y + b.anim.shiftY);
+		}
+	});
 
-		for(var i=0; i < mapObjectsLength; i++) {	// tasks, framestep
-			this.currentRenderObject = this.mapObjects[e][i];
-			this.currentRenderImg = _assets[this.currentRenderObject.anim.img];
+	for(var i=0; i < mapObjectsLength; i++) {	// tasks, framestep
+		this.currentRenderObject = this.mapObjects[e][i];
+		
+		this.currentRenderImg = _assets[this.currentRenderObject.anim.img];
 
-			if(this.currentRenderObject.anim.animActive) {	// framestep and animation functions
-				this.currentRenderObject.anim.animDelta = (getTicks() - this.currentRenderObject.anim.lastFrameTime);
-				if(this.currentRenderObject.anim.animDelta >= (1000/this.currentRenderImg.fps)) {	// if time to update frame.
+		if(this.currentRenderObject.anim.animActive) {	// framestep and animation functions
+			this.currentRenderObject.anim.animDelta = (getTicks() - this.currentRenderObject.anim.lastFrameTime);
+			if(this.currentRenderObject.anim.animDelta >= (1000/this.currentRenderImg.fps)) {	// if time to update frame.
 
-					var cond = (this.currentRenderObject.anim.animDirection == 0) ? this.currentRenderObject.anim.frameNumber < this.currentRenderImg.nFrames-1 : this.currentRenderObject.anim.frameNumber > 0;
-					if(cond) {	// frame increment
-						if(this.currentRenderObject.anim.animDirection == 0) {
-							this.currentRenderObject.anim.frameNumber++;
-							this.currentRenderObject.anim.shiftX += this.currentRenderImg.frameInfo[this.currentRenderObject.orientation][this.currentRenderObject.anim.frameNumber].offsetX;
-							this.currentRenderObject.anim.shiftY += this.currentRenderImg.frameInfo[this.currentRenderObject.orientation][this.currentRenderObject.anim.frameNumber].offsetY;
-						} else {	// reverse
-							this.currentRenderObject.anim.shiftX -= this.currentRenderImg.frameInfo[this.currentRenderObject.orientation][this.currentRenderObject.anim.frameNumber].offsetX;
-							this.currentRenderObject.anim.shiftY -= this.currentRenderImg.frameInfo[this.currentRenderObject.orientation][this.currentRenderObject.anim.frameNumber].offsetY;
-							this.currentRenderObject.anim.frameNumber--;
-						}
-
-						if(this.currentRenderObject.anim.frameNumber == this.currentRenderObject.anim.actionFrame) {	// if action frame
-							if(isFunction(this.currentRenderObject.anim.actionFrameCallback)) {
-								var callback = this.currentRenderObject.anim.actionFrameCallback;	
-								this.currentRenderObject.anim.actionFrameCallback = 0;	// pop callback
-								callback.call(this.currentRenderObject);
-							}
-						}
-					} else {	// if anim ended
-						if(this.currentRenderObject.anim.animLoop) {
-							if(this.currentRenderObject.anim.animDirection == 0) {
-								this.object_setFrame(this.currentRenderObject,0)
-							} else {	// reverse
-								this.object_setFrame(this.currentRenderObject,-1)
-							}
-
-						} else {
-							this.currentRenderObject.anim.animActive = false;
-						}
-
-						if(isFunction(this.currentRenderObject.anim.animEndCallback)) {		// end anim callback
-							var callback = this.currentRenderObject.anim.animEndCallback;	// pop callback
-							this.currentRenderObject.anim.animEndCallback = 0;
-							callback.call(this.currentRenderObject);
-						}
-
+				var cond = (this.currentRenderObject.anim.animDirection == 0) ? this.currentRenderObject.anim.frameNumber < this.currentRenderImg.nFrames-1 : this.currentRenderObject.anim.frameNumber > 0;
+				if(cond) {	// frame increment
+					if(this.currentRenderObject.anim.animDirection == 0) {
+						this.currentRenderObject.anim.frameNumber++;
+						this.currentRenderObject.anim.shiftX += this.currentRenderImg.frameInfo[this.currentRenderObject.orientation][this.currentRenderObject.anim.frameNumber].offsetX;
+						this.currentRenderObject.anim.shiftY += this.currentRenderImg.frameInfo[this.currentRenderObject.orientation][this.currentRenderObject.anim.frameNumber].offsetY;
+					} else {	// reverse
+						this.currentRenderObject.anim.shiftX -= this.currentRenderImg.frameInfo[this.currentRenderObject.orientation][this.currentRenderObject.anim.frameNumber].offsetX;
+						this.currentRenderObject.anim.shiftY -= this.currentRenderImg.frameInfo[this.currentRenderObject.orientation][this.currentRenderObject.anim.frameNumber].offsetY;
+						this.currentRenderObject.anim.frameNumber--;
 					}
 
-					this.currentRenderObject.anim.lastFrameTime = getTicks();
+					if(this.currentRenderObject.anim.frameNumber == this.currentRenderObject.anim.actionFrame) {	// if action frame
+						if(isFunction(this.currentRenderObject.anim.actionFrameCallback)) {
+							var callback = this.currentRenderObject.anim.actionFrameCallback;	
+							this.currentRenderObject.anim.actionFrameCallback = 0;	// pop callback
+							callback.call(this.currentRenderObject);
+						}
+					}
+				} else {	// if anim ended
+					if(this.currentRenderObject.anim.animLoop) {
+						if(this.currentRenderObject.anim.animDirection == 0) {
+							this.object_setFrame(this.currentRenderObject,0)
+						} else {	// reverse
+							this.object_setFrame(this.currentRenderObject,-1)
+						}
+
+					} else {
+						this.currentRenderObject.anim.animActive = false;
+					}
+
+					if(isFunction(this.currentRenderObject.anim.animEndCallback)) {		// end anim callback
+						var callback = this.currentRenderObject.anim.animEndCallback;	// pop callback
+						this.currentRenderObject.anim.animEndCallback = 0;
+						callback.call(this.currentRenderObject);
+					}
+
 				}
+
+				this.currentRenderObject.anim.lastFrameTime = getTicks();
 			}
+		}
 
-		}	// end mapobjects loop
-	}	// end elevations loop
+	}	// end mapobjects loop		
 
+	var playerCoords = this.mapGeometry.h2s(this.player.hexPosition);
+	var playerX = playerCoords.x + 16 + this.player.anim.shiftX - this.camera.x;
+	var playerY = (playerCoords.y + 8) + this.player.anim.shiftY- this.camera.y;
+	
+	this.roofRenderState = true;		// check if player is under a roof
+	for(var i = 0; i < 10000; i++) {
+		if(this.map.tileInfo[this.player.currentElevation].roofTiles[i] < 2) continue;
+		var c = this.mapGeometry.c2s(i,this.player.currentElevation);
+		
+		if(intersectTest(c.x - this.camera.x, c.y - this.camera.y - 96,
+			80, 36,
+			playerX - 40, playerY - 40,		// FIX THIS
+			80, 80)) {
+				this.roofRenderState = false;
+				break;
+		}
+	}
+	
 
 	if(this.inputState == "object") {		// 'hover' look
 		if(this.oIndex_state) {
@@ -918,7 +928,7 @@ MainState.prototype.update = function() {
 		}
 	}
 
-}
+};
 
 MainState.prototype.mapLightLevel = 1;
 MainState.prototype.scrollimg = 0;
@@ -942,93 +952,106 @@ MainState.prototype.render = function() {
 
 	this.eggBufferRect.x = playerX - (this.eggBufferRect.width/2)|0;
 	this.eggBufferRect.y = playerY - ((this.eggBufferRect.height/2)|0) - 35;	// fix this
+	
+	var e = this.player.currentElevation;
+	for(var i = 0; i < 10000; i++) {	// floor tiles	/* contemplate changing this system to utilize the hexPosition of the object, and compare it to the hex indexes of the top right and bottom right corners */
+	
+		if(this.map.tileInfo[e].floorTiles[i] < 2) continue;
+			
+		var c = this.mapGeometry.c2s(i);
+		if(!intersectTest(c.x, c.y,		// camera test
+			80, 36,
+			this.camera.x, this.camera.y,
+			_screenWidth, _screenHeight)) continue;				
 
-	for(var e = 0; e < this.map.nElevations; e++) {
-		for(var i = 0; i < 10000; i++) {	// floor tiles
-			var c = this.mapGeometry.c2s(i,e);
-			if(!intersectTest(c.x, c.y,		// camera test
+		_context.drawImage(_assets[ "art/tiles/" + _assets['art/tiles/tiles.lst'][this.map.tileInfo[e].floorTiles[i]] ].frameInfo[0][0].img,
+			c.x - this.camera.x, c.y - this.camera.y);
+
+		if(!intersectTest(c.x - this.camera.x, c.y - this.camera.y,		// camera test
+			80, 36,
+			this.eggBufferRect.x, this.eggBufferRect.y,
+			this.eggBufferRect.width, this.eggBufferRect.height)) continue;
+
+		this.eggContext.globalCompositeOperation = "source-atop";	// EGG
+		this.eggContext.drawImage(_assets[ "art/tiles/" + _assets['art/tiles/tiles.lst'][this.map.tileInfo[e].floorTiles[i]] ].frameInfo[0][0].img,
+			c.x - this.camera.x - this.eggBufferRect.x, c.y - this.camera.y - this.eggBufferRect.y);
+		
+	}
+
+	if(!this.statePause && !this.scrollState && !this.interfaceState && this.inputState == "move") {	// lower hex cursor
+		_context.drawImage(_assets["art/intrface/msef000.frm"].frameInfo[0][0].img, this.hsIndex.x - this.camera.x, this.hsIndex.y - this.camera.y);
+		this.eggContext.drawImage(_assets["art/intrface/msef000.frm"].frameInfo[0][0].img, this.hsIndex.x - this.camera.x - this.eggBufferRect.x, this.hsIndex.y - this.camera.y - this.eggBufferRect.y);
+	}
+
+	
+	var mapObjectsLength = this.mapObjects[e].length;
+	for(var i = 0; i < mapObjectsLength; i++) {
+		
+		this.currentRenderObject = this.mapObjects[e][i];
+		
+		var c = this.mapGeometry.h2s(this.currentRenderObject.hexPosition);
+		this.currentRenderImg = _assets[this.currentRenderObject.anim.img].frameInfo[this.currentRenderObject.orientation][this.currentRenderObject.anim.frameNumber];
+		if(!intersectTest(c.x, c.y,
+			this.currentRenderImg.width, this.currentRenderImg.height,
+			this.camera.x, this.camera.y,
+			_screenWidth, _screenHeight)) continue;
+		
+		var destX = (c.x + 16 - ((this.currentRenderImg.width/2)|0)) + this.currentRenderObject.anim.shiftX - this.camera.x;
+		var destY = (c.y + 8 - this.currentRenderImg.height) + this.currentRenderObject.anim.shiftY- this.camera.y;
+		
+		
+		_context.drawImage(this.currentRenderImg.img, destX, destY);
+
+		var cCol = this.mapObjects[e][i].hexPosition % 100;
+		var pCol = this.player.hexPosition % 100;
+
+		var cRow = (this.mapObjects[e][i].hexPosition / 100)|0;
+		var pRow = (this.player.hexPosition / 100)|0;
+
+		if(!intersectTest(destX, destY,		// test if under eggBufferRect
+			this.currentRenderImg.width, this.currentRenderImg.height,
+			this.eggBufferRect.x, this.eggBufferRect.y,
+			this.eggBufferRect.width, this.eggBufferRect.height)) continue;
+
+
+		this.eggContext.globalCompositeOperation = "source-atop";		// this was moved from inside if(cRow....
+		if(this.getObjectType(this.mapObjects[e][i].frmTypeID) == "walls") {
+			if(cRow < pRow || cCol < pCol  ) {	// conditions for wall transparency
+				this.eggContext.drawImage(this.currentRenderImg.img, destX - this.eggBufferRect.x, destY - this.eggBufferRect.y);
+			}
+		} else {
+			this.eggContext.drawImage(this.currentRenderImg.img, destX - this.eggBufferRect.x, destY - this.eggBufferRect.y);
+		}
+	}	// end mapObject loop
+
+	if(this.roofRenderState) {
+		for(var i = 0; i < 10000; i++) {					
+			if(this.map.tileInfo[e].roofTiles[i] < 2) continue;
+				
+			var c = this.mapGeometry.c2s(i);
+			if(!intersectTest(c.x, c.y,
 				80, 36,
 				this.camera.x, this.camera.y,
 				_screenWidth, _screenHeight)) continue;
+			
+			_context.drawImage(_assets[ "art/tiles/" + _assets['art/tiles/tiles.lst'][this.map.tileInfo[e].roofTiles[i]] ].frameInfo[0][0].img,
+				c.x - this.camera.x, c.y - this.mapGeometry.m_roofHeight - this.camera.y);
 
-			/* contemplate changing this system to utilize the hexPosition of the object, and compare it to the hex indexes of the top right and bottom right corners */
-			if(this.map.tileInfo[e].floorTiles[i] > 1) {
-				var tileName = _assets['art/tiles/tiles.lst'][this.map.tileInfo[e].floorTiles[i]]
-				_context.drawImage(_assets[ "art/tiles/" + tileName ].frameInfo[0][0].img, c.x - this.camera.x, c.y - this.camera.y);
+		}			
+	}
 
-				if(!intersectTest(c.x - this.camera.x, c.y - this.camera.y,		// camera test
-					80, 36,
-					this.eggBufferRect.x, this.eggBufferRect.y,
-					this.eggBufferRect.width, this.eggBufferRect.height)) continue;
-
-				this.eggContext.globalCompositeOperation = "source-atop";	// EGG
-				this.eggContext.drawImage(_assets[ "art/tiles/" + tileName ].frameInfo[0][0].img, c.x - this.camera.x - this.eggBufferRect.x, c.y - this.camera.y - this.eggBufferRect.y);
-			}
-		}
-
-		if(!this.statePause && !this.scrollState && !this.interfaceState && this.inputState == "move") {	// lower hex cursor
-			_context.drawImage(_assets["art/intrface/msef000.frm"].frameInfo[0][0].img, this.hsIndex.x - this.camera.x, this.hsIndex.y - this.camera.y);
-			this.eggContext.drawImage(_assets["art/intrface/msef000.frm"].frameInfo[0][0].img, this.hsIndex.x - this.camera.x - this.eggBufferRect.x, this.hsIndex.y - this.camera.y - this.eggBufferRect.y);
-		}
+	if(_debug.drawSpecialHexes) {		// Hex debug 
+		var centreHex = this.mapGeometry.h2s(this.mapGeometry.s2h( 320 + this.camera.x, 190 + this.camera.y));	// hex debug stuff
+		drawHex(centreHex.x - this.camera.x,centreHex.y - this.camera.y,"","#00FFFF");
 		
-		/* for(var h = 0; h < 40000; h++) {
+		for(var h = 0; h < 40000; h++) {
 			var cx = this.mapGeometry.h2s(h);
 			if(this.map.hexMap[e][h].exitGrid) drawHex(cx.x - this.camera.x,cx.y - this.camera.y, "","#00FF00");
 			if(this.map.hexMap[e][h].blocked) drawHex(cx.x - this.camera.x,cx.y - this.camera.y, "","#FF0000");	
-		} */
+			if(this.map.hexMap[e][h].scrollBlock) drawHex(cx.x - this.camera.x,cx.y - this.camera.y, "","#FFFF00");	
+		}			
+	}
 		
-		
-		var mapObjectsLength = this.mapObjects[e].length;
-		for(var i = 0; i < mapObjectsLength; i++) {
-			
-			this.currentRenderObject = this.mapObjects[e][i];
-			
-			var c = this.mapGeometry.h2s(this.currentRenderObject.hexPosition,e);
-			this.currentRenderImg = _assets[this.currentRenderObject.anim.img].frameInfo[this.currentRenderObject.orientation][this.currentRenderObject.anim.frameNumber];
-			if(!intersectTest(c.x, c.y,
-				this.currentRenderImg.width, this.currentRenderImg.height,
-				this.camera.x, this.camera.y,
-				_screenWidth, _screenHeight)) continue;
-			
-			var destX = (c.x + 16 - ((this.currentRenderImg.width/2)|0)) + this.currentRenderObject.anim.shiftX - this.camera.x;
-			var destY = (c.y + 8 - this.currentRenderImg.height) + this.currentRenderObject.anim.shiftY- this.camera.y;
-			
-			_context.drawImage(this.currentRenderImg.img, destX, destY);
-
-			var cCol = this.mapObjects[e][i].hexPosition % 100;
-			var pCol = this.player.hexPosition % 100;
-
-			var cRow = (this.mapObjects[e][i].hexPosition / 100)|0;
-			var pRow = (this.player.hexPosition / 100)|0;
-
-			if(!intersectTest(destX, destY,		// test if under eggBufferRect
-				this.currentRenderImg.width, this.currentRenderImg.height,
-				this.eggBufferRect.x, this.eggBufferRect.y,
-				this.eggBufferRect.width, this.eggBufferRect.height)) continue;
-
-
-			this.eggContext.globalCompositeOperation = "source-atop";		// this was moved from inside if(cRow....
-			if(this.getObjectType(this.mapObjects[e][i].frmTypeID) == "walls") {
-				if(cRow < pRow || cCol < pCol  ) {	// conditions for wall transparency
-					this.eggContext.drawImage(this.currentRenderImg.img, destX - this.eggBufferRect.x, destY - this.eggBufferRect.y);
-				}
-			} else {
-				this.eggContext.drawImage(this.currentRenderImg.img, destX - this.eggBufferRect.x, destY - this.eggBufferRect.y);
-			}
-		}	// end mapObject loop
-
-		for(var i = 0; i < 10000; i++) {		// change this to target x: 0, y:0
-			var c = this.mapGeometry.c2s(i,e);
-			if(!intersectTest(c.x, c.y,
-				80, 36,
-				this.camera.x, this.camera.y,
-				_screenWidth, _screenHeight)) continue;
-
-			if(this.map.tileInfo[e].roofTiles[i] > 1) _context.drawImage(_assets[ "art/tiles/" + _assets['art/tiles/tiles.lst'][this.map.tileInfo[e].roofTiles[i]] ].frameInfo[0][0].img,
-				c.x - this.camera.x, c.y - 96 - this.camera.y);
-		}
-
-	}	// end elevations loop
 
 	_context.globalCompositeOperation = 'source-over';
 	_context.drawImage(this.eggBuffer,this.eggBufferRect.x,this.eggBufferRect.y);
@@ -1037,8 +1060,8 @@ MainState.prototype.render = function() {
 		this.brightmapContext.fillStyle = "rgb("+((255*this.mapLightLevel)|0)+","+((255*this.mapLightLevel)|0)+","+((255*this.mapLightLevel)|0)+")";
 		this.brightmapContext.fillRect(0,0,_screenWidth,_screenHeight);
 
-		this.brightmapContext.fillStyle = "#FFFFFF";
-		this.brightmapContext.fillRect(this.eggBufferRect.x,this.eggBufferRect.y,200,200);
+		//this.brightmapContext.fillStyle = "#FFFFFF";
+		//this.brightmapContext.fillRect(this.eggBufferRect.x,this.eggBufferRect.y,200,200);
 
 		_context.globalCompositeOperation = "multiply";
 		_context.drawImage(this.brightmap,0,0);

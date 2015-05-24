@@ -1,11 +1,9 @@
 var _canvas;		// global vars
 var _context;
 
-var _brightmap;
-
 var callFrame = browser_getCallFrame();
 
-var _screenWidth = 1024, _screenHeight = 768;
+var _screenWidth = 640, _screenHeight = 480;
 
 var _mouse = {		// struct for mouse info
 	x: 0,	
@@ -18,9 +16,9 @@ var _mouse = {		// struct for mouse info
 var _keyboardStates = [];	// array to hold keycode states
 
 var _debug = {
-	remoteLoading: true,
+	remoteLoading: false,
 	enableKeyboardScroll: true,
-	
+	drawSpecialHexes: false,	
 };
 
 
@@ -64,6 +62,7 @@ function intersectTest(ax,ay,aw,ah, bx,by,bw,bh) {
 
 
 function drawHex(_x,_y,_text,_col) {
+	if(!_col) _col = "#00FF00";
 
 	_context.beginPath();
 	_context.moveTo(_x+16,_y);
@@ -79,9 +78,35 @@ function drawHex(_x,_y,_text,_col) {
 	_context.strokeStyle = _col;		
 	_context.stroke();
 	
-	_context.font="8px Georgia";
-	_context.fillStyle = _col;
-	_context.fillText(_text,_x+4,_y+10);
+	if(_text) {
+		_context.font="8px Georgia";
+		_context.fillStyle = _col;
+		_context.fillText(_text,_x+4,_y+10);			
+	}
+
+}
+
+function drawTile(_x,_y,_text,_col) {
+	if(!_col) _col = "#00FF00";
+
+	_context.beginPath();
+	_context.moveTo(_x,_y+12);
+	_context.lineTo(_x+48,_y);
+	_context.lineTo(_x+80,_y+24);		
+	_context.lineTo(_x+32,_y+36);
+	_context.lineTo(_x,_y+12);
+	
+	_context.closePath();
+	_context.lineWidth = 1;
+	_context.strokeStyle = _col;		
+	_context.stroke();
+	
+	if(_text) {
+		_context.font="8px Georgia";
+		_context.fillStyle = _col;
+		_context.fillText(_text,_x+4,_y+10);			
+	}	
+	
 }
 
 

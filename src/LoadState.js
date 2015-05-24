@@ -13,37 +13,31 @@ LoadState.prototype.overlay = 0;
 LoadState.prototype.loadPercentage = 0;
 
 LoadState.prototype.init = function(_saveState) {		// use arguments here to pass saved state data.
-
 	var LoadStatePtr = this;
+	
+	var mainLoader = new XMLHttpRequest();
 	
 	if(_debug.remoteLoading) {
 		console.log("LoadState: loading remotely");
-		var mainLoader = new XMLHttpRequest();
-		
-		switch(_saveState.map) {
-			case "geckpwpl.map":
-				var loadURL = "jsfdata/geckpwpl.jsf"
-				break;
-			case "gecksetl.map":
-				var loadURL = "jsfdata/gecksetl.jsf"
-				break;
-			case "city1.map":
-				var loadURL = "jsfdata/city1.jsf"
-				break;			
-		};
-		
-		var currentAssets = "";	
-		
+		var loadURL = "";
 		var clientData = "map="+_saveState.map;
 		
-		var transferComplete = function(evt) {
-			console.log("LoadState: download complete");
-			var loadData = JSON.parse(mainLoader.responseText);
-			
-			console.log("LoadState: creating sprites");
-			for(var key in loadData) {
+	} else {	// load locally
+		console.log("LoadState: loading locally");
+		var loadURL = "jsfdata/" + _saveState.map.split(".")[0] + ".jsf";
+		
+	}
+	
+
+	var transferComplete = function(evt) {
+		console.log("LoadState: download complete");
+		var loadData = JSON.parse(mainLoader.responseText);
+		
+		console.log("LoadState: creating sprites");
+		for(var key in loadData) {
+			if(!_assets[key]) {
 				_assets[key] = loadData[key];
-				if(_assets[key].nFrames) { // if frm - build images
+				if(_assets[key].nFrames) { // if asset is FRM - build images
 					var nDir = _assets[key].frameInfo.length;
 					for(var d = 0; d < nDir; d++) {
 						for(var f = 0; f < _assets[key].nFrames; f++) {
@@ -51,55 +45,41 @@ LoadState.prototype.init = function(_saveState) {		// use arguments here to pass
 							_assets[key].frameInfo[d][f].img.src = _assets[key].frameInfo[d][f].imgdata;
 						}
 					}
-				} else if(_assets[key].symbolInfo) {	// fonts
-					_assets[key].img = document.createElement('img');
-					_assets[key].img.src = _assets[key].imgdata;
-				}
-			}			
-			
-			mainState.init(_saveState);
-			stateQ.splice(stateQ.indexOf(LoadState),1);	
-			stateQ.push(mainState);
-			
-			console.log("LoadState: load complete");
-			
-		};
-	
-		var transferFailed = function(evt) {
-			
-			
-			
-		};
-		
-		var updateProgress = function(evt) {
-			if(evt.lengthComputable) {
-				LoadStatePtr.loadPercentage = evt.loaded / evt.total;
-			} else {
-				console.log("LoadState: cannot process load progress");
+				}	// end FRM				
 			}	
-			
-		};
+		}			
+		
+		console.log("LoadState: load complete");
+		LoadStatePtr.gameInit(_saveState);		
+	};
+
+	var transferFailed = function(evt) {};
 	
-		
-		mainLoader.addEventListener("progress", updateProgress, false);
-		mainLoader.addEventListener("load", transferComplete, false);
-		mainLoader.addEventListener("error", transferFailed, false);		
-		
-		mainLoader.open("POST", loadURL, true);
-		
-		mainLoader.setRequestHeader("Content-type", "application/x-www-form-urlencoded");
-		//mainLoader.setRequestHeader('accept-encoding','gzip');
-		mainLoader.overrideMimeType("application/gzip");	
-		mainLoader.send(clientData);
-		
-		console.log("LoadState: loading data from server");		
-		
-	} else {	// load locally
-		
-		
-	}	
+	var updateProgress = function(evt) {
+		if(evt.lengthComputable) {
+			LoadStatePtr.loadPercentage = evt.loaded / evt.total;
+		} else console.log("LoadState: cannot process load progress");
+	};
 	
+	mainLoader.addEventListener("progress", updateProgress, false);
+	mainLoader.addEventListener("load", transferComplete, false);
+	mainLoader.addEventListener("error", transferFailed, false);		
+	
+	mainLoader.open("POST", loadURL, true);
+	
+	mainLoader.setRequestHeader("Content-type", "application/x-www-form-urlencoded");
+	//mainLoader.setRequestHeader('accept-encoding','gzip');
+	mainLoader.overrideMimeType("application/gzip");	
+	mainLoader.send(clientData);
+	
+	console.log("LoadState: request sent");
 }
+
+LoadState.prototype.gameInit = function(_saveState) {
+	mainState.init(_saveState);
+	stateQ.splice(stateQ.indexOf(loadState),1);
+	stateQ.push(mainState);	
+};
 
 
 LoadState.prototype.input = function(e) { }

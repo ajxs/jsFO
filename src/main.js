@@ -49,6 +49,7 @@ function main_init() {
 
 	
 	main_loadMain();
+	mainState.console.print("Welcome to jsFO!");
 }
 
 
@@ -79,7 +80,7 @@ function main_menu() {
 }
 
 var newGame = {
-	map: "gecksetl.map",
+	map: "artemple.map",
 	playerStartPos: "default",
 	playerStartOrientation: "default",
 	playerStartElevation: "default",

@@ -13,10 +13,8 @@ MainState.prototype.createMapObject = function(source) {
 		newObject.armor = 0;
 
 	} else {		// static
-		
-		var newObjectType = this.getObjectType(source.objectTypeID);
-		
-		switch(newObjectType) {
+	
+		switch(this.getObjectType(source.objectTypeID)) {
 			case "items": 	// items
 			
 				newObject = new SpriteObject();
@@ -51,7 +49,7 @@ MainState.prototype.createMapObject = function(source) {
 				break;
 			case "misc":
 				newObject = new SpriteObject();
-					switch(source.frmID) {
+					switch(source.objectID) {
 						case 16:	// exit grids
 						case 17:
 						case 18:
@@ -59,7 +57,7 @@ MainState.prototype.createMapObject = function(source) {
 						case 20:
 						case 21:
 						case 22:
-						case 23:						
+						case 23:
 							newObject.exitGrid_map = source.exitMap;
 							newObject.exitGrid_pos = source.exitPosition;
 							newObject.exitGrid_elev = source.exitElevation;
@@ -192,6 +190,12 @@ MainState.prototype.object_setFrame = function(obj,frame) {
 	obj.anim.shiftX = _assets[obj.anim.img].shift[obj.orientation].x;
 	obj.anim.shiftY = _assets[obj.anim.img].shift[obj.orientation].y;
 	
+	if(!_assets[obj.anim.img].frameInfo[obj.orientation]) {
+		console.log("MainState: object_setFrame: Orientation error");
+		obj.orientation = 0;
+		return;
+	}
+	
 	for(var f = 0; f < obj.anim.frameNumber+1; f++) {	// set offsets
 		obj.anim.shiftX += _assets[obj.anim.img].frameInfo[obj.orientation][f].offsetX;
 		obj.anim.shiftY += _assets[obj.anim.img].frameInfo[obj.orientation][f].offsetY;
@@ -319,8 +323,7 @@ MainState.prototype.object_openDoor = function(obj) {
 	});
 };
 
-MainState.prototype.object_closeDoor = function(obj) {		// BUGGED
-	//MainState.prototype.object_playAnim = function(obj, newAnim, frame, actionFrame, dir, loop, actionCallback, endCallback) {
+MainState.prototype.object_closeDoor = function(obj) {
 	var mState = this;		
 	mState.object_playAnim(obj,0,-1,0,1,false,0,function() {
 		obj.openState = 0;
