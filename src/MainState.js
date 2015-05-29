@@ -40,12 +40,104 @@ MainState.prototype.constructor = MainState;
 
 MainState.prototype.map = 0;
 
+MainState.prototype.openSkilldex = function() {
+	this.skilldexState = true;
+	this.interfaceState = false;
+};
+
+MainState.prototype.closeSkilldex = function() {
+	this.skilldexState = false;	
+};
+
 MainState.prototype.interfaceRect = {
 	x: 0,		// set in main_setResolution
 	y: 0,
 	width: 640,
 	height: 99,
+	activeItem: -1,
+	mouseState: 0,
+	
+	skilldexButton: {
+		x: 523,
+		y: 6,
+		width: 22,
+		height: 21,
+		action: function() {
+			this.openSkilldex();
+		},
+	},
+	
 };
+
+MainState.prototype.skilldexRect = {
+	x: 0,		// set in main_setResolution
+	y: 0,
+	width: 185,
+	height: 368,
+	activeItem: -1,
+	mouseState: 0,
+	
+	closeButton: {
+		x: 48,
+		y: 338,
+		width: 15,
+		height: 16,		
+	},
+	
+	menuItems: [
+		{
+			text: "SNEAK",
+			action: 0,
+			x: 14, y: 44,
+			width: 86, height: 33,
+			textX: 18, textY: 6,
+		}, {
+			text: "LOCKPICK",
+			action: 0,
+			x: 14, y: 80,
+			width: 86, height: 33,
+			textX: 6, textY: 6,
+		}, {
+			text: "STEAL",
+			action: 0,
+			x: 14, y: 116,
+			width: 86, height: 33,
+			textX: 20, textY: 6,
+		}, {
+			text: "TRAPS",
+			action: 0,
+			x: 14, y: 152,
+			width: 86, height: 33,
+			textX: 17, textY: 6,
+		}, {
+			text: "FIRST AID",
+			action: 0,
+			x: 14, y: 188,
+			width: 86, height: 33,
+			textX: 5, textY: 6,
+		}, {
+			text: "DOCTOR",
+			action: 0,
+			x: 14, y: 224,
+			width: 86, height: 33,
+			textX: 11, textY: 6,
+		}, {
+			text: "SCIENCE",
+			action: 0,
+			x: 14, y: 260,
+			width: 86, height: 33,
+			textX: 13, textY: 6,
+		}, {
+			text: "REPAIR",
+			action: 0,
+			x: 14, y: 296,
+			width: 86, height: 33,
+			textX: 13, textY: 6,
+		},	
+	],
+	
+};
+
 
 MainState.prototype.mapGeometry = {	// struct for map geometry vars/functions
 
@@ -83,7 +175,7 @@ MainState.prototype.mapGeometry = {	// struct for map geometry vars/functions
 	},
 
 	c2s: function(i) {	// maptile index to screen coords
-		var tx = 49, ty = -3;
+		var tx = 48, ty = -2;
 
 		var tCol = i%this.m_width, tRow = (i/this.m_width)|0;
 		return {
@@ -172,6 +264,7 @@ MainState.prototype.objectIndex = 0;
 MainState.prototype.inputState = "move";
 MainState.prototype.scrollState = false;
 MainState.prototype.interfaceState = false;
+MainState.prototype.skilldexState = false;
 
 MainState.prototype.objectModeIndex = -1;
 MainState.prototype.contextMenuActive = false;
@@ -491,17 +584,6 @@ MainState.prototype.findPath = function(start,dest) {
 
 
 MainState.prototype.input = function(e) {
-	if(!this.contextMenuActive) {	// prevent losing cursor
-		if(intersectTest(_mouse.x,_mouse.y,0,0, this.interfaceRect.x,this.interfaceRect.y,this.interfaceRect.width,this.interfaceRect.height)) this.interfaceState = true;
-		else this.interfaceState = false;
-
-		this.scrollStates.yNeg = (_mouse.y < (_screenHeight * 0.05));
-		this.scrollStates.yPos = (_mouse.y > (_screenHeight * 0.95));
-		this.scrollStates.xNeg = (_mouse.x < (_screenWidth * 0.05));
-		this.scrollStates.xPos = (_mouse.x > (_screenWidth * 0.95));
-		this.scrollState = (this.scrollStates.yNeg || this.scrollStates.yPos || this.scrollStates.xNeg || this.scrollStates.xPos);
-	}
-
 	switch(e.type) {
 		case "mousemove":
 			break;
@@ -519,7 +601,12 @@ MainState.prototype.input = function(e) {
 
 		case "mousedown":
 			if(this.interfaceState) {
+				this.interfaceRect.mouseState = 1;
 				return;
+			}
+			
+			if(this.skilldexState) {
+				this.skilldexRect.mouseState = 1;
 			}
 
 			if(this.inputState == "object" && _mouse.c1) {
@@ -534,23 +621,61 @@ MainState.prototype.input = function(e) {
 			break;
 
 		case "mouseup":
+			if(this.interfaceState) {
+				this.interfaceRect.mouseState = 0;
+				return;
+			}
+		
+			if(this.skilldexState) {
+				this.skilldexRect.mouseState = 0;
+				return;
+			}
+		
 			if(this.contextMenuActive) {
 				this.contextMenuAction(this.contextMenu.menuItems[this.contextMenu.targetItem].action, this.objectIndex );	// context menu action
+				_mouse.x = this.contextMenu.mouseX;	// reset to previous stored mouse location
+				_mouse.y = this.contextMenu.mouseY;
+
+				this.contextMenuActive = false;
 			}
-
-			_mouse.x = this.contextMenu.mouseX;	// reset to previous stored mouse location
-			_mouse.y = this.contextMenu.mouseY;
-
-			this.contextMenuActive = false;
+			
 			break;
-
 		case "click":
 			//if(this.scrollState) return;
 
 			if(this.interfaceState) {
 				console.log("interface click");
+				switch(this.interfaceRect.activeItem) {
+					case -1: 
+						break;
+					case "skilldexButton":
+						this.openSkilldex.call(this);
+						this.interfaceRect.activeItem = -1;
+						break;
+				}
 				return;
 			}
+			
+			if(this.skilldexState) {
+				console.log("skilldex click");
+				switch(this.skilldexRect.activeItem) {
+					case -1: 
+						break;
+					case 0: 
+						this.skilldexAction("sneak");
+						break;
+					case 1: 
+						this.skilldexAction("lockpick");
+						break;
+					case "closeButton":
+						this.closeSkilldex.call(this);
+						this.interfaceRect.activeItem = -1;
+						break;
+				}				
+				
+				
+				return;
+			}			
 
 			if(this.inputState == "move") {
 				this.actor_beginMoveState(this.player,this.hIndex,this.inputRunState);
@@ -566,6 +691,12 @@ MainState.prototype.input = function(e) {
 			break;
 	};
 
+};
+
+MainState.prototype.skilldexAction = function(action) {
+	this.closeSkilldex.call(this);
+	this.interfaceRect.activeItem = -1;
+	console.log(action);
 };
 
 MainState.prototype.contextMenuAction = function(action,target) {		// make sure elevations fixed
@@ -767,10 +898,59 @@ MainState.prototype.getObjectIndex = function() {
 };
 
 MainState.prototype.update = function() {
+	if(!this.contextMenuActive && !this.skilldexState) {	// prevent losing cursor
+	
+		if(intersectTest(_mouse.x,_mouse.y,0,0, this.interfaceRect.x,this.interfaceRect.y,this.interfaceRect.width,this.interfaceRect.height)) {
+			
+			this.interfaceState = true;	
+			this.interfaceRect.activeItem = -1;
+			// check interface here
+			if(intersectTest(_mouse.x,_mouse.y,0,0,
+				this.interfaceRect.x + this.interfaceRect.skilldexButton.x, this.interfaceRect.y + this.interfaceRect.skilldexButton.y,
+				this.interfaceRect.skilldexButton.width, this.interfaceRect.skilldexButton.height)) {
+					this.interfaceRect.activeItem = "skilldexButton";
+				}
+				
+		} else this.interfaceState = false;
+
+		this.scrollStates.yNeg = (_mouse.y < (_screenHeight * 0.05));
+		this.scrollStates.yPos = (_mouse.y > (_screenHeight * 0.95));
+		this.scrollStates.xNeg = (_mouse.x < (_screenWidth * 0.05));
+		this.scrollStates.xPos = (_mouse.x > (_screenWidth * 0.95));
+		this.scrollState = (this.scrollStates.yNeg || this.scrollStates.yPos || this.scrollStates.xNeg || this.scrollStates.xPos);
+		
+	} else {
+		this.scrollState = false;
+	}	
+
+	
 	if(this.contextMenuActive) {
 		this.contextMenu.targetItem = Math.max(0,Math.min( ((_mouse.y - this.contextMenu.mouseY)/10)|0, this.contextMenu.menuItems.length-1));	// context menu action
 		return;
+	} else if(this.skilldexState) {
+
+		this.skilldexRect.activeItem = -1;	
+		if(intersectTest(_mouse.x,_mouse.y,0,0,
+			this.skilldexRect.x + this.skilldexRect.closeButton.x,
+			this.skilldexRect.y + this.skilldexRect.closeButton.y,
+			this.skilldexRect.closeButton.width,
+			this.skilldexRect.closeButton.height)) {
+				this.skilldexRect.activeItem = "closeButton";
+			}
+
+		for(var i = 0; i < this.skilldexRect.menuItems.length; i++) {
+			if(intersectTest(_mouse.x,_mouse.y,0,0,
+				this.skilldexRect.x + this.skilldexRect.menuItems[i].x,
+				this.skilldexRect.y + this.skilldexRect.menuItems[i].y,
+				this.skilldexRect.menuItems[i].width,
+				this.skilldexRect.menuItems[i].height)) {
+					this.skilldexRect.activeItem = i;
+				}
+		}
+		
+		return;
 	}
+	
 
 	if(this.inputState == "move") {		// get new cursor hex index, and check for blocked path cursor
 		this.hIndex_test = this.mapGeometry.s2h(_mouse.x + this.camera.x, _mouse.y + this.camera.y);
@@ -978,7 +1158,7 @@ MainState.prototype.render = function() {
 		
 	}
 
-	if(!this.statePause && !this.scrollState && !this.interfaceState && this.inputState == "move") {	// lower hex cursor
+	if(!this.statePause && !this.scrollState && !this.interfaceState && !this.skilldexState && this.inputState == "move") {	// lower hex cursor
 		_context.drawImage(_assets["art/intrface/msef000.frm"].frameInfo[0][0].img, this.hsIndex.x - this.camera.x, this.hsIndex.y - this.camera.y);
 		this.eggContext.drawImage(_assets["art/intrface/msef000.frm"].frameInfo[0][0].img, this.hsIndex.x - this.camera.x - this.eggBufferRect.x, this.hsIndex.y - this.camera.y - this.eggBufferRect.y);
 	}
@@ -1050,8 +1230,7 @@ MainState.prototype.render = function() {
 			if(this.map.hexMap[e][h].blocked) drawHex(cx.x - this.camera.x,cx.y - this.camera.y, "","#FF0000");	
 			if(this.map.hexMap[e][h].scrollBlock) drawHex(cx.x - this.camera.x,cx.y - this.camera.y, "","#FFFF00");	
 		}			
-	}
-		
+	}	
 
 	_context.globalCompositeOperation = 'source-over';
 	_context.drawImage(this.eggBuffer,this.eggBufferRect.x,this.eggBufferRect.y);
@@ -1071,7 +1250,56 @@ MainState.prototype.render = function() {
 
 	// interface
 	_context.drawImage(_assets["art/intrface/iface.frm"].frameInfo[0][0].img, this.interfaceRect.x, this.interfaceRect.y);	// interface
+	
+	if(this.interfaceState && this.interfaceRect.mouseState == 1) {
+		switch(this.interfaceRect.activeItem) {
+			case -1:
+				break;
+			case "skilldexButton":
+				_context.drawImage(_assets["art/intrface/bigreddn.frm"].frameInfo[0][0].img,
+					this.interfaceRect.x + this.interfaceRect.skilldexButton.x, this.interfaceRect.y + this.interfaceRect.skilldexButton.y);	// interface
+				break;
+		}		
+	}
+	
+		
+	if(this.skilldexState) {
+		_context.drawImage(_assets["art/intrface/skldxbox.frm"].frameInfo[0][0].img, this.skilldexRect.x, this.skilldexRect.y);	// interface
+		
+		bitmapFontRenderer.renderString(_assets["font3.aaf"], "SKILLDEX" ,
+			this.skilldexRect.x + 55,
+			this.skilldexRect.y + 14,
+			"#907824");
 
+		bitmapFontRenderer.renderString(_assets["font3.aaf"], "CANCEL" ,
+			this.skilldexRect.x + 72,
+			this.skilldexRect.y + 337,
+			(this.skilldexRect.mouseState == 1 && this.skilldexRect.activeItem == "closeButton") ? "#806814" : "#907824");	
+
+		if(this.skilldexRect.mouseState == 1 && this.skilldexRect.activeItem == "closeButton") {
+			_context.drawImage(_assets["art/intrface/lilreddn.frm"].frameInfo[0][0].img,
+				this.skilldexRect.x + this.skilldexRect.closeButton.x,
+				this.skilldexRect.y + this.skilldexRect.closeButton.y);	// interface
+		} else {
+			_context.drawImage(_assets["art/intrface/lilredup.frm"].frameInfo[0][0].img,
+				this.skilldexRect.x + this.skilldexRect.closeButton.x,
+				this.skilldexRect.y + this.skilldexRect.closeButton.y);	// interface			
+			
+		}
+		
+		for(var i = 0; i < this.skilldexRect.menuItems.length; i++) {
+			_context.drawImage(_assets["art/intrface/skldxoff.frm"].frameInfo[0][0].img,
+				this.skilldexRect.x + this.skilldexRect.menuItems[i].x,
+				this.skilldexRect.y + this.skilldexRect.menuItems[i].y);	// interface
+				
+			bitmapFontRenderer.renderString(_assets["font3.aaf"], this.skilldexRect.menuItems[i].text ,
+				this.skilldexRect.x + this.skilldexRect.menuItems[i].x + this.skilldexRect.menuItems[i].textX,
+				this.skilldexRect.y + this.skilldexRect.menuItems[i].y + this.skilldexRect.menuItems[i].textY,
+				(this.skilldexRect.mouseState == 1 && this.skilldexRect.activeItem == i) ? "#806814" : "#907824");			
+		}
+		
+	}
+	
 	// console
 	for(var i = 0; i < 5; i++) {	// iterate backwards through console
 		if(!this.console.consoleData[((this.console.consoleData.length-1) - i)]) break;
@@ -1137,9 +1365,10 @@ MainState.prototype.render = function() {
 		}
 		_context.drawImage(this.scrollimg.frameInfo[0][0].img, _mouse.x, _mouse.y);
 
-	} else {	// if not scrolling
-		if(this.interfaceState) {
+	} else {	// if not scrolling	
+		if(this.interfaceState || this.skilldexState) {
 			_context.drawImage(_assets["art/intrface/stdarrow.frm"].frameInfo[0][0].img, _mouse.x, _mouse.y);
+			return;
 		} else {	// if not in HUD - on map
 			switch(this.inputState) {
 				case "move":

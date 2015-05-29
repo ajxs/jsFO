@@ -197,6 +197,10 @@ function main_setResolution(width,height) {		// realtime resolution change
 	
 	mainState.interfaceRect.x = ((_screenWidth / 2)|0) - 320;
 	mainState.interfaceRect.y = _screenHeight - 99;
+
+	mainState.skilldexRect.x = _screenWidth  - 190;
+	mainState.skilldexRect.y = 5;	
+	
 	
 	mainState.console.x = (((_screenWidth / 2)|0) - 320) + 30;	// recompute coords 
 	mainState.console.y = _screenHeight - 26;

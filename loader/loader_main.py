@@ -216,8 +216,16 @@ def loadMain():
 	
 	loadFRM(master_dat_file,master_dat,"art/intrface/lilredup.frm")
 	loadFRM(master_dat_file,master_dat,"art/intrface/lilreddn.frm")
+	
+	loadFRM(master_dat_file,master_dat,"art/intrface/bigreddn.frm")
+	loadFRM(master_dat_file,master_dat,"art/intrface/bigredup.frm")
+	
 	loadFRM(master_dat_file,master_dat,"art/intrface/menuup.frm")
 	loadFRM(master_dat_file,master_dat,"art/intrface/menudown.frm")
+	
+	loadFRM(master_dat_file,master_dat,"art/intrface/skldxbox.frm")
+	loadFRM(master_dat_file,master_dat,"art/intrface/skldxoff.frm")
+	loadFRM(master_dat_file,master_dat,"art/intrface/skldxon.frm")
 	
 	
 	return loadData

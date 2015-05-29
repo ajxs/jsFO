@@ -6,7 +6,17 @@ function browser_getCallFrame() {
 		window.msRequestAnimationFrame     ||
 		null;
 
-}
+};
+
+var browser_getError = function(msg) {
+	if(window.console) {
+		if(window.console.error) {
+			window.console.error(msg);
+		} else if(window.console.log) {
+			window.console.log(msg);
+		}
+	}
+};
 
 function browser_getInfo() {		// returns user-agent info
 	var ua = navigator.userAgent, tem;
@@ -31,4 +41,4 @@ function browser_getInfo() {		// returns user-agent info
 		name: M[0],
 		version: M[1]
 	};
-}
+};
