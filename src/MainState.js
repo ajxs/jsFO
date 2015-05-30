@@ -40,6 +40,109 @@ MainState.prototype.constructor = MainState;
 
 MainState.prototype.map = 0;
 
+
+MainState.prototype.currentRenderObject = 0;
+MainState.prototype.currentRenderImg = 0;
+
+MainState.prototype.scrollDelta = 5;	// scroll handler
+MainState.prototype.scrollCheckIndex = 0;
+
+MainState.prototype.scrollCheckAdj = 0;
+
+
+MainState.prototype.hIndex_time = 0;
+MainState.prototype.hIndex_test = 0;
+MainState.prototype.hIndex_path = -1;
+
+MainState.prototype.oIndex_time = 0;
+MainState.prototype.oIndex_x = 0;
+MainState.prototype.oIndex_y = 0;
+MainState.prototype.oIndex_state = 0;
+
+MainState.prototype.objectBuffer = 0;
+MainState.prototype.objectBuffer2 = 0;
+MainState.prototype.objectBufferContext = 0;
+MainState.prototype.objectBufferContext2 = 0;
+MainState.prototype.objectBufferData = 0;
+
+MainState.prototype.objectBufferRect = {
+	x: 0,
+	y: 0,
+	width: 100,
+	height: 100,
+
+};
+
+
+MainState.prototype.hIndex = 0;
+MainState.prototype.hsIndex = 0;
+
+MainState.prototype.mse_overlay = 0;
+MainState.prototype.mse_overlay_blocked = 0;
+
+MainState.prototype.mapObjects = 0;
+
+MainState.prototype.player = 0;
+
+MainState.prototype.inputRunState = false;
+
+MainState.prototype.scrollStates = {
+	xPos: false, xNeg: false,
+	yPos: false, yNeg: false,
+
+	xPosBlocked: false, xNegBlocked: false,
+	yPosBlocked: false, yNegBlocked: false,
+
+};
+
+MainState.prototype.objectIndex = 0;
+
+MainState.prototype.inputState = "game";
+MainState.prototype.inputState_sub = "move";
+
+
+MainState.prototype.brightmap = 0;
+MainState.prototype.brightmapContext = 0;
+
+MainState.prototype.roofRenderState = 0;
+
+MainState.prototype.camera = {
+	x:0, y: 0,
+
+	trackToCoords: function(_c) {	// track camera to coordinates.
+		this.x = _c.x - (_screenWidth*0.5)|0;
+		this.y = _c.y - (_screenHeight*0.5)|0;
+	},
+};
+
+
+
+MainState.prototype.path_closedSet = 0;		// findPath vars
+MainState.prototype.path_frontier = 0;
+MainState.prototype.path_cameFrom = 0;
+MainState.prototype.path_g_score = 0;
+MainState.prototype.path_f_score = 0;
+MainState.prototype.path_tg_score = 0;
+MainState.prototype.path_path = 0;
+
+MainState.prototype.path_current = 0;
+MainState.prototype.path_next = 0;
+MainState.prototype.path_adjList = 0;
+
+
+MainState.prototype.mapLightLevel = 1;
+MainState.prototype.scrollimg = 0;
+
+MainState.prototype.transEgg = 0;
+MainState.prototype.eggBuffer = 0;
+MainState.prototype.eggContext = 0;
+MainState.prototype.eggBufferRect = {
+	x: 0, y: 0,
+	width: 129,
+	height: 98,
+};
+
+
 MainState.prototype.interfaceRect = {
 	x: 0,		// set in main_setResolution
 	y: 0,
@@ -55,6 +158,35 @@ MainState.prototype.interfaceRect = {
 		height: 21,
 	},
 	
+	invButton: {
+		x: 211,
+		y: 40,
+		width: 32,
+		height: 21,		
+	}
+	
+};
+
+
+MainState.prototype.console = {
+	consoleData: [],
+	x: -1, y: -1,		// set in main_setResolution()
+
+	fontHeight: 10,
+	fontColor: "rgb(0,255,0)",
+
+	print: function() {	// accepts n arguments, pushes all to console
+		for(var i = 0; i < arguments.length; i++) {
+			var string = "\x95" + arguments[i];
+			var split = string.match(/.{1,22}/g);
+			for(var k = 0; k < split.length; k++) this.consoleData.push(split[k]);
+			
+		}
+	},
+
+	clear: function() {
+		this.consoleData = [];
+	}
 };
 
 MainState.prototype.mapGeometry = {	// struct for map geometry vars/functions
@@ -94,7 +226,6 @@ MainState.prototype.mapGeometry = {	// struct for map geometry vars/functions
 
 	c2s: function(i) {	// maptile index to screen coords
 		var tx = 48, ty = -2;
-
 		var tCol = i%this.m_width, tRow = (i/this.m_width)|0;
 		return {
 			x: this.m_origin.x - tx - (tCol*48) + (tRow*32),
@@ -152,49 +283,6 @@ MainState.prototype.mapGeometry = {	// struct for map geometry vars/functions
 
 	},
 
-};
-
-
-
-MainState.prototype.hIndex = 0;
-MainState.prototype.hsIndex = 0;
-
-MainState.prototype.mse_overlay = 0;
-MainState.prototype.mse_overlay_blocked = 0;
-
-MainState.prototype.mapObjects = 0;
-
-MainState.prototype.player = 0;
-
-MainState.prototype.inputRunState = false;
-
-MainState.prototype.scrollStates = {
-	xPos: false, xNeg: false,
-	yPos: false, yNeg: false,
-
-	xPosBlocked: false, xNegBlocked: false,
-	yPosBlocked: false, yNegBlocked: false,
-
-};
-
-MainState.prototype.objectIndex = 0;
-
-MainState.prototype.inputState = "move";
-MainState.prototype.scrollState = false;
-MainState.prototype.interfaceState = false;
-
-MainState.prototype.brightmap = 0;
-MainState.prototype.brightmapContext = 0;
-
-MainState.prototype.roofRenderState = 0;
-
-MainState.prototype.camera = {
-	x:0, y: 0,
-
-	trackToCoords: function(_c) {	// track camera to coordinates.
-		this.x = _c.x - (_screenWidth*0.5)|0;
-		this.y = _c.y - (_screenHeight*0.5)|0;
-	},
 };
 
 
@@ -311,7 +399,6 @@ MainState.prototype.createSaveState = function(_map,_pos,_elev,_orientation) {
 	if(!_orientation) _orientation == "default";
 	if(!_elev) _elev == "default";
 	
-	
 	saveState.map = _assets["data/maps.txt"][_map].mapName + ".map";
 	
 	saveState.playerStartPos = _pos,
@@ -421,18 +508,6 @@ MainState.prototype.generateFRMstring = function(object) {	// generates FRM stri
 };
 
 
-MainState.prototype.path_closedSet = 0;		// findPath vars
-MainState.prototype.path_frontier = 0;
-MainState.prototype.path_cameFrom = 0;
-MainState.prototype.path_g_score = 0;
-MainState.prototype.path_f_score = 0;
-MainState.prototype.path_tg_score = 0;
-MainState.prototype.path_path = 0;
-
-MainState.prototype.path_current = 0;
-MainState.prototype.path_next = 0;
-MainState.prototype.path_adjList = 0;
-
 MainState.prototype.findPath = function(start,dest) {
 	if(start == dest) return 0;
 
@@ -501,7 +576,6 @@ MainState.prototype.input = function(e) {
 	switch(e.type) {
 		case "mousemove":
 			break;
-
 		case "keydown":
 			if(_keyboardStates[27]) {
 				main_ingameMenu();
@@ -509,37 +583,27 @@ MainState.prototype.input = function(e) {
 			}
 
 			break;
-
 		case "keyup":
 			break;
-
 		case "mousedown":
-			if(this.interfaceState) {
+			if(this.inputState == "interface") {
 				this.interfaceRect.mouseState = 1;
 				return;
+			} else if(this.inputState == "game") {
+				if(this.inputState_sub == "command") {
+					this.objectIndex = this.getObjectIndex();
+					var objC = this.mapGeometry.h2s(this.mapObjects[this.player.currentElevation][this.objectIndex].hexPosition);
+					main_openContextMenu(this.objectIndex, objC.x - this.camera.x + 30, objC.y - this.camera.y - 20);
+				}
 			}
-
-			if(this.inputState == "object" && _mouse.c1) {
-				this.objectIndex = this.getObjectIndex();
-				var objC = this.mapGeometry.h2s(this.mapObjects[this.player.currentElevation][this.objectIndex].hexPosition);
-				main_openContextMenu(this.objectIndex, objC.x - this.camera.x + 30, objC.y - this.camera.y - 20);
-				
-			}
-
 			break;
-
 		case "mouseup":
-			if(this.interfaceState) {
+			if(this.inputState == "interface") {
 				this.interfaceRect.mouseState = 0;
-				return;
 			}
-			
 			break;
 		case "click":
-			//if(this.scrollState) return;
-
-			if(this.interfaceState) {
-				console.log("interface click");
+			if(this.inputState == "interface") {
 				switch(this.interfaceRect.activeItem) {
 					case -1: 
 						break;
@@ -547,21 +611,22 @@ MainState.prototype.input = function(e) {
 						main_openSkilldex();
 						this.interfaceRect.activeItem = -1;
 						break;
+					case "invButton":
+						main_openInventory();
+						this.interfaceRect.activeItem = -1;
+						break;
 				}
-				return;
-			}	
-
-			if(this.inputState == "move") {
-				this.actor_beginMoveState(this.player,this.hIndex,this.inputRunState);
-			} else if(this.inputState == "object") {
-
-
+			} else if(this.inputState == "game") {
+				if(this.inputState_sub == "move") {
+					this.actor_beginMoveState(this.player,this.hIndex,this.inputRunState);
+				}
 			}
 			break;
-
 		case 'contextmenu':	// switch input modes on mouse2
-			if(this.inputState == "move") this.inputState = "object";
-			else if(this.inputState == "object") this.inputState = "move";
+			if(this.inputState == "game") {
+				if(this.inputState_sub == "move") this.inputState_sub = "command";
+				else if(this.inputState_sub == "command") this.inputState_sub = "move";
+			}
 			break;
 	};
 
@@ -664,58 +729,6 @@ MainState.prototype.contextMenuAction = function(action,target) {		// make sure 
 	}
 };
 
-MainState.prototype.console = {
-	consoleData: [],
-	x: -1, y: -1,		// set in main_setResolution()
-
-	fontHeight: 10,
-	fontColor: "rgb(0,255,0)",
-
-	print: function() {	// accepts n arguments, pushes all to console
-		for(var i = 0; i < arguments.length; i++) {
-			var string = "\x95" + arguments[i];
-			var split = string.match(/.{1,22}/g);
-			for(var k = 0; k < split.length; k++) this.consoleData.push(split[k]);
-			
-		}
-	},
-
-	clear: function() {
-		this.consoleData = [];
-	}
-};
-
-MainState.prototype.currentRenderObject = 0;
-MainState.prototype.currentRenderImg = 0;
-
-MainState.prototype.scrollDelta = 5;	// scroll handler
-MainState.prototype.scrollCheckIndex = 0;
-
-MainState.prototype.scrollCheckAdj = 0;
-
-
-MainState.prototype.hIndex_time = 0;
-MainState.prototype.hIndex_test = 0;
-MainState.prototype.hIndex_path = -1;
-
-MainState.prototype.oIndex_time = 0;
-MainState.prototype.oIndex_x = 0;
-MainState.prototype.oIndex_y = 0;
-MainState.prototype.oIndex_state = 0;
-
-MainState.prototype.objectBuffer = 0;
-MainState.prototype.objectBuffer2 = 0;
-MainState.prototype.objectBufferContext = 0;
-MainState.prototype.objectBufferContext2 = 0;
-MainState.prototype.objectBufferData = 0;
-
-MainState.prototype.objectBufferRect = {
-	x: 0,
-	y: 0,
-	width: 100,
-	height: 100,
-
-};
 
 MainState.prototype.getObjectIndex = function() {
 	this.objectBuffer.width = this.objectBufferRect.width;	// hack clear
@@ -756,19 +769,6 @@ MainState.prototype.getObjectIndex = function() {
 };
 
 MainState.prototype.update = function() {
-	
-	if(intersectTest(_mouse.x,_mouse.y,0,0, this.interfaceRect.x,this.interfaceRect.y,this.interfaceRect.width,this.interfaceRect.height)) {
-		
-		this.interfaceState = true;	
-		this.interfaceRect.activeItem = -1;
-		// check interface here
-		if(intersectTest(_mouse.x,_mouse.y,0,0,
-			this.interfaceRect.x + this.interfaceRect.skilldexButton.x, this.interfaceRect.y + this.interfaceRect.skilldexButton.y,
-			this.interfaceRect.skilldexButton.width, this.interfaceRect.skilldexButton.height)) {
-				this.interfaceRect.activeItem = "skilldexButton";
-			}
-			
-	} else this.interfaceState = false;
 
 	this.scrollStates.yNeg = (_mouse.y < (_screenHeight * 0.05));
 	this.scrollStates.yPos = (_mouse.y > (_screenHeight * 0.95));
@@ -777,7 +777,8 @@ MainState.prototype.update = function() {
 	this.scrollState = (this.scrollStates.yNeg || this.scrollStates.yPos || this.scrollStates.xNeg || this.scrollStates.xPos);
 
 	if(intersectTest(_mouse.x,_mouse.y,0,0, 0,0,_screenWidth,_screenHeight) && this.scrollState) {
-
+		this.inputState = "scroll";
+		
 		this.scrollCheckAdj = this.mapGeometry.findAdj(this.mapGeometry.s2h( 320 + this.camera.x, 190 + this.camera.y));
 		
 		this.scrollStates.xPosBlocked = (this.map.hexMap[this.player.currentElevation][this.scrollCheckAdj[1]].scrollBlock);
@@ -791,25 +792,44 @@ MainState.prototype.update = function() {
 		if(this.scrollStates.xNeg && !this.scrollStates.xNegBlocked) this.camera.x -= this.scrollDelta;
 		if(this.scrollStates.xPos && !this.scrollStates.xPosBlocked) this.camera.x += this.scrollDelta;
 	
-	}
-	
-
-	if(this.inputState == "move") {		// get new cursor hex index, and check for blocked path cursor
-		this.hIndex_test = this.mapGeometry.s2h(_mouse.x + this.camera.x, _mouse.y + this.camera.y);
-		if(this.hIndex_test != this.hIndex) {
-			this.hIndex = this.hIndex_test;
-			this.hIndex_time = getTicks();
-			this.hIndex_path = -1;
-		} else {		// test for pathfind
-			if(Math.abs(getTicks() - this.hIndex_time) >= 1000 && this.hIndex_path == -1) {	// if user has been hovering the mouse on a specific point for 1 sec.
-				if(this.findPath(this.player.hexPosition,this.hIndex) != 0) this.hIndex_path = 1;
-				else this.hIndex_path = 0;
+	} else if(intersectTest(_mouse.x,_mouse.y,0,0, this.interfaceRect.x,this.interfaceRect.y,this.interfaceRect.width,this.interfaceRect.height)) {	// if mouse over interface rect
+		this.inputState = "interface";
+		this.interfaceRect.activeItem = -1;
+		// check interface items here
+		if(intersectTest(_mouse.x,_mouse.y,0,0,
+			this.interfaceRect.x + this.interfaceRect.skilldexButton.x, this.interfaceRect.y + this.interfaceRect.skilldexButton.y,
+			this.interfaceRect.skilldexButton.width, this.interfaceRect.skilldexButton.height)) {
+				this.interfaceRect.activeItem = "skilldexButton";
 			}
+		if(intersectTest(_mouse.x,_mouse.y,0,0,
+			this.interfaceRect.x + this.interfaceRect.invButton.x, this.interfaceRect.y + this.interfaceRect.invButton.y,
+			this.interfaceRect.invButton.width, this.interfaceRect.invButton.height)) {
+				this.interfaceRect.activeItem = "invButton";
+			}
+			
+	} else {
+		this.inputState = "game";
+		
+		if(this.inputState_sub == "move") {
+			this.hIndex_test = this.mapGeometry.s2h(_mouse.x + this.camera.x, _mouse.y + this.camera.y);
+			if(this.hIndex_test != this.hIndex) {
+				this.hIndex = this.hIndex_test;
+				this.hIndex_time = getTicks();
+				this.hIndex_path = -1;
+			} else {		// test for pathfind
+				if(Math.abs(getTicks() - this.hIndex_time) >= 1000 && this.hIndex_path == -1) {	// if user has been hovering the mouse on a specific point for 1 sec.
+					if(this.findPath(this.player.hexPosition,this.hIndex) != 0) this.hIndex_path = 1;
+					else this.hIndex_path = 0;
+				}
+			}			
+			
+			this.hsIndex = this.mapGeometry.h2s(this.hIndex);
 		}
+	
+	
 	}
 
-	this.hsIndex = this.mapGeometry.h2s(this.hIndex);
-
+	
 	if(_keyboardStates[16]) {	// SHIFT control input for running
 		this.inputRunState = true;
 	} else this.inputRunState = false;
@@ -903,7 +923,7 @@ MainState.prototype.update = function() {
 	}
 	
 
-	if(this.inputState == "object") {		// 'hover' look
+	if(this.inputState == "game" && this.inputState_sub == "command") {		// 'hover' look
 		if(this.oIndex_state) {
 			if(this.oIndex_x == _mouse.x && this.oIndex_y == _mouse.y) return;
 		}
@@ -927,17 +947,6 @@ MainState.prototype.update = function() {
 
 };
 
-MainState.prototype.mapLightLevel = 1;
-MainState.prototype.scrollimg = 0;
-
-MainState.prototype.transEgg = 0;
-MainState.prototype.eggBuffer = 0;
-MainState.prototype.eggContext = 0;
-MainState.prototype.eggBufferRect = {
-	x: 0, y: 0,
-	width: 129,
-	height: 98,
-};
 
 MainState.prototype.render = function() {
 	this.eggContext.globalCompositeOperation = 'source-over';	// EGG
@@ -975,7 +984,7 @@ MainState.prototype.render = function() {
 		
 	}
 
-	if(!this.statePause && !this.scrollState && !this.interfaceState && this.inputState == "move") {	// lower hex cursor
+	if(this.inputState == "game" && this.inputState_sub == "move") {	// lower hex cursor
 		_context.drawImage(_assets["art/intrface/msef000.frm"].frameInfo[0][0].img, this.hsIndex.x - this.camera.x, this.hsIndex.y - this.camera.y);
 		this.eggContext.drawImage(_assets["art/intrface/msef000.frm"].frameInfo[0][0].img, this.hsIndex.x - this.camera.x - this.eggBufferRect.x, this.hsIndex.y - this.camera.y - this.eggBufferRect.y);
 	}
@@ -1068,13 +1077,17 @@ MainState.prototype.render = function() {
 	// interface
 	_context.drawImage(_assets["art/intrface/iface.frm"].frameInfo[0][0].img, this.interfaceRect.x, this.interfaceRect.y);	// interface
 	
-	if(this.interfaceState && this.interfaceRect.mouseState == 1) {
+	if(this.inputState == "interface" && this.interfaceRect.mouseState == 1) {
 		switch(this.interfaceRect.activeItem) {
 			case -1:
 				break;
 			case "skilldexButton":
 				_context.drawImage(_assets["art/intrface/bigreddn.frm"].frameInfo[0][0].img,
 					this.interfaceRect.x + this.interfaceRect.skilldexButton.x, this.interfaceRect.y + this.interfaceRect.skilldexButton.y);	// interface
+				break;
+			case "invButton":
+				_context.drawImage(_assets["art/intrface/invbutdn.frm"].frameInfo[0][0].img,
+					this.interfaceRect.x + this.interfaceRect.invButton.x, this.interfaceRect.y + this.interfaceRect.invButton.y);	// interface
 				break;
 		}		
 	}
@@ -1087,13 +1100,13 @@ MainState.prototype.render = function() {
 
 	// cursors
 	if(this.statePause) return;		// don't render cursors if state is paused.
-	if(this.inputState == "object") {
+	if(this.inputState == "game") {
 		if(this.oIndex_state) {
 			_context.drawImage(_assets["art/intrface/lookn.frm"].frameInfo[0][0].img, _mouse.x + 40, _mouse.y);
 		}
 	}
 
-	if(this.scrollState) {		// if scrolling
+	if(this.inputState == "scroll") {		// if scrolling
 		if(this.scrollStates.xPos) {
 			if(this.scrollStates.xPosBlocked) this.scrollimg = _assets["art/intrface/screx.frm"];
 			else this.scrollimg = _assets["art/intrface/screast.frm"];
@@ -1128,30 +1141,26 @@ MainState.prototype.render = function() {
 		}
 		_context.drawImage(this.scrollimg.frameInfo[0][0].img, _mouse.x, _mouse.y);
 
-	} else {	// if not scrolling	
-		if(this.interfaceState) {
-			_context.drawImage(_assets["art/intrface/stdarrow.frm"].frameInfo[0][0].img, _mouse.x, _mouse.y);
-			return;
-		} else {	// if not in HUD - on map
-			switch(this.inputState) {
-				case "move":
-					if(this.inputState == "move") {
-						_context.globalAlpha = 0.5;
-						_context.drawImage(mse_overlay, this.hsIndex.x - this.camera.x - 1, this.hsIndex.y - this.camera.y - 1);	// top hex overlay img
-						_context.globalAlpha = 1;
+	} else if(this.inputState == "interface"){	// if not scrolling	
+		_context.drawImage(_assets["art/intrface/stdarrow.frm"].frameInfo[0][0].img, _mouse.x, _mouse.y);
+		
+	} else if(this.inputState == "game") {	// if not in HUD - on map
+		switch(this.inputState_sub) {
+			case "move":
+				_context.globalAlpha = 0.5;
+				_context.drawImage(mse_overlay, this.hsIndex.x - this.camera.x - 1, this.hsIndex.y - this.camera.y - 1);	// top hex overlay img
+				_context.globalAlpha = 1;
 
-						if(this.hIndex_path == 0) {		// render "X" if no path to location
-							_context.drawImage(mse_overlay_blocked, this.hsIndex.x - this.camera.x + 11, this.hsIndex.y - this.camera.y + 3);		// top hex overlay img
-						}
-					}
-					break;
-				case "object":
-					_context.drawImage(_assets["art/intrface/actarrow.frm"].frameInfo[0][0].img, _mouse.x, _mouse.y);
-					break;
-			}	// end switch
-
-		}
+				if(this.hIndex_path == 0) {		// render "X" if no path to location
+					_context.drawImage(mse_overlay_blocked, this.hsIndex.x - this.camera.x + 11, this.hsIndex.y - this.camera.y + 3);		// top hex overlay img
+				}
+				break;
+			case "command":
+				_context.drawImage(_assets["art/intrface/actarrow.frm"].frameInfo[0][0].img, _mouse.x, _mouse.y);
+				break;
+		}	// end switch
 
 	}
+
 
 }

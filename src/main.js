@@ -34,6 +34,7 @@ function main_init() {
 	ingameMenuState = new IngameMenuState();	// init in mainState
 	skilldexState = new SkilldexState();
 	contextMenuState = new ContextMenuState();
+	inventoryState = new InventoryState();
 	
 	main_setResolution(640,480);	// set after init states
 	
@@ -114,31 +115,6 @@ function main_loadGame(_saveState) {
 };
 
 
-function main_ingameMenu() {
-	mainState.statePause = true;
-	mainState.contextMenuActive = false;
-	stateQ.push(ingameMenuState);
-	_keyboardStates[27] = false;	// LOL - sets ESC key state to false to prevent the next iteration of the gamestate stack from capturing the input.
-};
-
-function main_ingameMenu_close() {
-	if(mainState.statePause) mainState.statePause = false;
-	stateQ.splice(stateQ.indexOf(ingameMenuState),1);
-};
-
-function main_openSkilldex() {
-	console.log("Fsfsf");
-	mainState.statePause = true;
-	mainState.contextMenuActive = false;
-	stateQ.push(skilldexState);
-	_keyboardStates[27] = false;	// LOL - sets ESC key state to false to prevent the next iteration of the gamestate stack from capturing the input.	
-};
-
-function main_closeSkilldex() {
-	console.log("closing");
-	if(mainState.statePause) mainState.statePause = false;
-	stateQ.splice(stateQ.indexOf(skilldexState),1);
-};
 
 function main_input(e) {
 	e.preventDefault();
@@ -187,9 +163,7 @@ function main_update() {
 
 
 function main_render() {
-	//_context.fillStyle = _context_clearcolour;	// optional clear
-	//_context.fillRect(0,0,_screenWidth,_screenHeight);
-	_canvas.width = _screenWidth;
+	_canvas.width = _screenWidth;	// hack clear
 
 	for(var i = 0; i < stateQ.length; i++) {
 		stateQ[i].render.call(stateQ[i]);		
@@ -209,9 +183,11 @@ function main_setResolution(width,height) {		// realtime resolution change
 	mainState.interfaceRect.x = ((_screenWidth / 2)|0) - 320;
 	mainState.interfaceRect.y = _screenHeight - 99;
 
-	skilldexState.menu.x = _screenWidth  - 190;
-	skilldexState.menu.y = 5;	
+	skilldexState.x = _screenWidth  - 190;
+	skilldexState.y = 5;	
 	
+	inventoryState.x = ((_screenWidth / 2)|0) - 250;
+	inventoryState.y = 0;	
 	
 	mainState.console.x = (((_screenWidth / 2)|0) - 320) + 30;	// recompute coords 
 	mainState.console.y = _screenHeight - 26;
@@ -226,9 +202,19 @@ function main_setResolution(width,height) {		// realtime resolution change
 	
 }
 
+function main_openInventory() {
+	mainState.statePause = true;
+	stateQ.push(inventoryState);		
+	
+};
+
+function main_closeInventory() {
+	mainState.statePause = false;
+	stateQ.splice(stateQ.indexOf(inventoryState),1);
+	
+};
 
 function main_openContextMenu(obj,x,y) {
-	console.log(obj);
 	mainState.statePause = true;
 	contextMenuState.objectIndex = obj;
 	contextMenuState.x = x;
@@ -243,5 +229,29 @@ function main_closeContextMenu() {
 	if(mainState.statePause) mainState.statePause = false;
 	stateQ.splice(stateQ.indexOf(contextMenuState),1);	
 	
+};
+
+function main_ingameMenu() {
+	mainState.statePause = true;
+	mainState.contextMenuActive = false;
+	stateQ.push(ingameMenuState);
+	_keyboardStates[27] = false;	// LOL - sets ESC key state to false to prevent the next iteration of the gamestate stack from capturing the input.
+};
+
+function main_ingameMenu_close() {
+	if(mainState.statePause) mainState.statePause = false;
+	stateQ.splice(stateQ.indexOf(ingameMenuState),1);
+};
+
+function main_openSkilldex() {
+	mainState.statePause = true;
+	mainState.contextMenuActive = false;
+	stateQ.push(skilldexState);
+	_keyboardStates[27] = false;	// LOL - sets ESC key state to false to prevent the next iteration of the gamestate stack from capturing the input.	
+};
+
+function main_closeSkilldex() {
+	if(mainState.statePause) mainState.statePause = false;
+	stateQ.splice(stateQ.indexOf(skilldexState),1);
 };
 

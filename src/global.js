@@ -35,6 +35,7 @@ var loadState;
 var mainState;
 var mainLoadState;
 var contextMenuState;
+var inventoryState;
 var skilldexState;
 var ingameMenuState;
 var mainMenuState;

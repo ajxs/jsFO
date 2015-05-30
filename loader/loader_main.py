@@ -213,7 +213,6 @@ def loadMain():
 	loadFRM(master_dat_file,master_dat,"art/intrface/opbtnoff.frm")
 	loadFRM(master_dat_file,master_dat,"art/intrface/opbtnon.frm")
 	
-	
 	loadFRM(master_dat_file,master_dat,"art/intrface/lilredup.frm")
 	loadFRM(master_dat_file,master_dat,"art/intrface/lilreddn.frm")
 	
@@ -226,6 +225,13 @@ def loadMain():
 	loadFRM(master_dat_file,master_dat,"art/intrface/skldxbox.frm")
 	loadFRM(master_dat_file,master_dat,"art/intrface/skldxoff.frm")
 	loadFRM(master_dat_file,master_dat,"art/intrface/skldxon.frm")
+	
+	loadFRM(master_dat_file,master_dat,"art/intrface/invbox.frm")
+	loadFRM(master_dat_file,master_dat,"art/intrface/invbutdn.frm")
+	loadFRM(master_dat_file,master_dat,"art/intrface/invbutup.frm")
+	loadFRM(master_dat_file,master_dat,"art/intrface/hand.frm")
+	
+	
 	
 	
 	return loadData
