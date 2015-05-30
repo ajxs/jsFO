@@ -183,9 +183,6 @@ MainState.prototype.inputState = "move";
 MainState.prototype.scrollState = false;
 MainState.prototype.interfaceState = false;
 
-MainState.prototype.objectModeIndex = -1;
-MainState.prototype.contextMenuActive = false;
-
 MainState.prototype.brightmap = 0;
 MainState.prototype.brightmapContext = 0;
 
@@ -524,11 +521,9 @@ MainState.prototype.input = function(e) {
 
 			if(this.inputState == "object" && _mouse.c1) {
 				this.objectIndex = this.getObjectIndex();
-				if(this.objectIndex != -1) {
-					this.contextMenu.mouseX = _mouse.x;
-					this.contextMenu.mouseY = _mouse.y;
-					this.contextMenuActive = true;
-				}
+				var objC = this.mapGeometry.h2s(this.mapObjects[this.player.currentElevation][this.objectIndex].hexPosition);
+				main_openContextMenu(this.objectIndex, objC.x - this.camera.x + 30, objC.y - this.camera.y - 20);
+				
 			}
 
 			break;
@@ -537,14 +532,6 @@ MainState.prototype.input = function(e) {
 			if(this.interfaceState) {
 				this.interfaceRect.mouseState = 0;
 				return;
-			}
-
-			if(this.contextMenuActive) {
-				this.contextMenuAction(this.contextMenu.menuItems[this.contextMenu.targetItem].action, this.objectIndex );	// context menu action
-				_mouse.x = this.contextMenu.mouseX;	// reset to previous stored mouse location
-				_mouse.y = this.contextMenu.mouseY;
-
-				this.contextMenuActive = false;
 			}
 			
 			break;
@@ -706,16 +693,6 @@ MainState.prototype.scrollCheckIndex = 0;
 
 MainState.prototype.scrollCheckAdj = 0;
 
-MainState.prototype.contextMenu = {
-	menuItems: [],
-	x: 0,
-	y: 0,
-	mouseX: 0,
-	mouseY: 0,
-
-	targetItem: 0,
-};
-
 
 MainState.prototype.hIndex_time = 0;
 MainState.prototype.hIndex_test = 0;
@@ -779,36 +756,43 @@ MainState.prototype.getObjectIndex = function() {
 };
 
 MainState.prototype.update = function() {
-	if(!this.contextMenuActive) {	// prevent losing cursor
 	
-		if(intersectTest(_mouse.x,_mouse.y,0,0, this.interfaceRect.x,this.interfaceRect.y,this.interfaceRect.width,this.interfaceRect.height)) {
-			
-			this.interfaceState = true;	
-			this.interfaceRect.activeItem = -1;
-			// check interface here
-			if(intersectTest(_mouse.x,_mouse.y,0,0,
-				this.interfaceRect.x + this.interfaceRect.skilldexButton.x, this.interfaceRect.y + this.interfaceRect.skilldexButton.y,
-				this.interfaceRect.skilldexButton.width, this.interfaceRect.skilldexButton.height)) {
-					this.interfaceRect.activeItem = "skilldexButton";
-				}
-				
-		} else this.interfaceState = false;
-
-		this.scrollStates.yNeg = (_mouse.y < (_screenHeight * 0.05));
-		this.scrollStates.yPos = (_mouse.y > (_screenHeight * 0.95));
-		this.scrollStates.xNeg = (_mouse.x < (_screenWidth * 0.05));
-		this.scrollStates.xPos = (_mouse.x > (_screenWidth * 0.95));
-		this.scrollState = (this.scrollStates.yNeg || this.scrollStates.yPos || this.scrollStates.xNeg || this.scrollStates.xPos);
+	if(intersectTest(_mouse.x,_mouse.y,0,0, this.interfaceRect.x,this.interfaceRect.y,this.interfaceRect.width,this.interfaceRect.height)) {
 		
-	} else {
-		this.scrollState = false;
-	}	
+		this.interfaceState = true;	
+		this.interfaceRect.activeItem = -1;
+		// check interface here
+		if(intersectTest(_mouse.x,_mouse.y,0,0,
+			this.interfaceRect.x + this.interfaceRect.skilldexButton.x, this.interfaceRect.y + this.interfaceRect.skilldexButton.y,
+			this.interfaceRect.skilldexButton.width, this.interfaceRect.skilldexButton.height)) {
+				this.interfaceRect.activeItem = "skilldexButton";
+			}
+			
+	} else this.interfaceState = false;
 
+	this.scrollStates.yNeg = (_mouse.y < (_screenHeight * 0.05));
+	this.scrollStates.yPos = (_mouse.y > (_screenHeight * 0.95));
+	this.scrollStates.xNeg = (_mouse.x < (_screenWidth * 0.05));
+	this.scrollStates.xPos = (_mouse.x > (_screenWidth * 0.95));
+	this.scrollState = (this.scrollStates.yNeg || this.scrollStates.yPos || this.scrollStates.xNeg || this.scrollStates.xPos);
+
+	if(intersectTest(_mouse.x,_mouse.y,0,0, 0,0,_screenWidth,_screenHeight) && this.scrollState) {
+
+		this.scrollCheckAdj = this.mapGeometry.findAdj(this.mapGeometry.s2h( 320 + this.camera.x, 190 + this.camera.y));
+		
+		this.scrollStates.xPosBlocked = (this.map.hexMap[this.player.currentElevation][this.scrollCheckAdj[1]].scrollBlock);
+		this.scrollStates.yNegBlocked = (this.map.hexMap[this.player.currentElevation][this.scrollCheckAdj[0]].scrollBlock && this.map.hexMap[this.player.currentElevation][this.scrollCheckAdj[5]].scrollBlock);
+		this.scrollStates.yNegBlocked = (this.map.hexMap[this.player.currentElevation][this.scrollCheckAdj[0]].scrollBlock && this.map.hexMap[this.player.currentElevation][this.scrollCheckAdj[5]].scrollBlock);
+		this.scrollStates.yPosBlocked = (this.map.hexMap[this.player.currentElevation][this.scrollCheckAdj[2]].scrollBlock && this.map.hexMap[this.player.currentElevation][this.scrollCheckAdj[3]].scrollBlock);	
+		this.scrollStates.xNegBlocked = (this.map.hexMap[this.player.currentElevation][this.scrollCheckAdj[4]].scrollBlock);
+
+		if(this.scrollStates.yNeg && !this.scrollStates.yNegBlocked) this.camera.y -= this.scrollDelta;
+		if(this.scrollStates.yPos && !this.scrollStates.yPosBlocked) this.camera.y += this.scrollDelta;
+		if(this.scrollStates.xNeg && !this.scrollStates.xNegBlocked) this.camera.x -= this.scrollDelta;
+		if(this.scrollStates.xPos && !this.scrollStates.xPosBlocked) this.camera.x += this.scrollDelta;
 	
-	if(this.contextMenuActive) {
-		this.contextMenu.targetItem = Math.max(0,Math.min( ((_mouse.y - this.contextMenu.mouseY)/10)|0, this.contextMenu.menuItems.length-1));	// context menu action
-		return;
-	}	
+	}
+	
 
 	if(this.inputState == "move") {		// get new cursor hex index, and check for blocked path cursor
 		this.hIndex_test = this.mapGeometry.s2h(_mouse.x + this.camera.x, _mouse.y + this.camera.y);
@@ -825,31 +809,6 @@ MainState.prototype.update = function() {
 	}
 
 	this.hsIndex = this.mapGeometry.h2s(this.hIndex);
-
-	this.scrollCheckAdj = this.mapGeometry.findAdj(this.mapGeometry.s2h( 320 + this.camera.x, 190 + this.camera.y));
-	
-	this.scrollStates.xPosBlocked = (this.map.hexMap[this.player.currentElevation][this.scrollCheckAdj[1]].scrollBlock);
-	this.scrollStates.yNegBlocked = (this.map.hexMap[this.player.currentElevation][this.scrollCheckAdj[0]].scrollBlock && this.map.hexMap[this.player.currentElevation][this.scrollCheckAdj[5]].scrollBlock);
-	this.scrollStates.yNegBlocked = (this.map.hexMap[this.player.currentElevation][this.scrollCheckAdj[0]].scrollBlock && this.map.hexMap[this.player.currentElevation][this.scrollCheckAdj[5]].scrollBlock);
-	this.scrollStates.yPosBlocked = (this.map.hexMap[this.player.currentElevation][this.scrollCheckAdj[2]].scrollBlock && this.map.hexMap[this.player.currentElevation][this.scrollCheckAdj[3]].scrollBlock);	
-	this.scrollStates.xNegBlocked = (this.map.hexMap[this.player.currentElevation][this.scrollCheckAdj[4]].scrollBlock);
-	
-	if(_debug.enableKeyboardScroll) {
-		if(_keyboardStates[87]) this.camera.y -= this.scrollDelta;
-		else if(_keyboardStates[83]) this.camera.y += this.scrollDelta;
-		if(_keyboardStates[65]) this.camera.x -= this.scrollDelta;
-		else if(_keyboardStates[68]) this.camera.x += this.scrollDelta;
-	}
-
-	if(intersectTest(_mouse.x,_mouse.y,0,0, 0,0,_screenWidth,_screenHeight)) {
-		if(this.scrollState) {		// consider changing this
-			if(this.scrollStates.yNeg && !this.scrollStates.yNegBlocked) this.camera.y -= this.scrollDelta;
-			if(this.scrollStates.yPos && !this.scrollStates.yPosBlocked) this.camera.y += this.scrollDelta;
-			if(this.scrollStates.xNeg && !this.scrollStates.xNegBlocked) this.camera.x -= this.scrollDelta;
-			if(this.scrollStates.xPos && !this.scrollStates.xPosBlocked) this.camera.x += this.scrollDelta;
-		}		
-	}
-
 
 	if(_keyboardStates[16]) {	// SHIFT control input for running
 		this.inputRunState = true;
@@ -1129,23 +1088,7 @@ MainState.prototype.render = function() {
 	// cursors
 	if(this.statePause) return;		// don't render cursors if state is paused.
 	if(this.inputState == "object") {
-		if(this.contextMenuActive) {	// context menu
-			var objC = this.mapGeometry.h2s(this.mapObjects[this.player.currentElevation][this.objectIndex].hexPosition);
-			this.contextMenu.x = objC.x + 30 - this.camera.x;
-			this.contextMenu.y = objC.y - 60 - this.camera.y;
-
-			var nItems = 0;		// only render 'active' items.
-			for(var c = 0; c < this.contextMenu.menuItems.length; c++) {
-				if(this.contextMenu.menuItems[c].active) {
-					if(c == this.contextMenu.targetItem) {
-						_context.drawImage(this.contextMenu.menuItems[c].hoverImg, this.contextMenu.x, this.contextMenu.y+(40*nItems));
-					} else {
-						_context.drawImage(this.contextMenu.menuItems[c].img, this.contextMenu.x, this.contextMenu.y+(40*nItems));
-					}
-					nItems++;
-				}
-			}
-		} else if(this.oIndex_state) {
+		if(this.oIndex_state) {
 			_context.drawImage(_assets["art/intrface/lookn.frm"].frameInfo[0][0].img, _mouse.x + 40, _mouse.y);
 		}
 	}
@@ -1203,7 +1146,7 @@ MainState.prototype.render = function() {
 					}
 					break;
 				case "object":
-					_context.drawImage(_assets["art/intrface/actarrow.frm"].frameInfo[0][0].img, (this.contextMenuActive) ? this.contextMenu.mouseX : _mouse.x, (this.contextMenuActive) ? this.contextMenu.mouseY : _mouse.y);
+					_context.drawImage(_assets["art/intrface/actarrow.frm"].frameInfo[0][0].img, _mouse.x, _mouse.y);
 					break;
 			}	// end switch
 

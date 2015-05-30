@@ -225,3 +225,23 @@ function main_setResolution(width,height) {		// realtime resolution change
 	mainState.camera.trackToCoords(mainState.mapGeometry.h2s(mainState.player.hexPosition));
 	
 }
+
+
+function main_openContextMenu(obj,x,y) {
+	console.log(obj);
+	mainState.statePause = true;
+	contextMenuState.objectIndex = obj;
+	contextMenuState.x = x;
+	contextMenuState.y = y;
+	contextMenuState.prevX = _mouse.x;
+	contextMenuState.prevY = _mouse.y;
+	stateQ.push(contextMenuState);	
+
+};
+
+function main_closeContextMenu() {
+	if(mainState.statePause) mainState.statePause = false;
+	stateQ.splice(stateQ.indexOf(contextMenuState),1);	
+	
+};
+

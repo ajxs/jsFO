@@ -104,7 +104,7 @@ MainLoadState.prototype.init = function() {		// use arguments here to pass saved
 		}			
 			
 		console.log("MainLoadState: mainState context menuItems init");
-		mainState.contextMenu.menuItems = [{
+		contextMenuState.menuItems = [{
 				img: _assets["art/intrface/usegetn.frm"].frameInfo[0][0].img,
 				hoverImg: _assets["art/intrface/usegeth.frm"].frameInfo[0][0].img,
 				action: "use",
