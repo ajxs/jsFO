@@ -34,6 +34,8 @@ var stateQ = [];		// states
 var loadState;
 var mainState;
 var mainLoadState;
+var contextMenuState;
+var skilldexState;
 var ingameMenuState;
 var mainMenuState;
 

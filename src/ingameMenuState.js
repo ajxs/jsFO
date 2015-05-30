@@ -1,7 +1,5 @@
 "use strict";
 
-IngameMenuState.prototype.menu = 0;
-
 function IngameMenuState() {
 	GameState.call(this);
 }

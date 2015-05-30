@@ -32,6 +32,8 @@ function main_init() {
 	mainLoadState = new MainLoadState();
 	mainMenuState = new MainMenuState();
 	ingameMenuState = new IngameMenuState();	// init in mainState
+	skilldexState = new SkilldexState();
+	contextMenuState = new ContextMenuState();
 	
 	main_setResolution(640,480);	// set after init states
 	
@@ -121,13 +123,22 @@ function main_ingameMenu() {
 
 function main_ingameMenu_close() {
 	if(mainState.statePause) mainState.statePause = false;
-	
-	var ingameMenuState_index = stateQ.indexOf(ingameMenuState);
-	if(ingameMenuState_index > -1) {	//	remove mainState
-		stateQ.splice(ingameMenuState_index,1);
-	}
+	stateQ.splice(stateQ.indexOf(ingameMenuState),1);
 };
 
+function main_openSkilldex() {
+	console.log("Fsfsf");
+	mainState.statePause = true;
+	mainState.contextMenuActive = false;
+	stateQ.push(skilldexState);
+	_keyboardStates[27] = false;	// LOL - sets ESC key state to false to prevent the next iteration of the gamestate stack from capturing the input.	
+};
+
+function main_closeSkilldex() {
+	console.log("closing");
+	if(mainState.statePause) mainState.statePause = false;
+	stateQ.splice(stateQ.indexOf(skilldexState),1);
+};
 
 function main_input(e) {
 	e.preventDefault();
@@ -198,8 +209,8 @@ function main_setResolution(width,height) {		// realtime resolution change
 	mainState.interfaceRect.x = ((_screenWidth / 2)|0) - 320;
 	mainState.interfaceRect.y = _screenHeight - 99;
 
-	mainState.skilldexRect.x = _screenWidth  - 190;
-	mainState.skilldexRect.y = 5;	
+	skilldexState.menu.x = _screenWidth  - 190;
+	skilldexState.menu.y = 5;	
 	
 	
 	mainState.console.x = (((_screenWidth / 2)|0) - 320) + 30;	// recompute coords 
