@@ -168,7 +168,7 @@ SkilldexState.prototype.render = function() {
 		this.y + this.closeButton.y);
 	
 	for(var i = 0; i < this.menuItems.length; i++) {
-		_context.drawImage((this.ouseState == 1 && this.activeItem == i) ? _assets["art/intrface/skldxon.frm"].frameInfo[0][0].img : _assets["art/intrface/skldxoff.frm"].frameInfo[0][0].img,
+		_context.drawImage((this.mouseState == 1 && this.activeItem == i) ? _assets["art/intrface/skldxon.frm"].frameInfo[0][0].img : _assets["art/intrface/skldxoff.frm"].frameInfo[0][0].img,
 			this.x + this.menuItems[i].x,
 			this.y + this.menuItems[i].y);
 			
