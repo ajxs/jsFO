@@ -146,13 +146,13 @@ function main_init() {
 		"meleeDamage": {
 			level: 1,
 		},
-		"damageRes.": {
+		"damageRes": {
 			level: 1,
 		},
-		"poisonRes.": {
+		"poisonRes": {
 			level: 1,
 		},
-		"radiationRes.": {
+		"radiationRes": {
 			level: 1,
 		},
 		"sequence": {

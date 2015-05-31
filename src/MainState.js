@@ -163,7 +163,16 @@ MainState.prototype.interfaceRect = {
 		y: 40,
 		width: 32,
 		height: 21,		
+	},
+	
+	charButton: {
+		x: 526,
+		y: 58,
+		width: 41,
+		height: 19,		
 	}
+	
+
 	
 };
 
@@ -615,6 +624,10 @@ MainState.prototype.input = function(e) {
 						main_openInventory();
 						this.interfaceRect.activeItem = -1;
 						break;
+					case "charButton":
+						main_openCharacterScreen();
+						this.interfaceRect.activeItem = -1;
+						break;
 				}
 			} else if(this.inputState == "game") {
 				if(this.inputState_sub == "move") {
@@ -806,7 +819,11 @@ MainState.prototype.update = function() {
 			this.interfaceRect.invButton.width, this.interfaceRect.invButton.height)) {
 				this.interfaceRect.activeItem = "invButton";
 			}
-			
+		if(intersectTest(_mouse.x,_mouse.y,0,0,
+			this.interfaceRect.x + this.interfaceRect.charButton.x, this.interfaceRect.y + this.interfaceRect.charButton.y,
+			this.interfaceRect.charButton.width, this.interfaceRect.charButton.height)) {
+				this.interfaceRect.activeItem = "charButton";
+			}			
 	} else {
 		this.inputState = "game";
 		
@@ -1088,6 +1105,10 @@ MainState.prototype.render = function() {
 			case "invButton":
 				_context.drawImage(_assets["art/intrface/invbutdn.frm"].frameInfo[0][0].img,
 					this.interfaceRect.x + this.interfaceRect.invButton.x, this.interfaceRect.y + this.interfaceRect.invButton.y);	// interface
+				break;
+			case "charButton":
+				_context.drawImage(_assets["art/intrface/chadn.frm"].frameInfo[0][0].img,
+					this.interfaceRect.x + this.interfaceRect.charButton.x, this.interfaceRect.y + this.interfaceRect.charButton.y);	// interface
 				break;
 		}		
 	}

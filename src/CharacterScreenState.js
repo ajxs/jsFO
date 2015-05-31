@@ -133,6 +133,91 @@ CharacterScreenState.prototype.outdoorsmanButton = {
 };
 
 
+CharacterScreenState.prototype.strengthButton = {
+	x: 100, y: 41,
+	width: 58, height: 17,	
+};
+CharacterScreenState.prototype.perceptionButton = {
+	x: 100, y: 74,
+	width: 58, height: 17,	
+};
+CharacterScreenState.prototype.enduranceButton = {
+	x: 100, y: 107,
+	width: 58, height: 17,	
+};
+CharacterScreenState.prototype.charismaButton = {
+	x: 100, y: 140,
+	width: 58, height: 17,	
+};
+CharacterScreenState.prototype.intelligenceButton = {
+	x: 100, y: 173,
+	width: 58, height: 17,	
+};
+CharacterScreenState.prototype.agilityButton = {
+	x: 100, y: 206,
+	width: 58, height: 17,	
+};
+CharacterScreenState.prototype.luckButton = {
+	x: 100, y: 239,
+	width: 58, height: 17,	
+};
+
+
+CharacterScreenState.prototype.armorClassButton = {
+	x: 194, y: 179,
+	width: 118, height: 11,	
+};
+CharacterScreenState.prototype.actionPointsButton = {
+	x: 194, y: 192,
+	width: 118, height: 11,		
+};
+CharacterScreenState.prototype.carryWeightButton = {
+	x: 194, y: 205,
+	width: 118, height: 11,		
+};
+CharacterScreenState.prototype.meleeDamageButton = {
+	x: 194, y: 218,
+	width: 118, height: 11,	
+};
+CharacterScreenState.prototype.damageResButton = {
+	x: 194, y: 231,
+	width: 118, height: 11,	
+};
+CharacterScreenState.prototype.poisonResButton = {
+	x: 194, y: 244,
+	width: 118, height: 11,	
+};
+CharacterScreenState.prototype.radiationResButton = {
+	x: 194, y: 257,
+	width: 118, height: 11,		
+};
+CharacterScreenState.prototype.sequenceButton = {
+	x: 194, y: 270,
+	width: 118, height: 11,		
+};
+CharacterScreenState.prototype.healingRateButton = {
+	x: 194, y: 283,
+	width: 118, height: 11,	
+};
+CharacterScreenState.prototype.criticalChanceButton = {
+	x: 194, y: 296,
+	width: 118, height: 11,		
+};
+
+
+CharacterScreenState.prototype.levelButton = {
+	x: 32, y: 280,
+	width: 118, height: 11,		
+};
+CharacterScreenState.prototype.expButton = {
+	x: 32, y: 291,
+	width: 118, height: 11,	
+};
+CharacterScreenState.prototype.nextLevelButton = {
+	x: 32, y: 302,
+	width: 118, height: 11,		
+};
+
 
 
 CharacterScreenState.prototype.input = function(e) {
@@ -243,6 +328,71 @@ CharacterScreenState.prototype.input = function(e) {
 					this.slider.y = this.outdoorsmanButton.y - 11;
 					break;
 					
+				case "strengthButton":
+					this.selectedItem = "strengthButton";
+					break;					
+				case "perceptionButton":
+					this.selectedItem = "perceptionButton";
+					break;						
+				case "enduranceButton":
+					this.selectedItem = "enduranceButton";
+					break;						
+				case "charismaButton":
+					this.selectedItem = "charismaButton";
+					break;						
+				case "intelligenceButton":
+					this.selectedItem = "intelligenceButton";
+					break;						
+				case "agilityButton":
+					this.selectedItem = "agilityButton";
+					break;						
+				case "luckButton":
+					this.selectedItem = "luckButton";
+					break;						
+	
+
+				case "armorClassButton":
+					this.selectedItem = "armorClassButton";
+					break;					
+				case "actionPointsButton":
+					this.selectedItem = "actionPointsButton";
+					break;						
+				case "carryWeightButton":
+					this.selectedItem = "carryWeightButton";
+					break;						
+				case "meleeDamageButton":
+					this.selectedItem = "meleeDamageButton";
+					break;						
+				case "damageResButton":
+					this.selectedItem = "damageResButton";
+					break;						
+				case "poisonResButton":
+					this.selectedItem = "poisonResButton";
+					break;						
+				case "radiationResButton":
+					this.selectedItem = "radiationResButton";
+					break;		
+				case "sequenceButton":
+					this.selectedItem = "sequenceButton";
+					break;		
+				case "healingRateButton":
+					this.selectedItem = "healingRateButton";
+					break;		
+				case "criticalChanceButton":
+					this.selectedItem = "criticalChanceButton";
+					break;	
+
+				case "levelButton":
+					this.selectedItem = "levelButton";
+					break;		
+				case "expButton":
+					this.selectedItem = "expButton";
+					break;		
+				case "nextLevelButton":
+					this.selectedItem = "nextLevelButton";
+					break;	
+
+					
 			}
 			break;
 		case 'contextmenu':	// switch input modes on mouse2
@@ -254,106 +404,194 @@ CharacterScreenState.prototype.update = function() {
 	
 	this.activeItem = -1;	
 	if(intersectTest(_mouse.x,_mouse.y,0,0,
-		this.printButton.x, this.printButton.y,
+		this.x + this.printButton.x, this.y + this.printButton.y,
 		this.printButton.width, this.printButton.height)) {
 			this.activeItem = "printButton";
 	} else if(intersectTest(_mouse.x,_mouse.y,0,0,
-		this.cancelButton.x, this.cancelButton.y,
+		this.x + this.cancelButton.x, this.y + this.cancelButton.y,
 		this.cancelButton.width, this.cancelButton.height)) {
 			this.activeItem = "cancelButton";
 	} else if(intersectTest(_mouse.x,_mouse.y,0,0,
-		this.doneButton.x, this.doneButton.y,
+		this.x + this.doneButton.x, this.y + this.doneButton.y,
 		this.doneButton.width, this.doneButton.height)) {
 			this.activeItem = "doneButton";
-	} else if(intersectTest(_mouse.x,_mouse.y,0,0,
-		this.perksTab.x, this.perksTab.y,
+	} 
+	
+	if(intersectTest(_mouse.x,_mouse.y,0,0,
+		this.x + this.perksTab.x, this.y + this.perksTab.y,
 		this.perksTab.width, this.perksTab.height)) {
 			this.activeItem = "perksTab";
 	} else if(intersectTest(_mouse.x,_mouse.y,0,0,
-		this.karmaTab.x, this.karmaTab.y,
+		this.x + this.karmaTab.x, this.y + this.karmaTab.y,
 		this.karmaTab.width, this.karmaTab.height)) {
 			this.activeItem = "karmaTab";
 	} else if(intersectTest(_mouse.x,_mouse.y,0,0,
-		this.killsTab.x, this.killsTab.y,
+		this.x + this.killsTab.x, this.y + this.killsTab.y,
 		this.killsTab.width, this.killsTab.height)) {
 			this.activeItem = "killsTab";
 	}
 	
 	if(intersectTest(_mouse.x,_mouse.y,0,0,		// check skills. ha
-		this.smallGunsButton.x, this.smallGunsButton.y,
+		this.x + this.smallGunsButton.x, this.y + this.smallGunsButton.y,
 		this.smallGunsButton.width, this.smallGunsButton.height)) {
 			this.activeItem = "smallGunsButton";
 	} else if(intersectTest(_mouse.x,_mouse.y,0,0,
-		this.bigGunsButton.x, this.bigGunsButton.y,
+		this.x + this.bigGunsButton.x, this.y + this.bigGunsButton.y,
 		this.bigGunsButton.width, this.bigGunsButton.height)) {
 			this.activeItem = "bigGunsButton";
 	} else if(intersectTest(_mouse.x,_mouse.y,0,0,
-		this.energyWeaponsButton.x, this.energyWeaponsButton.y,
+		this.x + this.energyWeaponsButton.x, this.y + this.energyWeaponsButton.y,
 		this.energyWeaponsButton.width, this.energyWeaponsButton.height)) {
 			this.activeItem = "energyWeaponsButton";
 	} else if(intersectTest(_mouse.x,_mouse.y,0,0,
-		this.unarmedButton.x, this.unarmedButton.y,
+		this.x + this.unarmedButton.x, this.y + this.unarmedButton.y,
 		this.unarmedButton.width, this.unarmedButton.height)) {
 			this.activeItem = "unarmedButton";
 	} else if(intersectTest(_mouse.x,_mouse.y,0,0,
-		this.meleeWeaponsButton.x, this.meleeWeaponsButton.y,
+		this.x + this.meleeWeaponsButton.x, this.y + this.meleeWeaponsButton.y,
 		this.meleeWeaponsButton.width, this.meleeWeaponsButton.height)) {
 			this.activeItem = "meleeWeaponsButton";
 	} else if(intersectTest(_mouse.x,_mouse.y,0,0,
-		this.throwingButton.x, this.throwingButton.y,
+		this.x + this.throwingButton.x, this.y + this.throwingButton.y,
 		this.throwingButton.width, this.throwingButton.height)) {
 			this.activeItem = "throwingButton";
 	} else if(intersectTest(_mouse.x,_mouse.y,0,0,
-		this.firstAidButton.x, this.firstAidButton.y,
+		this.x + this.firstAidButton.x, this.y + this.firstAidButton.y,
 		this.firstAidButton.width, this.firstAidButton.height)) {
 			this.activeItem = "firstAidButton";
 	} else if(intersectTest(_mouse.x,_mouse.y,0,0,
-		this.doctorButton.x, this.doctorButton.y,
+		this.x + this.doctorButton.x, this.y + this.doctorButton.y,
 		this.doctorButton.width, this.doctorButton.height)) {
 			this.activeItem = "doctorButton";
 	} else if(intersectTest(_mouse.x,_mouse.y,0,0,
-		this.sneakButton.x, this.sneakButton.y,
+		this.x + this.sneakButton.x, this.y + this.sneakButton.y,
 		this.sneakButton.width, this.sneakButton.height)) {
 			this.activeItem = "sneakButton";
 	} else if(intersectTest(_mouse.x,_mouse.y,0,0,
-		this.lockpickButton.x, this.lockpickButton.y,
+		this.x + this.lockpickButton.x, this.y + this.lockpickButton.y,
 		this.lockpickButton.width, this.lockpickButton.height)) {
 			this.activeItem = "lockpickButton";
 	} else if(intersectTest(_mouse.x,_mouse.y,0,0,
-		this.stealButton.x, this.stealButton.y,
+		this.x + this.stealButton.x, this.y + this.stealButton.y,
 		this.stealButton.width, this.stealButton.height)) {
 			this.activeItem = "stealButton";
 	} else if(intersectTest(_mouse.x,_mouse.y,0,0,
-		this.trapsButton.x, this.trapsButton.y,
+		this.x + this.trapsButton.x, this.y + this.trapsButton.y,
 		this.trapsButton.width, this.trapsButton.height)) {
 			this.activeItem = "trapsButton";
 	} else if(intersectTest(_mouse.x,_mouse.y,0,0,
-		this.scienceButton.x, this.scienceButton.y,
+		this.x + this.scienceButton.x, this.y + this.scienceButton.y,
 		this.scienceButton.width, this.scienceButton.height)) {
 			this.activeItem = "scienceButton";
 	} else if(intersectTest(_mouse.x,_mouse.y,0,0,
-		this.repairButton.x, this.repairButton.y,
+		this.x + this.repairButton.x, this.y + this.repairButton.y,
 		this.repairButton.width, this.repairButton.height)) {
 			this.activeItem = "repairButton";
 	} else if(intersectTest(_mouse.x,_mouse.y,0,0,
-		this.speechButton.x, this.speechButton.y,
+		this.x + this.speechButton.x, this.y + this.speechButton.y,
 		this.speechButton.width, this.speechButton.height)) {
 			this.activeItem = "speechButton";
 	} else if(intersectTest(_mouse.x,_mouse.y,0,0,
-		this.barterButton.x, this.barterButton.y,
+		this.x + this.barterButton.x, this.y + this.barterButton.y,
 		this.barterButton.width, this.barterButton.height)) {
 			this.activeItem = "barterButton";
 	} else if(intersectTest(_mouse.x,_mouse.y,0,0,
-		this.gamblingButton.x, this.gamblingButton.y,
+		this.x + this.gamblingButton.x, this.y + this.gamblingButton.y,
 		this.gamblingButton.width, this.gamblingButton.height)) {
 			this.activeItem = "gamblingButton";
 	} else if(intersectTest(_mouse.x,_mouse.y,0,0,
-		this.outdoorsmanButton.x, this.outdoorsmanButton.y,
+		this.x + this.outdoorsmanButton.x, this.y + this.outdoorsmanButton.y,
 		this.outdoorsmanButton.width, this.outdoorsmanButton.height)) {
 			this.activeItem = "outdoorsmanButton";
 	}
 	
 	
+	if(intersectTest(_mouse.x,_mouse.y,0,0,		// check skills. ha
+		this.x + this.strengthButton.x, this.y + this.strengthButton.y,
+		this.strengthButton.width, this.strengthButton.height)) {
+			this.activeItem = "strengthButton";
+	} else if(intersectTest(_mouse.x,_mouse.y,0,0,
+		this.x + this.perceptionButton.x, this.y + this.perceptionButton.y,
+		this.perceptionButton.width, this.perceptionButton.height)) {
+			this.activeItem = "perceptionButton";
+	} else if(intersectTest(_mouse.x,_mouse.y,0,0,
+		this.x + this.enduranceButton.x, this.y + this.enduranceButton.y,
+		this.enduranceButton.width, this.enduranceButton.height)) {
+			this.activeItem = "enduranceButton";
+	} else if(intersectTest(_mouse.x,_mouse.y,0,0,
+		this.x + this.charismaButton.x, this.y + this.charismaButton.y,
+		this.charismaButton.width, this.charismaButton.height)) {
+			this.activeItem = "charismaButton";
+	} else if(intersectTest(_mouse.x,_mouse.y,0,0,
+		this.x + this.intelligenceButton.x, this.y + this.intelligenceButton.y,
+		this.intelligenceButton.width, this.intelligenceButton.height)) {
+			this.activeItem = "intelligenceButton";
+	} else if(intersectTest(_mouse.x,_mouse.y,0,0,
+		this.x + this.agilityButton.x, this.y + this.agilityButton.y,
+		this.agilityButton.width, this.agilityButton.height)) {
+			this.activeItem = "agilityButton";
+	} else if(intersectTest(_mouse.x,_mouse.y,0,0,
+		this.x + this.luckButton.x, this.y + this.luckButton.y,
+		this.luckButton.width, this.luckButton.height)) {
+			this.activeItem = "luckButton";
+	}
+	
+	if(intersectTest(_mouse.x,_mouse.y,0,0,		// check skills. ha
+		this.x + this.armorClassButton.x, this.y + this.armorClassButton.y,
+		this.armorClassButton.width, this.armorClassButton.height)) {
+			this.activeItem = "armorClassButton";
+	} else if(intersectTest(_mouse.x,_mouse.y,0,0,
+		this.x + this.actionPointsButton.x, this.y + this.actionPointsButton.y,
+		this.actionPointsButton.width, this.actionPointsButton.height)) {
+			this.activeItem = "actionPointsButton";
+	} else if(intersectTest(_mouse.x,_mouse.y,0,0,
+		this.x + this.carryWeightButton.x, this.y + this.carryWeightButton.y,
+		this.carryWeightButton.width, this.carryWeightButton.height)) {
+			this.activeItem = "carryWeightButton";
+	} else if(intersectTest(_mouse.x,_mouse.y,0,0,
+		this.x + this.meleeDamageButton.x, this.y + this.meleeDamageButton.y,
+		this.meleeDamageButton.width, this.meleeDamageButton.height)) {
+			this.activeItem = "meleeDamageButton";
+	} else if(intersectTest(_mouse.x,_mouse.y,0,0,
+		this.x + this.damageResButton.x, this.y + this.damageResButton.y,
+		this.damageResButton.width, this.damageResButton.height)) {
+			this.activeItem = "damageResButton";
+	} else if(intersectTest(_mouse.x,_mouse.y,0,0,
+		this.x + this.poisonResButton.x, this.y + this.poisonResButton.y,
+		this.poisonResButton.width, this.poisonResButton.height)) {
+			this.activeItem = "poisonResButton";
+	} else if(intersectTest(_mouse.x,_mouse.y,0,0,
+		this.x + this.radiationResButton.x, this.y + this.radiationResButton.y,
+		this.radiationResButton.width, this.radiationResButton.height)) {
+			this.activeItem = "radiationResButton";
+	} else if(intersectTest(_mouse.x,_mouse.y,0,0,
+		this.x + this.sequenceButton.x, this.y + this.sequenceButton.y,
+		this.sequenceButton.width, this.sequenceButton.height)) {
+			this.activeItem = "sequenceButton";
+	} else if(intersectTest(_mouse.x,_mouse.y,0,0,
+		this.x + this.healingRateButton.x, this.y + this.healingRateButton.y,
+		this.healingRateButton.width, this.healingRateButton.height)) {
+			this.activeItem = "healingRateButton";
+	} else if(intersectTest(_mouse.x,_mouse.y,0,0,
+		this.x + this.criticalChanceButton.x, this.y + this.criticalChanceButton.y,
+		this.criticalChanceButton.width, this.criticalChanceButton.height)) {
+			this.activeItem = "criticalChanceButton";
+	}	
+	
+	
+	if(intersectTest(_mouse.x,_mouse.y,0,0,
+		this.x + this.levelButton.x, this.y + this.levelButton.y,
+		this.levelButton.width, this.levelButton.height)) {
+			this.activeItem = "levelButton";
+	} else if(intersectTest(_mouse.x,_mouse.y,0,0,
+		this.x + this.expButton.x, this.y + this.expButton.y,
+		this.expButton.width, this.expButton.height)) {
+			this.activeItem = "expButton";
+	} else if(intersectTest(_mouse.x,_mouse.y,0,0,
+		this.x + this.nextLevelButton.x, this.y + this.nextLevelButton.y,
+		this.nextLevelButton.width, this.nextLevelButton.height)) {
+			this.activeItem = "nextLevelButton";
+	}
 	
 };
 
@@ -398,27 +636,41 @@ CharacterScreenState.prototype.render = function() {
 	bitmapFontRenderer.renderString(_assets["font3.aaf"], "SKILLS", 380, 5, "#907824");
 	bitmapFontRenderer.renderString(_assets["font3.aaf"], "SKILL POINTS", 400, 233, "#907824");
 	
-	bitmapFontRenderer.renderString(_assets["font1.aaf"], "Armor Class", 194, 179, "#00FF00");	
-	bitmapFontRenderer.renderString(_assets["font1.aaf"], "Action Points", 194, 192, "#00FF00");	
-	bitmapFontRenderer.renderString(_assets["font1.aaf"], "Carry Weight", 194, 205, "#00FF00");	
-	bitmapFontRenderer.renderString(_assets["font1.aaf"], "Melee Damage", 194, 218, "#00FF00");	
-	bitmapFontRenderer.renderString(_assets["font1.aaf"], "Damage Res.", 194, 231, "#00FF00");	
-	bitmapFontRenderer.renderString(_assets["font1.aaf"], "Poison Res.", 194, 244, "#00FF00");	
-	bitmapFontRenderer.renderString(_assets["font1.aaf"], "Radiation Res.", 194, 257, "#00FF00");	
-	bitmapFontRenderer.renderString(_assets["font1.aaf"], "Sequence", 194, 270, "#00FF00");	
-	bitmapFontRenderer.renderString(_assets["font1.aaf"], "Healing Rate", 194, 283, "#00FF00");	
-	bitmapFontRenderer.renderString(_assets["font1.aaf"], "Critical Chance", 194, 296, "#00FF00");	
+	bitmapFontRenderer.renderString(_assets["font1.aaf"], "Level: 2", 32, 280, (this.selectedItem == "levelButton") ? "#fcfc7c" : "#00FF00");	
+	bitmapFontRenderer.renderString(_assets["font1.aaf"], "Exp: 1,999", 32, 291, (this.selectedItem == "expButton") ? "#fcfc7c" : "#00FF00");	
+	bitmapFontRenderer.renderString(_assets["font1.aaf"], "Next Level: 2000", 32, 302, (this.selectedItem == "nextLevelButton") ? "#fcfc7c" : "#00FF00");	
+
+	bitmapFontRenderer.renderString(_assets["font1.aaf"], "Hit Points 29/34", this.x + 194, this.y + 46, (this.selectedItem == "hitPointsButton") ? "#fcfc7c" : "#00FF00");	
+	bitmapFontRenderer.renderString(_assets["font1.aaf"], "Poisoned", this.x + 194, this.y + 59, "#183018");	
+	bitmapFontRenderer.renderString(_assets["font1.aaf"], "Radiated", this.x + 194, this.y + 72, "#183018");	
+	bitmapFontRenderer.renderString(_assets["font1.aaf"], "Eye Damage", this.x + 194, this.y + 85, "#183018");	
+	bitmapFontRenderer.renderString(_assets["font1.aaf"], "Crippled Right Arm", this.x + 194, this.y + 98, "#183018");	
+	bitmapFontRenderer.renderString(_assets["font1.aaf"], "Crippled Left Arm", this.x + 194, this.y + 111, "#183018");	
+	bitmapFontRenderer.renderString(_assets["font1.aaf"], "Crippled Right Leg", this.x + 194, this.y + 124, "#183018");	
+	bitmapFontRenderer.renderString(_assets["font1.aaf"], "Crippled Left Leg", this.x + 194, this.y + 137, "#183018");	
 	
-	bitmapFontRenderer.renderString(_assets["font1.aaf"], "" + mainState.player.stats["armorClass"].level, 288, 179, (this.selectedItem == "armorClass") ? "#fcfc7c" : "#00FF00");	
-	bitmapFontRenderer.renderString(_assets["font1.aaf"], "" + mainState.player.stats["actionPoints"].level, 288, 192, "#00FF00");	
-	bitmapFontRenderer.renderString(_assets["font1.aaf"], "" + mainState.player.stats["carryWeight"].level, 288, 205, "#00FF00");	
-	bitmapFontRenderer.renderString(_assets["font1.aaf"], "" + mainState.player.stats["meleeDamage"].level, 288, 218, "#00FF00");	
-	bitmapFontRenderer.renderString(_assets["font1.aaf"], "" + mainState.player.stats["damageRes."].level, 288, 231, "#00FF00");	
-	bitmapFontRenderer.renderString(_assets["font1.aaf"], "" + mainState.player.stats["poisonRes."].level, 288, 244, "#00FF00");	
-	bitmapFontRenderer.renderString(_assets["font1.aaf"], "" + mainState.player.stats["radiationRes."].level, 288, 257, "#00FF00");	
-	bitmapFontRenderer.renderString(_assets["font1.aaf"], "" + mainState.player.stats["sequence"].level, 288, 270, "#00FF00");	
-	bitmapFontRenderer.renderString(_assets["font1.aaf"], "" + mainState.player.stats["healingRate"].level, 288, 283, "#00FF00");	
-	bitmapFontRenderer.renderString(_assets["font1.aaf"], "" + mainState.player.stats["criticalChance"].level, 288, 296, "#00FF00");	
+	
+	bitmapFontRenderer.renderString(_assets["font1.aaf"], "Armor Class", 194, 179, (this.selectedItem == "armorClassButton") ? "#fcfc7c" : "#00FF00");	
+	bitmapFontRenderer.renderString(_assets["font1.aaf"], "Action Points", 194, 192, (this.selectedItem == "actionPointsButton") ? "#fcfc7c" : "#00FF00");	
+	bitmapFontRenderer.renderString(_assets["font1.aaf"], "Carry Weight", 194, 205, (this.selectedItem == "carryWeightButton") ? "#fcfc7c" : "#00FF00");	
+	bitmapFontRenderer.renderString(_assets["font1.aaf"], "Melee Damage", 194, 218, (this.selectedItem == "meleeDamageButton") ? "#fcfc7c" : "#00FF00");	
+	bitmapFontRenderer.renderString(_assets["font1.aaf"], "Damage Res.", 194, 231, (this.selectedItem == "damageResButton") ? "#fcfc7c" : "#00FF00");	
+	bitmapFontRenderer.renderString(_assets["font1.aaf"], "Poison Res.", 194, 244, (this.selectedItem == "poisonResButton") ? "#fcfc7c" : "#00FF00");	
+	bitmapFontRenderer.renderString(_assets["font1.aaf"], "Radiation Res.", 194, 257, (this.selectedItem == "radiationResButton") ? "#fcfc7c" : "#00FF00");	
+	bitmapFontRenderer.renderString(_assets["font1.aaf"], "Sequence", 194, 270, (this.selectedItem == "sequenceButton") ? "#fcfc7c" : "#00FF00");	
+	bitmapFontRenderer.renderString(_assets["font1.aaf"], "Healing Rate", 194, 283, (this.selectedItem == "healingRateButton") ? "#fcfc7c" : "#00FF00");	
+	bitmapFontRenderer.renderString(_assets["font1.aaf"], "Critical Chance", 194, 296, (this.selectedItem == "criticalChanceButton") ? "#fcfc7c" : "#00FF00");	
+	
+	bitmapFontRenderer.renderString(_assets["font1.aaf"], "" + mainState.player.stats["armorClass"].level, 288, 179, (this.selectedItem == "armorClassButton") ? "#fcfc7c" : "#00FF00");	
+	bitmapFontRenderer.renderString(_assets["font1.aaf"], "" + mainState.player.stats["actionPoints"].level, 288, 192, (this.selectedItem == "actionPointsButton") ? "#fcfc7c" : "#00FF00");	
+	bitmapFontRenderer.renderString(_assets["font1.aaf"], "" + mainState.player.stats["carryWeight"].level, 288, 205, (this.selectedItem == "carryWeightButton") ? "#fcfc7c" : "#00FF00");	
+	bitmapFontRenderer.renderString(_assets["font1.aaf"], "" + mainState.player.stats["meleeDamage"].level, 288, 218, (this.selectedItem == "meleeDamageButton") ? "#fcfc7c" : "#00FF00");	
+	bitmapFontRenderer.renderString(_assets["font1.aaf"], "" + mainState.player.stats["damageRes"].level, 288, 231, (this.selectedItem == "damageResButton") ? "#fcfc7c" : "#00FF00");	
+	bitmapFontRenderer.renderString(_assets["font1.aaf"], "" + mainState.player.stats["poisonRes"].level, 288, 244, (this.selectedItem == "poisonResButton") ? "#fcfc7c" : "#00FF00");	
+	bitmapFontRenderer.renderString(_assets["font1.aaf"], "" + mainState.player.stats["radiationRes"].level, 288, 257, (this.selectedItem == "radiationResButton") ? "#fcfc7c" : "#00FF00");	
+	bitmapFontRenderer.renderString(_assets["font1.aaf"], "" + mainState.player.stats["sequence"].level, 288, 270, (this.selectedItem == "sequenceButton") ? "#fcfc7c" : "#00FF00");	
+	bitmapFontRenderer.renderString(_assets["font1.aaf"], "" + mainState.player.stats["healingRate"].level, 288, 283, (this.selectedItem == "healingRateButton") ? "#fcfc7c" : "#00FF00");	
+	bitmapFontRenderer.renderString(_assets["font1.aaf"], "" + mainState.player.stats["criticalChance"].level, 288, 296, (this.selectedItem == "criticalChanceButton") ? "#fcfc7c" : "#00FF00");	
 	
 	bitmapFontRenderer.renderString(_assets["font1.aaf"], "Small Guns", 380, 27, (this.selectedItem == "smallGunsButton") ? "#fcfc7c" : "#00FF00");	
 	bitmapFontRenderer.renderString(_assets["font1.aaf"], "Big Guns", 380, 38, (this.selectedItem == "bigGunsButton") ? "#fcfc7c" : "#00FF00");	
@@ -457,6 +709,15 @@ CharacterScreenState.prototype.render = function() {
 	bitmapFontRenderer.renderString(_assets["font1.aaf"], mainState.player.skills["Barter"].level + "%", 573, 192, (this.selectedItem == "barterButton") ? "#fcfc7c" : "#00FF00");	
 	bitmapFontRenderer.renderString(_assets["font1.aaf"], mainState.player.skills["Gambling"].level + "%", 573, 203, (this.selectedItem == "gamblingButton") ? "#fcfc7c" : "#00FF00");	
 	bitmapFontRenderer.renderString(_assets["font1.aaf"], mainState.player.skills["Outdoorsman"].level + "%", 573, 214, (this.selectedItem == "outdoorsmanButton") ? "#fcfc7c" : "#00FF00");
+	
+	bitmapFontRenderer.renderString(_assets["font1.aaf"], "Great", 103, 45, (this.selectedItem == "strengthButton") ? "#fcfc7c" : "#00FF00");	
+	bitmapFontRenderer.renderString(_assets["font1.aaf"], "Great", 103, 78, (this.selectedItem == "perceptionButton") ? "#fcfc7c" : "#00FF00");	
+	bitmapFontRenderer.renderString(_assets["font1.aaf"], "Great", 103, 111, (this.selectedItem == "enduranceButton") ? "#fcfc7c" : "#00FF00");	
+	bitmapFontRenderer.renderString(_assets["font1.aaf"], "Great", 103, 144, (this.selectedItem == "charismaButton") ? "#fcfc7c" : "#00FF00");	
+	bitmapFontRenderer.renderString(_assets["font1.aaf"], "Great", 103, 177, (this.selectedItem == "intelligenceButton") ? "#fcfc7c" : "#00FF00");	
+	bitmapFontRenderer.renderString(_assets["font1.aaf"], "Great", 103, 210, (this.selectedItem == "agilityButton") ? "#fcfc7c" : "#00FF00");	
+	bitmapFontRenderer.renderString(_assets["font1.aaf"], "Great", 103, 243, (this.selectedItem == "luckButton") ? "#fcfc7c" : "#00FF00");	
+
 	
 	_context.drawImage(_assets["art/intrface/slider.frm"].frameInfo[0][0].img, this.x + this.slider.x, this.y + this.slider.y);
 	
