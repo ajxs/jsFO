@@ -10,8 +10,12 @@ InventoryState.prototype.constructor = InventoryState;
 
 InventoryState.prototype.x = 0;
 InventoryState.prototype.y = 0;
-SkilldexState.prototype.activeItem = -1;
-SkilldexState.prototype.mouseState = -1;
+InventoryState.prototype.activeItem = -1;
+InventoryState.prototype.mouseState = -1;
+
+InventoryState.prototype.playerAnimLastRotationTime = 0;
+InventoryState.prototype.playerAnimOrientation = 0;
+
 
 InventoryState.prototype.closeButton = {
 	x: 437,
@@ -46,6 +50,13 @@ InventoryState.prototype.input = function(e) {
 };
 
 InventoryState.prototype.update = function() {
+	
+	if(getTicks() - this.playerAnimLastRotationTime > 350) {
+		if(this.playerAnimOrientation < 5) this.playerAnimOrientation++;
+		else this.playerAnimOrientation = 0;
+		this.playerAnimLastRotationTime = getTicks();
+	}
+	
 	this.activeItem = -1;	
 	if(intersectTest(_mouse.x,_mouse.y,0,0,
 		this.x + this.closeButton.x,
@@ -55,6 +66,7 @@ InventoryState.prototype.update = function() {
 			this.activeItem = "closeButton";
 			return;
 		}
+		
 };
 
 InventoryState.prototype.render = function() {	
@@ -63,6 +75,9 @@ InventoryState.prototype.render = function() {
 	
 	_context.drawImage((this.activeItem == "closeButton" && this.mouseState == 1) ? _assets["art/intrface/lilreddn.frm"].frameInfo[0][0].img : _assets["art/intrface/lilredup.frm"].frameInfo[0][0].img,
 		this.x + this.closeButton.x, this.y + this.closeButton.y);	// bg	
+	
+	_context.drawImage(_assets[mainState.player.anim.img].frameInfo[this.playerAnimOrientation][0].img,
+		this.x + 190 + _assets[mainState.player.anim.img].shift[this.playerAnimOrientation].x, this.y + 45 + _assets[mainState.player.anim.img].shift[this.playerAnimOrientation].y);
 	
 	_context.drawImage(_assets["art/intrface/hand.frm"].frameInfo[0][0].img, _mouse.x, _mouse.y);		// cursor
 };

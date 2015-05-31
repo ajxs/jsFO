@@ -39,6 +39,7 @@ var inventoryState;
 var skilldexState;
 var ingameMenuState;
 var mainMenuState;
+var characterScreenState;
 
 
 

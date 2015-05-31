@@ -35,6 +35,7 @@ function main_init() {
 	skilldexState = new SkilldexState();
 	contextMenuState = new ContextMenuState();
 	inventoryState = new InventoryState();
+	characterScreenState = new CharacterScreenState();
 	
 	main_setResolution(640,480);	// set after init states
 	
@@ -45,11 +46,125 @@ function main_init() {
 	newGame.player.PID = 0;
 	newGame.player.objectTypeID = 1;
 	newGame.player.objectID = 0;
+	
+	newGame.player.name = "Anthony";
+	newGame.player.age = 28;
+	newGame.player.sex = "male";
 
 	newGame.player.FID = 16777227;		// hmjmpsaa
 	newGame.player.frmTypeID = 0;
 	newGame.player.frmID = 0;	
 
+	newGame.player.skills = {
+		
+		"Small Guns": {
+			level: 0,
+			tagged: 0,
+		},
+		"Big Guns": {
+			level: 0,
+			tagged: 0,			
+		},
+		"Energy Weapons": {
+			level: 0,
+			tagged: 0,			
+		},
+		"Unarmed": {
+			level: 0,
+			tagged: 0,			
+		},
+		"Melee Weapons": {
+			level: 0,
+			tagged: 0,			
+		},
+		"Throwing": {
+			level: 0,
+			tagged: 0,			
+		},
+		"First Aid": {
+			level: 0,
+			tagged: 0,			
+		},	
+		"Doctor": {
+			level: 0,
+			tagged: 0,			
+		},
+		"Sneak": {
+			level: 0,
+			tagged: 0,			
+		},	
+		"Lockpick": {
+			level: 0,
+			tagged: 0,			
+		},
+		"Steal": {
+			level: 0,
+			tagged: 0,
+		},
+		"Traps": {
+			level: 0,
+			tagged: 0,
+		},
+		"Science": {
+			level: 0,
+			tagged: 0,
+		},
+		"Repair": {
+			level: 0,
+			tagged: 0,
+		},
+		"Speech": {
+			level: 0,
+			tagged: 0,
+		},
+		"Barter": {
+			level: 0,
+			tagged: 0,
+		},
+		"Gambling": {
+			level: 0,
+			tagged: 0,
+		},
+		"Outdoorsman": {
+			level: 0,
+			tagged: 0,
+		},
+		
+		
+	};
+	
+	newGame.player.stats = {
+		"armorClass": {
+			level: 1,
+		},
+		"actionPoints": {
+			level: 1,
+		},
+		"carryWeight": {
+			level: 1,
+		},
+		"meleeDamage": {
+			level: 1,
+		},
+		"damageRes.": {
+			level: 1,
+		},
+		"poisonRes.": {
+			level: 1,
+		},
+		"radiationRes.": {
+			level: 1,
+		},
+		"sequence": {
+			level: 1,
+		},
+		"healingRate": {
+			level: 1,
+		},
+		"criticalChance": {
+			level: 1,
+		},
+	}
 	
 	main_loadMain();
 	mainState.console.print("Welcome to jsFO!");
@@ -204,6 +319,7 @@ function main_setResolution(width,height) {		// realtime resolution change
 
 function main_openInventory() {
 	mainState.statePause = true;
+	inventoryState.playerAnimLastRotationTime = getTicks();
 	stateQ.push(inventoryState);		
 	
 };
@@ -254,4 +370,16 @@ function main_closeSkilldex() {
 	if(mainState.statePause) mainState.statePause = false;
 	stateQ.splice(stateQ.indexOf(skilldexState),1);
 };
+
+function main_openCharacterScreen() {
+	mainState.statePause = true;
+	mainState.contextMenuActive = false;
+	stateQ.push(characterScreenState);
+};
+
+function main_closeCharacterScreen() {
+	if(mainState.statePause) mainState.statePause = false;
+	stateQ.splice(stateQ.indexOf(characterScreenState),1);
+};
+
 
