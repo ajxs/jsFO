@@ -231,6 +231,15 @@ def loadMain():
 	loadFRM(master_dat_file,master_dat,"art/intrface/invbutup.frm")
 	loadFRM(master_dat_file,master_dat,"art/intrface/hand.frm")
 	
+	loadFRM(master_dat_file,master_dat,"art/intrface/pipup.frm")
+	loadFRM(master_dat_file,master_dat,"art/intrface/pipdn.frm")
+	
+	loadFRM(master_dat_file,master_dat,"art/intrface/mapdn.frm")
+	loadFRM(master_dat_file,master_dat,"art/intrface/mapup.frm")
+	
+	loadFRM(master_dat_file,master_dat,"art/intrface/optiup.frm")
+	loadFRM(master_dat_file,master_dat,"art/intrface/optidn.frm")
+	
 	loadFRM(master_dat_file,master_dat,"art/intrface/edtredt.frm")
 	loadFRM(master_dat_file,master_dat,"art/intrface/chaup.frm")
 	loadFRM(master_dat_file,master_dat,"art/intrface/chadn.frm")
@@ -250,6 +259,11 @@ def loadMain():
 	
 	loadFRM(master_dat_file,master_dat,"art/intrface/alltalk.frm")
 	loadFRM(master_dat_file,master_dat,"art/intrface/di_talk.frm")
+	
+	loadFRM(master_dat_file,master_dat,"art/intrface/pip.frm")
+	
+	loadFRM(master_dat_file,master_dat,"art/intrface/automap.frm")
+	loadFRM(master_dat_file,master_dat,"art/intrface/autoup.frm")
 	
 	loadFRM(master_dat_file,master_dat,"art/skilldex/strength.frm")		#skilldex
 	loadFRM(master_dat_file,master_dat,"art/skilldex/perceptn.frm")

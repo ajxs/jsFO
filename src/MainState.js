@@ -164,14 +164,34 @@ MainState.prototype.interfaceRect = {
 		width: 32,
 		height: 21,		
 	},
+
+	mapButton: {
+		x: 526,
+		y: 39,
+		width: 41,
+		height: 19,		
+	},
 	
 	charButton: {
 		x: 526,
 		y: 58,
 		width: 41,
 		height: 19,		
-	}
+	},
 	
+	pipButton: {
+		x: 526,
+		y: 77,
+		width: 41,
+		height: 19,		
+	},
+	
+	menuButton: {
+		x: 210,
+		y: 61,
+		width: 34,
+		height: 34,		
+	},	
 
 	
 };
@@ -628,6 +648,18 @@ MainState.prototype.input = function(e) {
 						main_openCharacterScreen();
 						this.interfaceRect.activeItem = -1;
 						break;
+					case "pipButton":
+						main_openPipboy();
+						this.interfaceRect.activeItem = -1;
+						break;
+					case "mapButton":
+						main_openMap();
+						this.interfaceRect.activeItem = -1;
+						break;
+					case "menuButton":
+						main_ingameMenu();
+						this.interfaceRect.activeItem = -1;
+						break;
 				}
 			} else if(this.inputState == "game") {
 				if(this.inputState_sub == "move") {
@@ -783,8 +815,8 @@ MainState.prototype.getObjectIndex = function() {
 
 MainState.prototype.update = function() {
 
-	this.scrollStates.yNeg = (_mouse.y < (_screenHeight * 0.05));
-	this.scrollStates.yPos = (_mouse.y > (_screenHeight * 0.95));
+	this.scrollStates.yNeg = (_mouse.y < (_screenHeight * 0.025));
+	this.scrollStates.yPos = (_mouse.y > (_screenHeight * 0.975));
 	this.scrollStates.xNeg = (_mouse.x < (_screenWidth * 0.05));
 	this.scrollStates.xPos = (_mouse.x > (_screenWidth * 0.95));
 	this.scrollState = (this.scrollStates.yNeg || this.scrollStates.yPos || this.scrollStates.xNeg || this.scrollStates.xPos);
@@ -823,7 +855,22 @@ MainState.prototype.update = function() {
 			this.interfaceRect.x + this.interfaceRect.charButton.x, this.interfaceRect.y + this.interfaceRect.charButton.y,
 			this.interfaceRect.charButton.width, this.interfaceRect.charButton.height)) {
 				this.interfaceRect.activeItem = "charButton";
-			}			
+			}
+		if(intersectTest(_mouse.x,_mouse.y,0,0,
+			this.interfaceRect.x + this.interfaceRect.pipButton.x, this.interfaceRect.y + this.interfaceRect.pipButton.y,
+			this.interfaceRect.pipButton.width, this.interfaceRect.pipButton.height)) {
+				this.interfaceRect.activeItem = "pipButton";
+			}
+		if(intersectTest(_mouse.x,_mouse.y,0,0,
+			this.interfaceRect.x + this.interfaceRect.mapButton.x, this.interfaceRect.y + this.interfaceRect.mapButton.y,
+			this.interfaceRect.mapButton.width, this.interfaceRect.mapButton.height)) {
+				this.interfaceRect.activeItem = "mapButton";
+			}
+		if(intersectTest(_mouse.x,_mouse.y,0,0,
+			this.interfaceRect.x + this.interfaceRect.menuButton.x, this.interfaceRect.y + this.interfaceRect.menuButton.y,
+			this.interfaceRect.menuButton.width, this.interfaceRect.menuButton.height)) {
+				this.interfaceRect.activeItem = "menuButton";
+			}				
 	} else {
 		this.inputState = "game";
 		
@@ -1109,6 +1156,18 @@ MainState.prototype.render = function() {
 			case "charButton":
 				_context.drawImage(_assets["art/intrface/chadn.frm"].frameInfo[0][0].img,
 					this.interfaceRect.x + this.interfaceRect.charButton.x, this.interfaceRect.y + this.interfaceRect.charButton.y);	// interface
+				break;
+			case "pipButton":
+				_context.drawImage(_assets["art/intrface/pipdn.frm"].frameInfo[0][0].img,
+					this.interfaceRect.x + this.interfaceRect.pipButton.x, this.interfaceRect.y + this.interfaceRect.pipButton.y);	// interface
+				break;
+			case "mapButton":
+				_context.drawImage(_assets["art/intrface/mapdn.frm"].frameInfo[0][0].img,
+					this.interfaceRect.x + this.interfaceRect.mapButton.x, this.interfaceRect.y + this.interfaceRect.mapButton.y);	// interface
+				break;
+			case "menuButton":
+				_context.drawImage(_assets["art/intrface/optidn.frm"].frameInfo[0][0].img,
+					this.interfaceRect.x + this.interfaceRect.menuButton.x, this.interfaceRect.y + this.interfaceRect.menuButton.y);	// interface
 				break;
 		}		
 	}

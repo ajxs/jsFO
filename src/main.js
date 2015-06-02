@@ -36,6 +36,8 @@ function main_init() {
 	contextMenuState = new ContextMenuState();
 	inventoryState = new InventoryState();
 	characterScreenState = new CharacterScreenState();
+	pipboyState = new PipboyState();
+	mapScreenState = new MapScreenState();
 	
 	main_setResolution(640,480);	// set after init states
 	
@@ -198,7 +200,7 @@ function main_menu() {
 }
 
 var newGame = {
-	map: "artemple.map",
+	map: "geckpwpl.map",
 	playerStartPos: "default",
 	playerStartOrientation: "default",
 	playerStartElevation: "default",
@@ -307,6 +309,10 @@ function main_setResolution(width,height) {		// realtime resolution change
 	mainState.console.x = (((_screenWidth / 2)|0) - 320) + 30;	// recompute coords 
 	mainState.console.y = _screenHeight - 26;
 	
+	mapScreenState.x = (((_screenWidth / 2)|0) - 260);
+	mapScreenState.y = 0;
+	
+	
 	ingameMenuState.menu.x = ((_screenWidth/2)|0) - 82;
 	ingameMenuState.menu.y = ((_screenHeight/2)|0) - 108;
 	
@@ -344,12 +350,10 @@ function main_openContextMenu(obj,x,y) {
 function main_closeContextMenu() {
 	if(mainState.statePause) mainState.statePause = false;
 	stateQ.splice(stateQ.indexOf(contextMenuState),1);	
-	
 };
 
 function main_ingameMenu() {
 	mainState.statePause = true;
-	mainState.contextMenuActive = false;
 	stateQ.push(ingameMenuState);
 	_keyboardStates[27] = false;	// LOL - sets ESC key state to false to prevent the next iteration of the gamestate stack from capturing the input.
 };
@@ -361,7 +365,6 @@ function main_ingameMenu_close() {
 
 function main_openSkilldex() {
 	mainState.statePause = true;
-	mainState.contextMenuActive = false;
 	stateQ.push(skilldexState);
 	_keyboardStates[27] = false;	// LOL - sets ESC key state to false to prevent the next iteration of the gamestate stack from capturing the input.	
 };
@@ -373,7 +376,6 @@ function main_closeSkilldex() {
 
 function main_openCharacterScreen() {
 	mainState.statePause = true;
-	mainState.contextMenuActive = false;
 	stateQ.push(characterScreenState);
 };
 
@@ -381,5 +383,29 @@ function main_closeCharacterScreen() {
 	if(mainState.statePause) mainState.statePause = false;
 	stateQ.splice(stateQ.indexOf(characterScreenState),1);
 };
+
+function main_openPipboy() {
+	mainState.statePause = true;
+	stateQ.push(pipboyState);
+	
+};
+
+function main_closePipboy() {
+	if(mainState.statePause) mainState.statePause = false;
+	stateQ.splice(stateQ.indexOf(pipboyState),1);
+};
+
+
+function main_openMap() {
+	mainState.statePause = true;
+	stateQ.push(mapScreenState);
+	
+};
+
+function main_closeMap() {
+	if(mainState.statePause) mainState.statePause = false;
+	stateQ.splice(stateQ.indexOf(mapScreenState),1);
+};
+
 
 

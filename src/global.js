@@ -40,6 +40,8 @@ var skilldexState;
 var ingameMenuState;
 var mainMenuState;
 var characterScreenState;
+var pipboyState;
+var mapScreenState;
 
 
 
