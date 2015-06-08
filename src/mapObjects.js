@@ -1,6 +1,7 @@
 function Actor() {
 	SpriteObject.call(this);
 
+	
 	this.runState = false;
 	this.moveState = false;
 	this.moveDest = 0;
@@ -35,6 +36,8 @@ function SpriteObject() {		// REMEMBER TO INIT EVERYTHING
 	
 	this.orientation = 0;
 	this.hexPosition = 0;
+	
+	this.actionQ = [];
 	
 	this.PID = 0,
 	this.objectTypeID = 0,
@@ -76,6 +79,7 @@ function SpriteObject() {		// REMEMBER TO INIT EVERYTHING
 SpriteObject.prototype = {
 	constructor: SpriteObject,
 
+	actionQ: [],
 	orientation: 0,
 	hexPosition: 0,
 	

@@ -129,6 +129,7 @@ MainState.prototype.createMapObject = function(source) {
 
 };
 
+
 MainState.prototype.object_playAnim = function(obj, newAnim, frame, actionFrame, dir, loop, actionCallback, endCallback) {
 	// playAnim differs from setAnim in that behaviors can be set here, this calls setAnim where the img var is generated, and offsets computed.
 	if(!dir) dir = 0;
@@ -143,16 +144,11 @@ MainState.prototype.object_playAnim = function(obj, newAnim, frame, actionFrame,
 
 	obj.anim.actionFrame = actionFrame;
 	
-	if(isFunction(actionCallback)) {
-		obj.anim.actionFrameCallback = actionCallback;
+	if(actionCallback == endCallback) {
+		if(isFunction(actionCallback) && isFunction(endCallback)) this.actor_addAction(obj,actionCallback,"onActionFrame|onAnimEnd");		
 	} else {
-		obj.anim.actionFrameCallback = 0;
-	}
-	
-	if(isFunction(endCallback)) {
-		obj.anim.animEndCallback = endCallback;
-	} else {
-		obj.anim.animEndCallback = 0;
+		if(isFunction(actionCallback)) this.actor_addAction(obj,actionCallback,"onActionFrame");
+		if(isFunction(endCallback)) this.actor_addAction(obj,endCallback,"onAnimEnd");
 	}
 	
 };
@@ -176,8 +172,6 @@ MainState.prototype.object_setAnim = function(obj, newAnim, frame, dir, loop, ac
 	obj.anim.img = this.generateFRMstring(obj);	
 	this.object_setFrame(obj,frame);	// reset frame and offset
 		
-	
-	
 };
 
 MainState.prototype.object_setFrame = function(obj,frame) {
@@ -210,11 +204,13 @@ MainState.prototype.actor_beginMoveState = function(actor, dest, runState, pathC
 		var newMoveState = function() {
 			mState.actor_moveStep(actor);
 			mState.actor_endMoveState(actor);
+			mState.actor_cancelAction(actor);
 			mState.actor_beginMoveState(actor,dest,mState.inputRunState);			
-		};
+		}
 		
-		actor.anim.actionFrameCallback = newMoveState;
-		actor.anim.animEndCallback = newMoveState;
+		mState.actor_addActionToFront(actor,newMoveState,"onAnimEnd|onActionFrame");
+		
+		
 		return;
 	}
 	
@@ -228,21 +224,19 @@ MainState.prototype.actor_beginMoveState = function(actor, dest, runState, pathC
 	actor.ai.moveNext = actor.ai.pathQ.shift();
 	actor.orientation = this.mapGeometry.findOrientation(actor.hexPosition,actor.ai.moveNext);
 	
-	if(isFunction(pathCompleteCallback)) {
-		actor.anim.moveEndCallback = pathCompleteCallback;
-	} else {
-		actor.anim.moveEndCallback = 0;
-	}
 	
-	var callback = function() {
+	var moveStep = function() {
 		mState.actor_moveStep(actor);
 	};
 
 	if(actor.ai.runState) {	// run
-		this.object_playAnim(actor,"run",0,2,0,true,callback,callback);
+		this.object_playAnim(actor,"run",0,2,0,true);
 	} else {	// walk
-		this.object_playAnim(actor,"walk",0,4,0,true,callback,callback);
+		this.object_playAnim(actor,"walk",0,4,0,true);
 	}
+	
+	mState.actor_addActionToFront(actor,moveStep,"onAnimEnd|onActionFrame");
+	
 };
 
 
@@ -252,11 +246,6 @@ MainState.prototype.actor_moveStep = function(actor) {
 
 	if(actor.hexPosition == actor.ai.moveDest) {		// destination reached
 		this.actor_endMoveState(actor);		
-		if(isFunction(actor.anim.moveEndCallback)) {	// moveEndCallback
-			var cb = actor.anim.moveEndCallback;
-			cb.call(actor);
-			actor.anim.moveEndCallback = 0;
-		}
 		return;
 	}
 
@@ -290,8 +279,8 @@ MainState.prototype.actor_moveStep = function(actor) {
 		mState.actor_moveStep(actor);
 	};
 
-	actor.anim.actionFrameCallback = moveStep;
-	actor.anim.animEndCallback = moveStep;
+	mState.actor_addActionToFront(actor,moveStep,"onAnimEnd|onActionFrame");
+	
 	
 	if(actor == mState.player) {
 		if(mState.map.hexMap[actor.currentElevation][actor.hexPosition].exitGrid) {		// exit map
@@ -311,7 +300,48 @@ MainState.prototype.actor_endMoveState = function(actor) {
 	this.object_setAnim(actor,"idle",0,0,false,false);
 	actor.anim.actionFrameCallback = 0;
 	actor.anim.animEndCallback = 0;
+	
+	this.actor_nextAction(actor,"endMoveState");
+};
 
+
+MainState.prototype.actor_addAction = function(actor,action,trigger) {
+	console.log(trigger);
+	if(isFunction(action)) {
+		actor.actionQ.push({
+			trigger: trigger,
+			action: action,
+		});
+	}
+};
+
+MainState.prototype.actor_addActionToFront = function(actor,action,trigger) {
+	if(isFunction(action)) {
+		actor.actionQ.unshift({
+			trigger: trigger,
+			action: action,
+		});
+	}
+};
+
+
+MainState.prototype.actor_nextAction = function(actor, trigger) {
+	if(!actor.actionQ.length) return false;
+	
+	actionTriggers = actor.actionQ[0].trigger.split("|");	// allow logical OR
+	for(var i = 0; i < actionTriggers.length; i++) {
+		if(actionTriggers[i] == trigger) {
+			var nextAction = actor.actionQ.shift();
+			nextAction.action.call(this);
+			return true;			
+		}		
+	}
+	return false;
+
+};
+
+MainState.prototype.actor_cancelAction = function(actor) {
+	actor.actionQ = [];	
 };
 
 

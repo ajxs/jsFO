@@ -663,6 +663,7 @@ MainState.prototype.input = function(e) {
 				}
 			} else if(this.inputState == "game") {
 				if(this.inputState_sub == "move") {
+					//this.actor_cancelAction(this.player);
 					this.actor_beginMoveState(this.player,this.hIndex,this.inputRunState);
 				}
 			}
@@ -760,7 +761,9 @@ MainState.prototype.contextMenuAction = function(action,target) {		// make sure 
 			if(useFunction) {
 				if(useDest == this.player.hexPosition) useFunction();
 				if(useDest != -1) {		// fix this to be correctly aligned
-					this.actor_beginMoveState(this.player, useDest, this.inputRunState, useFunction);
+					this.actor_addAction(this.player,useFunction,"endMoveState");
+					this.actor_beginMoveState(this.player, useDest, this.inputRunState);
+					
 				}
 			} else {
 				console.log("no useFunction definiton");
@@ -935,12 +938,8 @@ MainState.prototype.update = function() {
 						this.currentRenderObject.anim.frameNumber--;
 					}
 
-					if(this.currentRenderObject.anim.frameNumber == this.currentRenderObject.anim.actionFrame) {	// if action frame
-						if(isFunction(this.currentRenderObject.anim.actionFrameCallback)) {
-							var callback = this.currentRenderObject.anim.actionFrameCallback;	
-							this.currentRenderObject.anim.actionFrameCallback = 0;	// pop callback
-							callback.call(this.currentRenderObject);
-						}
+					if(this.currentRenderObject.anim.frameNumber == this.currentRenderObject.anim.actionFrame) {	// if action frame						
+						this.actor_nextAction(this.currentRenderObject,"onActionFrame");	
 					}
 				} else {	// if anim ended
 					if(this.currentRenderObject.anim.animLoop) {
@@ -953,15 +952,10 @@ MainState.prototype.update = function() {
 					} else {
 						this.currentRenderObject.anim.animActive = false;
 					}
-
-					if(isFunction(this.currentRenderObject.anim.animEndCallback)) {		// end anim callback
-						var callback = this.currentRenderObject.anim.animEndCallback;	// pop callback
-						this.currentRenderObject.anim.animEndCallback = 0;
-						callback.call(this.currentRenderObject);
-					}
+					
+					this.actor_nextAction(this.currentRenderObject,"onAnimEnd");
 
 				}
-
 				this.currentRenderObject.anim.lastFrameTime = getTicks();
 			}
 		}
