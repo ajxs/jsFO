@@ -254,7 +254,7 @@ MainState.prototype.mapGeometry = {	// struct for map geometry vars/functions
 	},
 
 	c2s: function(i) {	// maptile index to screen coords
-		var tx = 48, ty = -2;
+		var tx = 48, ty = -3;
 		var tCol = i%this.m_width, tRow = (i/this.m_width)|0;
 		return {
 			x: this.m_origin.x - tx - (tCol*48) + (tRow*32),
