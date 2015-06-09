@@ -171,6 +171,10 @@ MainState.prototype.object_setAnim = function(obj, newAnim, frame, dir, loop, ac
 	
 	obj.anim.img = this.generateFRMstring(obj);	
 	this.object_setFrame(obj,frame);	// reset frame and offset
+	
+	if(obj.hasOwnProperty('ai') && newAnim == "idle") {		// idle
+		obj.ai.idleStartTime = getTicks();
+	}
 		
 };
 
@@ -305,25 +309,49 @@ MainState.prototype.actor_endMoveState = function(actor) {
 };
 
 
-MainState.prototype.actor_addAction = function(actor,action,trigger) {
-	console.log(trigger);
+MainState.prototype.actor_addAction = function(actor,action,trigger,delay) {
 	if(isFunction(action)) {
 		actor.actionQ.push({
 			trigger: trigger,
 			action: action,
+			timeStart: getTicks(),
+			delay: delay,
 		});
 	}
 };
 
-MainState.prototype.actor_addActionToFront = function(actor,action,trigger) {
+MainState.prototype.actor_addActionToFront = function(actor,action,trigger,delay) {
 	if(isFunction(action)) {
 		actor.actionQ.unshift({
 			trigger: trigger,
 			action: action,
+			timeStart: getTicks(),
+			delay: delay,
 		});
 	}
 };
 
+MainState.prototype.actor_checkTimedAction = function(actor) {
+	if(!actor.actionQ.length) return false;
+	
+	actionTriggers = actor.actionQ[0].trigger.split("|");	// allow logical OR
+	for(var i = 0; i < actionTriggers.length; i++) {
+		if(actionTriggers[i] == "timed") {
+			
+			var currentTime = getTicks();
+			var endTime = actor.actionQ[0].timeStart + (actor.actionQ[0].delay*1000);
+			
+			if(currentTime > endTime) {
+				var nextAction = actor.actionQ.shift();
+				nextAction.action.call(this);
+				return true;			
+			}
+				
+		}		
+	}
+	return false;
+	
+}
 
 MainState.prototype.actor_nextAction = function(actor, trigger) {
 	if(!actor.actionQ.length) return false;

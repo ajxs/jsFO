@@ -104,47 +104,60 @@ MainLoadState.prototype.init = function() {		// use arguments here to pass saved
 		}			
 			
 		console.log("MainLoadState: mainState context menuItems init");
-		contextMenuState.menuItems = [{
-				img: _assets["art/intrface/usegetn.frm"].frameInfo[0][0].img,
-				hoverImg: _assets["art/intrface/usegeth.frm"].frameInfo[0][0].img,
-				action: "use",
-				active: true,
-			}, {
+		
+		ContextMenuState.prototype.menu_talk = {
 				img: _assets["art/intrface/talkn.frm"].frameInfo[0][0].img,
 				hoverImg: _assets["art/intrface/talkh.frm"].frameInfo[0][0].img,
 				action: "talk",
-				active: true,
-			}, {
+			};
+			
+		ContextMenuState.prototype.menu_look = {
 				img: _assets["art/intrface/lookn.frm"].frameInfo[0][0].img,
 				hoverImg: _assets["art/intrface/lookh.frm"].frameInfo[0][0].img,
 				action: "look",
-				active: true,
-			}, {
+			};
+			
+		ContextMenuState.prototype.menu_use = {
+				img: _assets["art/intrface/usegetn.frm"].frameInfo[0][0].img,
+				hoverImg: _assets["art/intrface/usegeth.frm"].frameInfo[0][0].img,
+				action: "use",
+			};
+			
+		ContextMenuState.prototype.menu_push = {
 				img: _assets["art/intrface/pushn.frm"].frameInfo[0][0].img,
 				hoverImg: _assets["art/intrface/pushh.frm"].frameInfo[0][0].img,
 				action: "push",
-				active: false,
-			},  {
+			};
+			
+		ContextMenuState.prototype.menu_rotate = {
 				img: _assets["art/intrface/rotaten.frm"].frameInfo[0][0].img,
 				hoverImg: _assets["art/intrface/rotateh.frm"].frameInfo[0][0].img,
 				action: "rotate",
-				active: false,
-			}, {
-				img: _assets["art/intrface/skilln.frm"].frameInfo[0][0].img,
-				hoverImg: _assets["art/intrface/skillh.frm"].frameInfo[0][0].img,
-				action: "skill",
-				active: true,
-			}, {
-				img: _assets["art/intrface/invenn.frm"].frameInfo[0][0].img,
-				hoverImg: _assets["art/intrface/invenh.frm"].frameInfo[0][0].img,
-				action: "cancel",
-				active: true,
-			}, {
+			};
+			
+		ContextMenuState.prototype.menu_cancel = {
 				img: _assets["art/intrface/canceln.frm"].frameInfo[0][0].img,
 				hoverImg: _assets["art/intrface/cancelh.frm"].frameInfo[0][0].img,
 				action: "cancel",
-				active: true,
-			}];
+			};
+			
+		ContextMenuState.prototype.menu_inven = {
+				img: _assets["art/intrface/invenn.frm"].frameInfo[0][0].img,
+				hoverImg: _assets["art/intrface/invenh.frm"].frameInfo[0][0].img,
+				action: "cancel",
+			};
+			
+		ContextMenuState.prototype.menu_skill = {
+				img: _assets["art/intrface/skilln.frm"].frameInfo[0][0].img,
+				hoverImg: _assets["art/intrface/skillh.frm"].frameInfo[0][0].img,
+				action: "skill",
+			};
+			
+		ContextMenuState.prototype.menu_get = {
+				img: _assets["art/intrface/usegetn.frm"].frameInfo[0][0].img,
+				hoverImg: _assets["art/intrface/usegeth.frm"].frameInfo[0][0].img,
+				action: "get",
+			};
 		
 		console.log("MainLoadState: load complete");
 		main_menu();	// launch main menu

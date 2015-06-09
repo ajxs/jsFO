@@ -343,6 +343,40 @@ function main_openContextMenu(obj,x,y) {
 	contextMenuState.y = y;
 	contextMenuState.prevX = _mouse.x;
 	contextMenuState.prevY = _mouse.y;
+	
+	contextMenuState.activeItems = [];		// reset active items
+	
+	var targetObject = mainState.mapObjects[mainState.player.currentElevation][obj];
+	
+	switch(mainState.getObjectType(targetObject.objectTypeID)) {
+		case "items":
+			contextMenuState.activeItems.push(contextMenuState.menu_get);
+			contextMenuState.activeItems.push(contextMenuState.menu_look);
+			contextMenuState.activeItems.push(contextMenuState.menu_inven);
+			contextMenuState.activeItems.push(contextMenuState.menu_skill);
+			break;
+		case "critters":
+			contextMenuState.activeItems.push(contextMenuState.menu_talk);
+			contextMenuState.activeItems.push(contextMenuState.menu_look);
+			contextMenuState.activeItems.push(contextMenuState.menu_inven);
+			contextMenuState.activeItems.push(contextMenuState.menu_skill);
+			break;
+		case "scenery":
+		case "walls":
+		case "tiles":
+		case "misc":
+			contextMenuState.activeItems.push(contextMenuState.menu_look);
+			break;
+		default:
+			break;
+	}
+	
+	if(targetObject.hasOwnProperty('openState')) {	// if door
+		contextMenuState.activeItems.unshift(contextMenuState.menu_use);
+	}
+	
+	contextMenuState.activeItems.push(contextMenuState.menu_cancel);
+	
 	stateQ.push(contextMenuState);	
 
 };

@@ -736,28 +736,33 @@ MainState.prototype.contextMenuAction = function(action,target) {		// make sure 
 					break;
 				}
 			}
+			
 
 			switch(targetItem.objectType) {
 				case "door":
-					if(targetItem.openState == 0) {	// door is closed
-						useFunction = function() {
-							//console.log("useFunction: " + targetItem.hexPosition + " / " + mainState.player.hexPosition);
-							mState.player.orientation = mState.mapGeometry.findOrientation(mState.player.hexPosition, targetItem.hexPosition);
-							mState.object_playAnim(mState.player,"use",0,0,0,false,0,function() {
-								mState.object_openDoor(targetItem);
-							});
-						};
-					} else {
-						useFunction = function() {
-							mState.player.orientation = mState.mapGeometry.findOrientation(mState.player.hexPosition, targetItem.hexPosition);
-							mState.object_playAnim(mState.player,"use",0,0,0,false,0,function() {
-								mState.object_closeDoor(targetItem);
-							});
-						};
-					}
+					useFunction = function() {
+						//console.log("useFunction: " + targetItem.hexPosition + " / " + mainState.player.hexPosition);
+						mState.player.orientation = mState.mapGeometry.findOrientation(mState.player.hexPosition, targetItem.hexPosition);
+						mState.object_playAnim(mState.player,"use",0,0,0,false,0,function() {
+							if(targetItem.openState == 0) mState.object_openDoor(targetItem);
+							else mState.object_closeDoor(targetItem);
+						});
+					};
 					break;
 			}
 
+			/* if(targetItem.anim.animActive) {
+				if(useDest == this.player.hexPosition) {
+					this.actor_addAction(targetItem,useFunction,"onAnimEnd");	// queue action till after animation - might need to fix this 
+				}
+				if(useDest != -1) {		// fix this to be correctly aligned
+					this.actor_addAction(this.player,useFunction,"endMoveState");
+					this.actor_beginMoveState(this.player, useDest, this.inputRunState);
+					
+				}
+				return;
+			} */
+			
 			if(useFunction) {
 				if(useDest == this.player.hexPosition) useFunction();
 				if(useDest != -1) {		// fix this to be correctly aligned
@@ -919,7 +924,7 @@ MainState.prototype.update = function() {
 
 	for(var i=0; i < mapObjectsLength; i++) {	// tasks, framestep
 		this.currentRenderObject = this.mapObjects[e][i];
-		
+
 		this.currentRenderImg = _assets[this.currentRenderObject.anim.img];
 
 		if(this.currentRenderObject.anim.animActive) {	// framestep and animation functions
@@ -958,8 +963,17 @@ MainState.prototype.update = function() {
 				}
 				this.currentRenderObject.anim.lastFrameTime = getTicks();
 			}
+		} else {	// anim inactive
+			if(this.currentRenderObject.hasOwnProperty('ai')) {		// idle twitch
+				if(getTicks() - this.currentRenderObject.ai.idleStartTime > 2000) {
+					if(Math.random() > 0.95) this.object_playAnim(this.currentRenderObject,"idle",0,0,0,false,0,function() {		//(obj, newAnim, frame, actionFrame, dir, loop, actionCallback, endCallback) {
+						this.object_setAnim(this.currentRenderObject,"idle");		// reset to frame zero.
+					});		
+					this.currentRenderObject.ai.idleStartTime = getTicks();
+				}
+			}
 		}
-
+		
 	}	// end mapobjects loop		
 
 	var playerCoords = this.mapGeometry.h2s(this.player.hexPosition);

@@ -15,7 +15,7 @@ function Actor() {
 		moveNext: 0,
 		
 		pathQ: 0,
-
+		idleStartTime: 0,
 	};
 	
 }
