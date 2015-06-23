@@ -5,7 +5,6 @@ function browser_getCallFrame() {
 		window.oRequestAnimationFrame      ||
 		window.msRequestAnimationFrame     ||
 		null;
-
 };
 
 var browser_getError = function(msg) {

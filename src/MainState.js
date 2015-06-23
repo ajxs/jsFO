@@ -679,39 +679,56 @@ MainState.prototype.input = function(e) {
 };
 
 MainState.prototype.contextMenuAction = function(action,target) {		// make sure elevations fixed
+
+	var description = function(type,textID) {	// returns description for item	
+		console.log(type + " " + textID);
+		var msgFile = 0;
+		switch(type) {
+			case "items":
+				msgFile = _assets["text/english/game/pro_item.msg"];
+				break;
+			case "critters":
+				msgFile = _assets["text/english/game/pro_crit.msg"];
+				break;
+			case "scenery":
+				msgFile = _assets["text/english/game/pro_scen.msg"];
+				break;
+			case "walls":
+				msgFile = _assets["text/english/game/pro_wall.msg"];
+				break;
+			case "tiles":
+				msgFile = _assets["text/english/game/pro_tile.msg"];
+				break;
+			case "misc":
+				msgFile = _assets["text/english/game/pro_misc.msg"];
+				break;
+		}
+
+		if(msgFile.msg[textID]) {
+			return msgFile.msg[textID].text;
+		} else return false;		
+		
+	};
+
 	switch(action) {
-		case "look":
-			if(target == 0) return;		// black false-positive
-			var itemDesc = "";
-			var msgFile = 0;
+		case "hoverlook":		// implement hover look to differentiate between hovering brief desc vs detailed desc. on 'look' action.
 			var type = this.getObjectType(this.mapObjects[this.player.currentElevation][target].objectTypeID);
-			switch(type) {
-				case "items":
-					msgFile = _assets["text/english/game/pro_item.msg"];
-					break;
-				case "critters":
-					msgFile = _assets["text/english/game/pro_crit.msg"];
-					break;
-				case "scenery":
-					msgFile = _assets["text/english/game/pro_scen.msg"];
-					break;
-				case "walls":
-					msgFile = _assets["text/english/game/pro_wall.msg"];
-					break;
-				case "tiles":
-					msgFile = _assets["text/english/game/pro_tile.msg"];
-					break;
-				case "misc":
-					msgFile = _assets["text/english/game/pro_misc.msg"];
-					break;
-			}
-
 			var textIndex = this.mapObjects[this.player.currentElevation][target].textID;
-			if(msgFile.msg[textIndex]) {
-				itemDesc = msgFile.msg[textIndex].text;
-				this.console.print("You see: " + itemDesc + ".");
-			} else return;
-
+			var desc = description(type, textIndex);
+			if(desc) {	//@change this so that it reads from text/english/game/proto.msg - line 490.
+				this.console.print("You see: " + desc + ".");			
+			}
+			break;
+	
+		case "look":
+			var type = this.getObjectType(this.mapObjects[this.player.currentElevation][target].objectTypeID);
+			var textIndex = this.mapObjects[this.player.currentElevation][target].textID+1;
+			var desc = description(type, textIndex);
+			if(desc) {	//@change this so that it reads from text/english/game/proto.msg - line 490.
+				this.console.print("You see " + desc + ".");			
+			} else {
+				this.console.print("You see nothing out of the ordinary.");
+			}
 			break;
 
 		case "use":
@@ -750,18 +767,6 @@ MainState.prototype.contextMenuAction = function(action,target) {		// make sure 
 					};
 					break;
 			}
-
-			/* if(targetItem.anim.animActive) {
-				if(useDest == this.player.hexPosition) {
-					this.actor_addAction(targetItem,useFunction,"onAnimEnd");	// queue action till after animation - might need to fix this 
-				}
-				if(useDest != -1) {		// fix this to be correctly aligned
-					this.actor_addAction(this.player,useFunction,"endMoveState");
-					this.actor_beginMoveState(this.player, useDest, this.inputRunState);
-					
-				}
-				return;
-			} */
 			
 			if(useFunction) {
 				if(useDest == this.player.hexPosition) useFunction();
@@ -1009,7 +1014,7 @@ MainState.prototype.update = function() {
 			if(Math.abs(getTicks() - this.oIndex_time) >= 1000) {	// if user has been hovering the mouse on a specific point for 1 sec.
 				this.objectIndex = this.getObjectIndex();
 				if(this.objectIndex != -1) {
-					this.contextMenuAction("look",this.objectIndex);
+					this.contextMenuAction("hoverlook",this.objectIndex);
 					this.oIndex_time = getTicks();
 					this.oIndex_state = true;
 				}
