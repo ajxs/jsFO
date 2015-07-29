@@ -1,7 +1,5 @@
 <html>
 <head>
-
-
 	<link rel="stylesheet" href="inc/main.css">
 
 	<script src="src/browser.js"></script>
@@ -10,6 +8,7 @@
 	<script src="src/GameState.js"></script>
 	<script src="src/GameMap.js"></script>
 	<script src="src/MainState.js"></script>
+	<script src="src/newGame.js"></script>
 	<script src="src/MainState_obj.js"></script>
 	<script src="src/LoadState.js"></script>
 	<script src="src/MainLoadState.js"></script>
@@ -31,8 +30,8 @@
 	
 </head>
 
-
-<body onLoad="main_init()">
+<!--Entry point defined as window.addEventListener("load", main_init) in main.js -->
+<body>
 	<div id="main">
 		<div id="main_header">
 			<img src="inc/main_topLogo.png"/>
@@ -54,5 +53,5 @@
 		<img id="MainMenuState_btn" src="inc/MainMenuState_btn.png"/>
 		<img id="MainLoadState_bg" src="inc/MainLoadState_bg.png"/>
 	</div>
-	
+	<canvas id="testCanvas" oncontextmenu="javascript: return false;"></canvas>
 </body>

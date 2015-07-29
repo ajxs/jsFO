@@ -207,9 +207,8 @@ MainState.prototype.console = {
 	print: function() {	// accepts n arguments, pushes all to console
 		for(var i = 0; i < arguments.length; i++) {
 			var string = "\x95" + arguments[i];
-			var split = string.match(/.{1,22}/g);
+			var split = string.match(/.{1,22}/g);	// split string to line width
 			for(var k = 0; k < split.length; k++) this.consoleData.push(split[k]);
-			
 		}
 	},
 
@@ -220,25 +219,25 @@ MainState.prototype.console = {
 
 MainState.prototype.mapGeometry = {	// struct for map geometry vars/functions
 
+	/* note: Hex and Tile sizes are hardcoded as:
+	hex - w: 32, h: 16
+	tile - w: 80: h: 32 */
+
 	m_width: 100,	// nTiles in row
 	h_width: 200,
 
 	m_roofHeight: 96,
 
-	m_origin: {
+	m_origin: {		//screen-space coords of map origin ( upper-right )
 		x: 0, y: 0
 	},
 
-	h_transform: {
-		x: 16, y: 12
+	m_transform: {	// offsets to make hexes and maptiles align
+		x: 48, y: -3,
 	},
+	
 
-	m_tileSize: {
-		width: 80, height: 36
-	},
-
-
-	h2s: function(i) {
+	h2s: function(i) {	// hex index to screen-space
 		var q = (i%this.h_width)|0;
 		var r = (i/this.h_width)|0;
 
@@ -253,19 +252,18 @@ MainState.prototype.mapGeometry = {	// struct for map geometry vars/functions
 		}
 	},
 
-	c2s: function(i) {	// maptile index to screen coords
-		var tx = 48, ty = -3;
+	c2s: function(i) {	// maptile index to screen-space
 		var tCol = i%this.m_width, tRow = (i/this.m_width)|0;
 		return {
-			x: this.m_origin.x - tx - (tCol*48) + (tRow*32),
-			y: this.m_origin.y + ty + tCol*12 + (tRow*24),
+			x: this.m_origin.x - this.m_transform.x - (tCol*48) + (tRow*32),
+			y: this.m_origin.y + this.m_transform.y + tCol*12 + (tRow*24),
 		}
 	},
 
-	s2h: function(mx,my) {
+	s2h: function(mx,my) {	// screen-space to hex index conversion
 		if(mx < 0) mx -= 32;    // compensate for -0 effect
 		mx *= -1;
-
+		
 		var hCol = (mx/32)|0, hRow = (my/12)|0;
 		if(hRow >0) hCol += Math.abs(hRow/2)|0;
 		hRow -= (hCol/2)|0;
@@ -274,32 +272,27 @@ MainState.prototype.mapGeometry = {	// struct for map geometry vars/functions
 
 	},
 
-	findAdj: function(i) {
-		var adjList = new Array(6);
-
-		adjList[0] = (i%2) ? i - (this.h_width+1) : i-1;
-		adjList[1] = (i%2) ? i-1 : i + (this.h_width-1);
-		adjList[2] = i+this.h_width;
-		adjList[3] = (i%2) ? i+1 : i + (this.h_width+1);
-		adjList[4] = (i%2) ? i-(this.h_width-1) : i+1;
-		adjList[5] = i-this.h_width;
-
-		return adjList;
-
-
+	findAdj: function(i) {	// returns array of indexes of hexes adjacent to index		
+		return new Array(
+			(i%2) ? i - (this.h_width+1) : i-1,
+			(i%2) ? i-1 : i + (this.h_width-1),
+			i+this.h_width,
+			(i%2) ? i+1 : i + (this.h_width+1),
+			(i%2) ? i-(this.h_width-1) : i+1,
+			i-this.h_width);
 	},
 
 	findOrientation: function(_origin, _dest) {		// finds orientation between two adjacent hexes
 		if(_origin == _dest) {
-			console.log("MainState: mapGeometry - idential origin and destination: " + _origin + " - " + _dest);
+			console.log("MainState: findOrientation error: origin and dest identical");
 			return 0;
 		}
-		var adjArr = this.findAdj(_origin);
-		for(var i = 0; i < 6; i++) if(_dest == adjArr[i]) return i;
-
-		console.log("MainState: mapGeometry - findOrientation error: " + _origin + " - " + _dest);
-		return 0;	// if error
-
+		var orientation = this.findAdj(_origin).indexOf(_dest);
+		if(orientation == -1) {
+			console.log("MainState: findOrientation error: -1");
+			return 0;
+		}
+		return orientation;
 	},
 
 	hDistance: function(_a,_b) {	// pythagorean distance
@@ -357,10 +350,8 @@ MainState.prototype.init = function(_saveState) {		// use arguments here to pass
 		for(var i = 0; i < objectInfoLength; i++) {
 
 			this.mapObjects[n][i] = this.createMapObject(_assets[loadMap].objectInfo[n][i]);
-			
-			if(this.mapObjects[n][i].itemFlags & 0x00000010) {	// if can be walked through
-				//this.map.hexMap[n][this.mapObjects[n][i].hexPosition].blocked = false;				
-			} else this.map.hexMap[n][this.mapObjects[n][i].hexPosition].blocked = true;
+
+			if(!(this.mapObjects[n][i].itemFlags & 0x00000010)) this.map.hexMap[n][this.mapObjects[n][i].hexPosition].blocked = true;	// check if flags for 'can be walked through' are false.
 			
 			switch(this.getObjectType(this.mapObjects[n][i].frmTypeID)) {
 				case "walls":
@@ -421,7 +412,7 @@ MainState.prototype.init = function(_saveState) {		// use arguments here to pass
 
 };
 
-MainState.prototype.createSaveState = function(_map,_pos,_elev,_orientation) {
+MainState.prototype.createSaveState = function(_map,_pos,_elev,_orientation) {	// creates a gamestate for MainState to load to facilitate switching maps.
 	var saveState = {}
 	
 	if(!_pos) _pos == "default";		// fix this to track '0'
@@ -436,7 +427,7 @@ MainState.prototype.createSaveState = function(_map,_pos,_elev,_orientation) {
 	
 	saveState.player = this.player;		// save player
 	return saveState;
-}
+};
 
 
 MainState.prototype.exitMap = function(_map,_pos,_elev,_orientation) {
@@ -620,9 +611,12 @@ MainState.prototype.input = function(e) {
 				return;
 			} else if(this.inputState == "game") {
 				if(this.inputState_sub == "command") {
+					if(_mouse.c2) return;
 					this.objectIndex = this.getObjectIndex();
 					var objC = this.mapGeometry.h2s(this.mapObjects[this.player.currentElevation][this.objectIndex].hexPosition);
-					main_openContextMenu(this.objectIndex, objC.x - this.camera.x + 30, objC.y - this.camera.y - 20);
+					main_openContextMenu(this.objectIndex,
+						objC.x - this.camera.x + 30,
+						objC.y - this.camera.y - 20);
 				}
 			}
 			break;
@@ -742,19 +736,14 @@ MainState.prototype.contextMenuAction = function(action,target) {		// make sure 
 			
 			var useAdj = this.mapGeometry.findAdj(targetItem.hexPosition);
 			
-			for(var a = 0; a < 6; a++ ) {
-				if(useAdj[a] == this.player.hexPosition) {	// if player next to item
-					useDest = useAdj[a];
-					break;
-				}
-
+			useDest = useAdj.indexOf(this.player.hexPosition);	// check if player next to item
+			for(var a = 0; a < 6; a++) {
 				if(this.findPath(this.player.hexPosition,useAdj[a])) {
 					useDest = useAdj[a];
 					break;
 				}
-			}
+			}				
 			
-
 			switch(targetItem.objectType) {
 				case "door":
 					useFunction = function() {
@@ -770,7 +759,7 @@ MainState.prototype.contextMenuAction = function(action,target) {		// make sure 
 			
 			if(useFunction) {
 				if(useDest == this.player.hexPosition) useFunction();
-				if(useDest != -1) {		// fix this to be correctly aligned
+				else if(useDest != -1) {		// fix this to be correctly aligned
 					this.actor_addAction(this.player,useFunction,"endMoveState");
 					this.actor_beginMoveState(this.player, useDest, this.inputRunState);
 					
@@ -794,29 +783,38 @@ MainState.prototype.getObjectIndex = function() {
 	this.objectBufferRect.y = _mouse.y - this.objectBufferRect.height/2;
 
 	var mapObjectsLength = this.mapObjects[this.player.currentElevation].length;
-	for(var i=0; i < mapObjectsLength; i++) {
+	for(var i = 0; i < mapObjectsLength; i++) {
 		this.currentRenderObject = this.mapObjects[this.player.currentElevation][i];
 		
 		var c = this.mapGeometry.h2s(this.currentRenderObject.hexPosition);
 		this.currentRenderImg = _assets[this.currentRenderObject.anim.img].frameInfo[this.currentRenderObject.orientation][this.currentRenderObject.anim.frameNumber];
 
-		var destX = (c.x + 16 - ((this.currentRenderImg.width/2)|0)) + this.currentRenderObject.anim.shiftX - this.camera.x;
+		var destX = (c.x + 16 - ((this.currentRenderImg.width/2)|0)) + this.currentRenderObject.anim.shiftX - this.camera.x;	// object coords.
 		var destY = (c.y + 8 - this.currentRenderImg.height) + this.currentRenderObject.anim.shiftY- this.camera.y;
 
 		if(!intersectTest(destX, destY,
-			this.currentRenderImg.width, this.currentRenderImg.height,
-			this.objectBufferRect.x, this.objectBufferRect.y,
-			this.objectBufferRect.width, this.objectBufferRect.height)) continue;
+			this.currentRenderImg.width,
+			this.currentRenderImg.height,
+			this.objectBufferRect.x,
+			this.objectBufferRect.y,
+			this.objectBufferRect.width,
+			this.objectBufferRect.height)) continue;
 
 		this.objectBufferContext2.globalCompositeOperation = "source-over";
 		this.objectBuffer2.width = this.objectBufferRect.width;	// hack clear
 
-		this.objectBufferContext2.drawImage(this.currentRenderImg.img, 0, 0, this.currentRenderImg.width, this.currentRenderImg.height, 0, 0, this.currentRenderImg.width, this.currentRenderImg.height);
+		this.objectBufferContext2.drawImage(this.currentRenderImg.img,
+			0, 0);			
+			
 		this.objectBufferContext2.globalCompositeOperation = "source-in";
 		this.objectBufferContext2.fillStyle = "rgb("+ Math.floor(i/1000) +","+ Math.floor((i%1000)/100) +","+ i%100 +")";
-		this.objectBufferContext2.fillRect(0,0,this.currentRenderImg.width,this.currentRenderImg.height);
+		this.objectBufferContext2.fillRect(0,0,
+			this.currentRenderImg.width,
+			this.currentRenderImg.height);
 
-		this.objectBufferContext.drawImage(this.objectBuffer2, destX - this.objectBufferRect.x, destY - this.objectBufferRect.y);
+		this.objectBufferContext.drawImage(this.objectBuffer2,
+			destX - this.objectBufferRect.x,
+			destY - this.objectBufferRect.y);
 
 	}
 
@@ -858,32 +856,32 @@ MainState.prototype.update = function() {
 			this.interfaceRect.x + this.interfaceRect.skilldexButton.x, this.interfaceRect.y + this.interfaceRect.skilldexButton.y,
 			this.interfaceRect.skilldexButton.width, this.interfaceRect.skilldexButton.height)) {
 				this.interfaceRect.activeItem = "skilldexButton";
-			}
+		}
 		if(intersectTest(_mouse.x,_mouse.y,0,0,
 			this.interfaceRect.x + this.interfaceRect.invButton.x, this.interfaceRect.y + this.interfaceRect.invButton.y,
 			this.interfaceRect.invButton.width, this.interfaceRect.invButton.height)) {
 				this.interfaceRect.activeItem = "invButton";
-			}
+		}
 		if(intersectTest(_mouse.x,_mouse.y,0,0,
 			this.interfaceRect.x + this.interfaceRect.charButton.x, this.interfaceRect.y + this.interfaceRect.charButton.y,
 			this.interfaceRect.charButton.width, this.interfaceRect.charButton.height)) {
 				this.interfaceRect.activeItem = "charButton";
-			}
+		}
 		if(intersectTest(_mouse.x,_mouse.y,0,0,
 			this.interfaceRect.x + this.interfaceRect.pipButton.x, this.interfaceRect.y + this.interfaceRect.pipButton.y,
 			this.interfaceRect.pipButton.width, this.interfaceRect.pipButton.height)) {
 				this.interfaceRect.activeItem = "pipButton";
-			}
+		}
 		if(intersectTest(_mouse.x,_mouse.y,0,0,
 			this.interfaceRect.x + this.interfaceRect.mapButton.x, this.interfaceRect.y + this.interfaceRect.mapButton.y,
 			this.interfaceRect.mapButton.width, this.interfaceRect.mapButton.height)) {
 				this.interfaceRect.activeItem = "mapButton";
-			}
+		}
 		if(intersectTest(_mouse.x,_mouse.y,0,0,
 			this.interfaceRect.x + this.interfaceRect.menuButton.x, this.interfaceRect.y + this.interfaceRect.menuButton.y,
 			this.interfaceRect.menuButton.width, this.interfaceRect.menuButton.height)) {
 				this.interfaceRect.activeItem = "menuButton";
-			}				
+		}				
 	} else {
 		this.inputState = "game";
 		
@@ -918,7 +916,7 @@ MainState.prototype.update = function() {
 	
 	var mapObjectsLength = this.mapObjects[e].length;
 
-	this.mapObjects[e].sort( function(a, b) {
+	this.mapObjects[e].sort( function(a, b) {	// z-sort
 		var ret = a.hexPosition - b.hexPosition;
 		if(ret != 0) return ret;
 		else {
@@ -990,9 +988,11 @@ MainState.prototype.update = function() {
 		if(this.map.tileInfo[this.player.currentElevation].roofTiles[i] < 2) continue;
 		var c = this.mapGeometry.c2s(i,this.player.currentElevation);
 		
-		if(intersectTest(c.x - this.camera.x, c.y - this.camera.y - 96,
+		if(intersectTest(c.x - this.camera.x,
+			c.y - this.camera.y - 96,
 			80, 36,
-			playerX - 40, playerY - 40,		// FIX THIS
+			playerX - 40,
+			playerY - 40,		// FIX THIS
 			80, 80)) {
 				this.roofRenderState = false;
 				break;
@@ -1026,8 +1026,8 @@ MainState.prototype.update = function() {
 
 
 MainState.prototype.render = function() {
-	this.eggContext.globalCompositeOperation = 'source-over';	// EGG
-	this.eggContext.drawImage(this.transEgg,0,0);
+	this.eggContext.globalCompositeOperation = 'source-over';		// draw egg mask onto egg context.
+	this.eggContext.drawImage(this.transEgg,0,0);	
 
 	var playerCoords = this.mapGeometry.h2s(this.player.hexPosition);
 	var playerX = playerCoords.x + 16 + this.player.anim.shiftX - this.camera.x;
@@ -1037,36 +1037,50 @@ MainState.prototype.render = function() {
 	this.eggBufferRect.y = playerY - ((this.eggBufferRect.height/2)|0) - 35;	// fix this
 	
 	var e = this.player.currentElevation;
-	for(var i = 0; i < 10000; i++) {	// floor tiles	/* contemplate changing this system to utilize the hexPosition of the object, and compare it to the hex indexes of the top right and bottom right corners */
 	
-		if(this.map.tileInfo[e].floorTiles[i] < 2) continue;
+	// render floor tiles.
+	for(var i = 0; i < 10000; i++) {	
+	
+		//if(this.map.tileInfo[e].floorTiles[i] < 2) continue;
 			
 		var c = this.mapGeometry.c2s(i);
 		if(!intersectTest(c.x, c.y,		// camera test
 			80, 36,
-			this.camera.x, this.camera.y,
-			_screenWidth, _screenHeight)) continue;				
+			this.camera.x,
+			this.camera.y,
+			_screenWidth,
+			_screenHeight)) continue;				
 
 		_context.drawImage(_assets[ "art/tiles/" + _assets['art/tiles/tiles.lst'][this.map.tileInfo[e].floorTiles[i]] ].frameInfo[0][0].img,
-			c.x - this.camera.x, c.y - this.camera.y);
+			c.x - this.camera.x,
+			c.y - this.camera.y);
 
 		if(!intersectTest(c.x - this.camera.x, c.y - this.camera.y,		// camera test
 			80, 36,
-			this.eggBufferRect.x, this.eggBufferRect.y,
-			this.eggBufferRect.width, this.eggBufferRect.height)) continue;
+			this.eggBufferRect.x,
+			this.eggBufferRect.y,
+			this.eggBufferRect.width,
+			this.eggBufferRect.height)) continue;
 
 		this.eggContext.globalCompositeOperation = "source-atop";	// EGG
 		this.eggContext.drawImage(_assets[ "art/tiles/" + _assets['art/tiles/tiles.lst'][this.map.tileInfo[e].floorTiles[i]] ].frameInfo[0][0].img,
-			c.x - this.camera.x - this.eggBufferRect.x, c.y - this.camera.y - this.eggBufferRect.y);
+			c.x - this.camera.x - this.eggBufferRect.x,
+			c.y - this.camera.y - this.eggBufferRect.y);
 		
 	}
 
 	if(this.inputState == "game" && this.inputState_sub == "move") {	// lower hex cursor
-		_context.drawImage(_assets["art/intrface/msef000.frm"].frameInfo[0][0].img, this.hsIndex.x - this.camera.x, this.hsIndex.y - this.camera.y);
-		this.eggContext.drawImage(_assets["art/intrface/msef000.frm"].frameInfo[0][0].img, this.hsIndex.x - this.camera.x - this.eggBufferRect.x, this.hsIndex.y - this.camera.y - this.eggBufferRect.y);
+		_context.drawImage(_assets["art/intrface/msef000.frm"].frameInfo[0][0].img,
+			this.hsIndex.x - this.camera.x,
+			this.hsIndex.y - this.camera.y);
+			
+		this.eggContext.drawImage(_assets["art/intrface/msef000.frm"].frameInfo[0][0].img,
+			this.hsIndex.x - this.camera.x - this.eggBufferRect.x,
+			this.hsIndex.y - this.camera.y - this.eggBufferRect.y);
 	}
 
-	
+	// render map objects.
+	this.eggContext.globalCompositeOperation = 'source-over';
 	var mapObjectsLength = this.mapObjects[e].length;
 	for(var i = 0; i < mapObjectsLength; i++) {
 		
@@ -1075,50 +1089,63 @@ MainState.prototype.render = function() {
 		var c = this.mapGeometry.h2s(this.currentRenderObject.hexPosition);
 		this.currentRenderImg = _assets[this.currentRenderObject.anim.img].frameInfo[this.currentRenderObject.orientation][this.currentRenderObject.anim.frameNumber];
 		if(!intersectTest(c.x, c.y,
-			this.currentRenderImg.width, this.currentRenderImg.height,
-			this.camera.x, this.camera.y,
-			_screenWidth, _screenHeight)) continue;
+			this.currentRenderImg.width,
+			this.currentRenderImg.height,
+			this.camera.x,
+			this.camera.y,
+			_screenWidth,
+			_screenHeight)) continue;		// test if object is on screen. If not - skip.
 		
-		var destX = (c.x + 16 - ((this.currentRenderImg.width/2)|0)) + this.currentRenderObject.anim.shiftX - this.camera.x;
-		var destY = (c.y + 8 - this.currentRenderImg.height) + this.currentRenderObject.anim.shiftY- this.camera.y;
-		
-		
-		_context.drawImage(this.currentRenderImg.img, destX, destY);
+		var destX = (c.x + 16 - ((this.currentRenderImg.width/2)|0)) + this.currentRenderObject.anim.shiftX - this.camera.x;	// actual coords of of objects.
+		var destY = (c.y + 8 - this.currentRenderImg.height) + this.currentRenderObject.anim.shiftY - this.camera.y;
+		_context.drawImage(this.currentRenderImg.img,
+			destX,
+			destY);	// get dest coords in screen-space and blit.
 
-		var cCol = this.mapObjects[e][i].hexPosition % 100;
-		var pCol = this.player.hexPosition % 100;
+		// render mapObjects on eggBufferRect.
+		if(intersectTest(destX, destY,
+			this.currentRenderImg.width,
+			this.currentRenderImg.height,
+			this.eggBufferRect.x,
+			this.eggBufferRect.y,
+			this.eggBufferRect.width,
+			this.eggBufferRect.height)) {		// test if under eggBufferRect.
 
-		var cRow = (this.mapObjects[e][i].hexPosition / 100)|0;
-		var pRow = (this.player.hexPosition / 100)|0;
+			var cCol = this.mapObjects[e][i].hexPosition % 100;
+			var pCol = this.player.hexPosition % 100;
 
-		if(!intersectTest(destX, destY,		// test if under eggBufferRect
-			this.currentRenderImg.width, this.currentRenderImg.height,
-			this.eggBufferRect.x, this.eggBufferRect.y,
-			this.eggBufferRect.width, this.eggBufferRect.height)) continue;
+			var cRow = (this.mapObjects[e][i].hexPosition / 100)|0;
+			var pRow = (this.player.hexPosition / 100)|0;			
 
-
-		this.eggContext.globalCompositeOperation = "source-atop";		// this was moved from inside if(cRow....
-		if(this.getObjectType(this.mapObjects[e][i].frmTypeID) == "walls") {
-			if(cRow < pRow || cCol < pCol  ) {	// conditions for wall transparency
-				this.eggContext.drawImage(this.currentRenderImg.img, destX - this.eggBufferRect.x, destY - this.eggBufferRect.y);
+			if(this.getObjectType(this.mapObjects[e][i].frmTypeID) == "walls") {	// don't blit walls 'infront' of player.
+				if(!(cRow < pRow || cCol < pCol  )) continue;
 			}
-		} else {
-			this.eggContext.drawImage(this.currentRenderImg.img, destX - this.eggBufferRect.x, destY - this.eggBufferRect.y);
+			this.eggContext.globalCompositeOperation = "source-atop";
+			this.eggContext.drawImage(this.currentRenderImg.img,
+				destX - this.eggBufferRect.x,
+				destY - this.eggBufferRect.y);
+			
+			_context.globalCompositeOperation = 'source-over';
 		}
+		
 	}	// end mapObject loop
 
-	if(this.roofRenderState) {
+	if(this.roofRenderState) {		//Render Roofs - check against roofRenderState
 		for(var i = 0; i < 10000; i++) {					
-			if(this.map.tileInfo[e].roofTiles[i] < 2) continue;
+			//if(this.map.tileInfo[e].roofTiles[i] < 2) continue;
 				
 			var c = this.mapGeometry.c2s(i);
 			if(!intersectTest(c.x, c.y,
-				80, 36,
-				this.camera.x, this.camera.y,
-				_screenWidth, _screenHeight)) continue;
+				80,
+				36,
+				this.camera.x,
+				this.camera.y,
+				_screenWidth,
+				_screenHeight)) continue;
 			
 			_context.drawImage(_assets[ "art/tiles/" + _assets['art/tiles/tiles.lst'][this.map.tileInfo[e].roofTiles[i]] ].frameInfo[0][0].img,
-				c.x - this.camera.x, c.y - this.mapGeometry.m_roofHeight - this.camera.y);
+				c.x - this.camera.x,
+				c.y - this.mapGeometry.m_roofHeight - this.camera.y);
 
 		}			
 	}
@@ -1133,12 +1160,14 @@ MainState.prototype.render = function() {
 			if(this.map.hexMap[e][h].blocked) drawHex(cx.x - this.camera.x,cx.y - this.camera.y, "","#FF0000");	
 			if(this.map.hexMap[e][h].scrollBlock) drawHex(cx.x - this.camera.x,cx.y - this.camera.y, "","#FFFF00");	
 		}			
-	}	
+	}
 
-	_context.globalCompositeOperation = 'source-over';
+	
 	_context.drawImage(this.eggBuffer,this.eggBufferRect.x,this.eggBufferRect.y);
 
-	if(this.mapLightLevel < 1) {	// brightmap
+	// Render brightmap over the top of the main screen buffer.
+	if(this.mapLightLevel < 1) {
+		// blit main light level to brightmap buffer.
 		this.brightmapContext.fillStyle = "rgb("+((255*this.mapLightLevel)|0)+","+((255*this.mapLightLevel)|0)+","+((255*this.mapLightLevel)|0)+")";
 		this.brightmapContext.fillRect(0,0,_screenWidth,_screenHeight);
 
@@ -1152,7 +1181,9 @@ MainState.prototype.render = function() {
 	}
 
 	// interface
-	_context.drawImage(_assets["art/intrface/iface.frm"].frameInfo[0][0].img, this.interfaceRect.x, this.interfaceRect.y);	// interface
+	_context.drawImage(_assets["art/intrface/iface.frm"].frameInfo[0][0].img,
+		this.interfaceRect.x,
+		this.interfaceRect.y);	// interface
 	
 	if(this.inputState == "interface" && this.interfaceRect.mouseState == 1) {
 		switch(this.interfaceRect.activeItem) {
@@ -1160,27 +1191,33 @@ MainState.prototype.render = function() {
 				break;
 			case "skilldexButton":
 				_context.drawImage(_assets["art/intrface/bigreddn.frm"].frameInfo[0][0].img,
-					this.interfaceRect.x + this.interfaceRect.skilldexButton.x, this.interfaceRect.y + this.interfaceRect.skilldexButton.y);	// interface
+					this.interfaceRect.x + this.interfaceRect.skilldexButton.x,
+					this.interfaceRect.y + this.interfaceRect.skilldexButton.y);	// interface
 				break;
 			case "invButton":
 				_context.drawImage(_assets["art/intrface/invbutdn.frm"].frameInfo[0][0].img,
-					this.interfaceRect.x + this.interfaceRect.invButton.x, this.interfaceRect.y + this.interfaceRect.invButton.y);	// interface
+					this.interfaceRect.x + this.interfaceRect.invButton.x,
+					this.interfaceRect.y + this.interfaceRect.invButton.y);	// interface
 				break;
 			case "charButton":
 				_context.drawImage(_assets["art/intrface/chadn.frm"].frameInfo[0][0].img,
-					this.interfaceRect.x + this.interfaceRect.charButton.x, this.interfaceRect.y + this.interfaceRect.charButton.y);	// interface
+					this.interfaceRect.x + this.interfaceRect.charButton.x,
+					this.interfaceRect.y + this.interfaceRect.charButton.y);	// interface
 				break;
 			case "pipButton":
 				_context.drawImage(_assets["art/intrface/pipdn.frm"].frameInfo[0][0].img,
-					this.interfaceRect.x + this.interfaceRect.pipButton.x, this.interfaceRect.y + this.interfaceRect.pipButton.y);	// interface
+					this.interfaceRect.x + this.interfaceRect.pipButton.x,
+					this.interfaceRect.y + this.interfaceRect.pipButton.y);	// interface
 				break;
 			case "mapButton":
 				_context.drawImage(_assets["art/intrface/mapdn.frm"].frameInfo[0][0].img,
-					this.interfaceRect.x + this.interfaceRect.mapButton.x, this.interfaceRect.y + this.interfaceRect.mapButton.y);	// interface
+					this.interfaceRect.x + this.interfaceRect.mapButton.x,
+					this.interfaceRect.y + this.interfaceRect.mapButton.y);	// interface
 				break;
 			case "menuButton":
 				_context.drawImage(_assets["art/intrface/optidn.frm"].frameInfo[0][0].img,
-					this.interfaceRect.x + this.interfaceRect.menuButton.x, this.interfaceRect.y + this.interfaceRect.menuButton.y);	// interface
+					this.interfaceRect.x + this.interfaceRect.menuButton.x,
+					this.interfaceRect.y + this.interfaceRect.menuButton.y);	// interface
 				break;
 		}		
 	}
@@ -1188,16 +1225,14 @@ MainState.prototype.render = function() {
 	// console
 	for(var i = 0; i < 5; i++) {	// iterate backwards through console
 		if(!this.console.consoleData[((this.console.consoleData.length-1) - i)]) break;
-		bitmapFontRenderer.renderString(_assets["font1.aaf"], this.console.consoleData[((this.console.consoleData.length-1) - i)], this.console.x, this.console.y - (i*this.console.fontHeight), "#00FF00");
+		bitmapFontRenderer.renderString(_assets["font1.aaf"],
+			this.console.consoleData[((this.console.consoleData.length-1) - i)],
+			this.console.x,
+			this.console.y - (i*this.console.fontHeight), "#00FF00");
 	}
 
 	// cursors
 	if(this.statePause) return;		// don't render cursors if state is paused.
-	if(this.inputState == "game") {
-		if(this.oIndex_state) {
-			_context.drawImage(_assets["art/intrface/lookn.frm"].frameInfo[0][0].img, _mouse.x + 40, _mouse.y);
-		}
-	}
 
 	if(this.inputState == "scroll") {		// if scrolling
 		if(this.scrollStates.xPos) {
@@ -1232,16 +1267,22 @@ MainState.prototype.render = function() {
 			if(this.scrollStates.yPosBlocked || this.scrollStates.xNegBlocked) this.scrollimg = _assets["art/intrface/scrsex.frm"];
 			else this.scrollimg = _assets["art/intrface/scrseast.frm"];
 		}
-		_context.drawImage(this.scrollimg.frameInfo[0][0].img, _mouse.x, _mouse.y);
+		_context.drawImage(this.scrollimg.frameInfo[0][0].img,
+			_mouse.x,
+			_mouse.y);
 
-	} else if(this.inputState == "interface"){	// if not scrolling	
-		_context.drawImage(_assets["art/intrface/stdarrow.frm"].frameInfo[0][0].img, _mouse.x, _mouse.y);
+	} else if(this.inputState == "interface") {		// if not scrolling	
+		_context.drawImage(_assets["art/intrface/stdarrow.frm"].frameInfo[0][0].img,
+			_mouse.x,
+			_mouse.y);
 		
 	} else if(this.inputState == "game") {	// if not in HUD - on map
 		switch(this.inputState_sub) {
 			case "move":
 				_context.globalAlpha = 0.5;
-				_context.drawImage(mse_overlay, this.hsIndex.x - this.camera.x - 1, this.hsIndex.y - this.camera.y - 1);	// top hex overlay img
+				_context.drawImage(mse_overlay,
+					this.hsIndex.x - this.camera.x - 1,
+					this.hsIndex.y - this.camera.y - 1);	// top hex overlay img
 				_context.globalAlpha = 1;
 
 				if(this.hIndex_path == 0) {		// render "X" if no path to location
@@ -1249,11 +1290,18 @@ MainState.prototype.render = function() {
 				}
 				break;
 			case "command":
-				_context.drawImage(_assets["art/intrface/actarrow.frm"].frameInfo[0][0].img, _mouse.x, _mouse.y);
+				_context.drawImage(_assets["art/intrface/actarrow.frm"].frameInfo[0][0].img,
+					_mouse.x,
+					_mouse.y);
+				if(this.oIndex_state) {		
+					_context.drawImage(_assets["art/intrface/lookn.frm"].frameInfo[0][0].img,
+						_mouse.x + 40,
+						_mouse.y);		// "hover look" icon
+				}
 				break;
 		}	// end switch
 
 	}
 
 
-}
+};
