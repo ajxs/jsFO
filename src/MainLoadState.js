@@ -16,17 +16,9 @@ MainLoadState.prototype.init = function() {		// use arguments here to pass saved
 	var MainLoadStatePtr = this;
 	var mainLoader = new XMLHttpRequest();
 	
-	
-	if(_debug.remoteLoading) {
-		console.log("MainLoadState: loading remotely");
-		var loadURL = "jsfdata/main.jsf";
-		
-	} else {	// load locally
-		console.log("MainLoadState: loading locally");
-		var loadURL = "jsfdata/main.jsf";		
-		
-	}
-	
+	console.log("MainLoadState: loading remotely");
+	var loadURL = "jsfdata/main.jsf";
+
 	var transferComplete = function(evt) {
 		console.log("MainLoadState: download complete - parsing loadData");
 		
@@ -107,11 +99,13 @@ MainLoadState.prototype.init = function() {		// use arguments here to pass saved
 	mainLoader.addEventListener("load", transferComplete, false);
 	mainLoader.addEventListener("error", transferFailed, false);		
 
-	mainLoader.open("POST", loadURL, true);
+	//mainLoader.open("POST", loadURL, true);
 
-	mainLoader.setRequestHeader("Content-type", "application/x-www-form-urlencoded");
+	//mainLoader.setRequestHeader("Content-type", "application/x-www-form-urlencoded");
 	//mainLoader.setRequestHeader('accept-encoding','gzip');
-	mainLoader.overrideMimeType("application/gzip");	
+	//mainLoader.overrideMimeType("application/gzip");	
+	
+	mainLoader.open("GET", loadURL, true);
 	mainLoader.send();
 
 	console.log("MainLoadState: loading data from server");		

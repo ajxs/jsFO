@@ -17,7 +17,7 @@ LoadState.prototype.init = function(_saveState) {		// use arguments here to pass
 	
 	var mainLoader = new XMLHttpRequest();
 	
-	if(_debug.remoteLoading) {
+/*	if(_debug.remoteLoading) {
 		console.log("LoadState: loading remotely");
 		var loadURL = "";
 		var clientData = "map="+_saveState.map;
@@ -26,8 +26,10 @@ LoadState.prototype.init = function(_saveState) {		// use arguments here to pass
 		console.log("LoadState: loading locally");
 		var loadURL = "jsfdata/" + _saveState.map.split(".")[0] + ".jsf";
 		
-	}
-	
+	} */
+
+	console.log("LoadState: loading locally");
+	var loadURL = "jsfdata/" + _saveState.map.split(".")[0] + ".jsf";	
 
 	var transferComplete = function(evt) {
 		console.log("LoadState: download complete - parsing loadData");
@@ -51,10 +53,13 @@ LoadState.prototype.init = function(_saveState) {		// use arguments here to pass
 	
 	mainLoader.open("POST", loadURL, true);
 	
-	mainLoader.setRequestHeader("Content-type", "application/x-www-form-urlencoded");
+	//mainLoader.setRequestHeader("Content-type", "application/x-www-form-urlencoded");
 	//mainLoader.setRequestHeader('accept-encoding','gzip');
-	mainLoader.overrideMimeType("application/gzip");	
-	mainLoader.send(clientData);
+	//mainLoader.overrideMimeType("application/gzip");	
+	//mainLoader.send(clientData);
+	
+	mainLoader.open("GET", loadURL, true);
+	mainLoader.send();
 	
 	console.log("LoadState: request sent");
 }

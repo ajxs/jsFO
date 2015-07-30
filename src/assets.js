@@ -63,11 +63,7 @@ function asset_parseLoadData(data) {		// parses loadData as JSON and properly cr
 			default:
 				_assets[key] = loadData[key];
 				break;
-			
-			
+				
 		}
-
-	
 	}
-	
 };
