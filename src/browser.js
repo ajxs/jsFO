@@ -41,3 +41,24 @@ function browser_getInfo() {		// returns user-agent info
 		version: M[1]
 	};
 };
+
+function browser_test() {
+	var info = browser_getInfo();
+	var testFeatures = [];
+	
+	testFeatures.push(document.createElement('canvas').getContext('2d'));
+	testFeatures.push(new XMLHttpRequest());
+	testFeatures.push(window.requestAnimationFrame ||
+		window.webkitRequestAnimationFrame ||
+		window.mozRequestAnimationFrame    ||
+		window.oRequestAnimationFrame      ||
+		window.msRequestAnimationFrame     ||
+		null);
+	testFeatures.push(Array.prototype.map);
+	
+	testFeatures.forEach(function(element) {
+		if(!element) return false;
+	});
+	
+	return true;	
+};

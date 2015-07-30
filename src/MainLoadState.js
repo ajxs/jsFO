@@ -21,7 +21,7 @@ MainLoadState.prototype.init = function() {		// use arguments here to pass saved
 
 	var transferComplete = function(evt) {
 		console.log("MainLoadState: download complete - parsing loadData");
-		
+
 		asset_parseLoadData(evt.target.responseText);
 			
 		console.log("MainLoadState: mainState context menuItems init");

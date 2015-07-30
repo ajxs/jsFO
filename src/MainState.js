@@ -672,7 +672,7 @@ MainState.prototype.input = function(e) {
 
 };
 
-MainState.prototype.contextMenuAction = function(action,target) {		// make sure elevations fixed
+MainState.prototype.contextMenuAction = function(action,target) {
 
 	var description = function(type,textID) {	// returns description for item	
 		console.log(type + " " + textID);
@@ -698,8 +698,8 @@ MainState.prototype.contextMenuAction = function(action,target) {		// make sure 
 				break;
 		}
 
-		if(msgFile.msg[textID]) {
-			return msgFile.msg[textID].text;
+		if(msgFile.data[textID]) {
+			return msgFile.data[textID].text;
 		} else return false;		
 		
 	};

@@ -3,6 +3,14 @@
 window.addEventListener("load", main_init);
 
 function main_init() {
+
+	if(!browser_test()) {		// test for browser compatibility
+		console.log("main: Browser failed compatibility test");
+		
+		return;
+	}
+	
+	
 	_canvas = document.getElementById('mainCanvas');
 	_canvas.style.cursor = "none";
 

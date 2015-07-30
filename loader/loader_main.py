@@ -11,6 +11,7 @@ import loader_pal
 import loader_fon
 import loader_aaf
 import loader_txt
+import loader_msg
 	
 	
 urlprefix = "../data/"	# use this to point to the directory with the undat'd Fallout2 data
@@ -124,41 +125,14 @@ def loadMain():
 	loadData["font0.fon"] = loader_fon.loadFON(loader_dat.getFile(master_dat_file, master_dat["fileEntries"]["font3.fon"]))	# fonts
 	loadData["font0.fon"] = loader_fon.loadFON(loader_dat.getFile(master_dat_file, master_dat["fileEntries"]["font5.fon"]))	# fonts
 
-	msgFile = loader_dat.getFile(master_dat_file,master_dat["fileEntries"]["text/english/game/pro_crit.msg"])
-	loadData["text/english/game/pro_crit.msg"] = {}
-	loadData["text/english/game/pro_crit.msg"]["data"] = []
-	for line in msgFile:
-		loadData["text/english/game/pro_crit.msg"]["data"].append(line.decode("utf-8").strip().lower())	
+	# MSG files
+	loadData["text/english/game/pro_crit.msg"] = loader_msg.loadMSG(loader_dat.getFile(master_dat_file, master_dat["fileEntries"]["text/english/game/pro_crit.msg"]))	# textfiles
+	loadData["text/english/game/pro_item.msg"] = loader_msg.loadMSG(loader_dat.getFile(master_dat_file, master_dat["fileEntries"]["text/english/game/pro_item.msg"]))	# textfiles
+	loadData["text/english/game/pro_scen.msg"] = loader_msg.loadMSG(loader_dat.getFile(master_dat_file, master_dat["fileEntries"]["text/english/game/pro_scen.msg"]))	# textfiles
+	loadData["text/english/game/pro_misc.msg"] = loader_msg.loadMSG(loader_dat.getFile(master_dat_file, master_dat["fileEntries"]["text/english/game/pro_misc.msg"]))	# textfiles
+	loadData["text/english/game/pro_wall.msg"] = loader_msg.loadMSG(loader_dat.getFile(master_dat_file, master_dat["fileEntries"]["text/english/game/pro_wall.msg"]))	# textfiles
+	loadData["text/english/game/pro_tile.msg"] = loader_msg.loadMSG(loader_dat.getFile(master_dat_file, master_dat["fileEntries"]["text/english/game/pro_tile.msg"]))	# textfiles
 	
-	msgFile = loader_dat.getFile(master_dat_file,master_dat["fileEntries"]["text/english/game/pro_item.msg"])
-	loadData["text/english/game/pro_item.msg"] = {}
-	loadData["text/english/game/pro_item.msg"]["data"] = []
-	for line in msgFile:
-		loadData["text/english/game/pro_item.msg"]["data"].append(line.decode("utf-8").strip().lower())	
-	
-	msgFile = loader_dat.getFile(master_dat_file,master_dat["fileEntries"]["text/english/game/pro_scen.msg"])
-	loadData["text/english/game/pro_scen.msg"] = {}
-	loadData["text/english/game/pro_scen.msg"]["data"] = []
-	for line in msgFile:
-		loadData["text/english/game/pro_scen.msg"]["data"].append(line.decode("utf-8").strip().lower())	
-
-	msgFile = loader_dat.getFile(master_dat_file,master_dat["fileEntries"]["text/english/game/pro_misc.msg"])
-	loadData["text/english/game/pro_misc.msg"] = {}
-	loadData["text/english/game/pro_misc.msg"]["data"] = []
-	for line in msgFile:
-		loadData["text/english/game/pro_misc.msg"]["data"].append(line.decode("utf-8").strip().lower())	
-
-	msgFile = loader_dat.getFile(master_dat_file,master_dat["fileEntries"]["text/english/game/pro_wall.msg"])
-	loadData["text/english/game/pro_wall.msg"] = {}
-	loadData["text/english/game/pro_wall.msg"]["data"] = []
-	for line in msgFile:
-		loadData["text/english/game/pro_wall.msg"]["data"].append(line.decode("utf-8").strip().lower())	
-
-	msgFile = loader_dat.getFile(master_dat_file,master_dat["fileEntries"]["text/english/game/pro_tile.msg"])
-	loadData["text/english/game/pro_tile.msg"] = {}
-	loadData["text/english/game/pro_tile.msg"]["data"] = []
-	for line in msgFile:
-		loadData["text/english/game/pro_tile.msg"]["data"].append(line.decode("utf-8").strip().lower())		
 	
 	loadCritter("hmjmps")	#player
 	

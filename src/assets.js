@@ -17,23 +17,6 @@ function asset_createFontFromJSON(obj) {
 	return fontItem;
 };
 
-
-function asset_createMSGFromJSON(obj) {
-	var msgItem = obj;
-	
-	msgItem.msg = new Array();		// init textIDs
-	for(var l = 0; l < msgItem.data.length; l++) {
-		var split = msgItem.data[l].split("{");
-		for(var k = 0; k < split.length; k++) split[k] = split[k].replace(/({|})/,"");
-		msgItem.msg[split[1]] = {
-			soundID : split[2], text : split[3],
-		}
-	}
-
-	return msgItem;
-};
-
-
 function asset_parseLoadData(data) {		// parses loadData as JSON and properly creates all assets.
 	var loadData = JSON.parse(data);
 	
@@ -48,18 +31,13 @@ function asset_parseLoadData(data) {		// parses loadData as JSON and properly cr
 			case "fon":
 				_assets[key] = asset_createFontFromJSON(loadData[key]);
 				break;
+				
 			case "msg":
-				_assets[key] = asset_createMSGFromJSON(loadData[key]);
-				break;
-				
-/*			case "int":
-				break;
+			case "lst":
+			case "int":
 			case "txt":
-				break;
 			case "pro":
-				break;
-				
-*/
+			
 			default:
 				_assets[key] = loadData[key];
 				break;

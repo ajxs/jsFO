@@ -5,13 +5,11 @@ def loadMSG(msgFile):
 	msgInfo = {}
 
 	msgInfo['type'] = "msg"
-	msgInfo['lines'] = []
+	msgInfo['data'] = {}
 	
-	msgLines = []
 	
+	msgLines = []	#@todo - can potentially optimize this to not need first array
 	lastIndex = 0
-	
-	#@todo - can potentially optimize this to not need first array
 	
 	lines = msgFile.readlines()
 	for i in range(len(lines)):
@@ -35,6 +33,6 @@ def loadMSG(msgFile):
 		newLine['sound'] = split[2].replace("}","");
 		newLine['text'] = split[3].replace("}","");
 		
-		msgInfo['lines'].append(newLine);
+		msgInfo['data'][newLine['id']] = newLine;		#set index to id for easy referencing later.
 				
 	return msgInfo
