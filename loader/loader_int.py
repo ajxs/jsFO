@@ -6,6 +6,7 @@ import binascii
 
 def loadINT(intFile):
 	intInfo = {}
+	intInfo['type'] = "int"
 	
 	headerdata = struct.unpack('>2HI2HI13H', intFile.read(42))
 	

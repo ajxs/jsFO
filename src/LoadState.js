@@ -30,24 +30,8 @@ LoadState.prototype.init = function(_saveState) {		// use arguments here to pass
 	
 
 	var transferComplete = function(evt) {
-		console.log("LoadState: download complete");
-		var loadData = JSON.parse(mainLoader.responseText);
-		
-		console.log("LoadState: creating sprites");
-		for(var key in loadData) {
-			if(!_assets[key]) {
-				_assets[key] = loadData[key];
-				if(_assets[key].nFrames) { // if asset is FRM - build images
-					var nDir = _assets[key].frameInfo.length;
-					for(var d = 0; d < nDir; d++) {
-						for(var f = 0; f < _assets[key].nFrames; f++) {
-							_assets[key].frameInfo[d][f].img = document.createElement('img');
-							_assets[key].frameInfo[d][f].img.src = _assets[key].frameInfo[d][f].imgdata;
-						}
-					}
-				}	// end FRM				
-			}	
-		}			
+		console.log("LoadState: download complete - parsing loadData");
+		asset_parseLoadData(evt.target.responseText);
 		
 		console.log("LoadState: load complete");
 		LoadStatePtr.gameInit(_saveState);		
@@ -133,4 +117,4 @@ LoadState.prototype.render = function() {
 	}
 
 	_context.globalAlpha = 1;
-}
+};

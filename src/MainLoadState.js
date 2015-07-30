@@ -28,80 +28,9 @@ MainLoadState.prototype.init = function() {		// use arguments here to pass saved
 	}
 	
 	var transferComplete = function(evt) {
-		console.log("MainLoadState: download complete");
-		var loadData = JSON.parse(mainLoader.responseText);
+		console.log("MainLoadState: download complete - parsing loadData");
 		
-		console.log("MainLoadState: creating sprites");
-		for(var key in loadData) {
-			_assets[key] = loadData[key];
-			if(_assets[key].nFrames) { // if frm - build images
-				var nDir = _assets[key].frameInfo.length;
-				for(var d = 0; d < nDir; d++) {
-					for(var f = 0; f < _assets[key].nFrames; f++) {
-						_assets[key].frameInfo[d][f].img = document.createElement('img');
-						_assets[key].frameInfo[d][f].img.src = _assets[key].frameInfo[d][f].imgdata;
-					}
-				}
-			} else if(_assets[key].symbolInfo) {	// fonts
-				_assets[key].img = document.createElement('img');
-				_assets[key].img.src = _assets[key].imgdata;
-			}
-		}
-			
-		console.log("MainLoadState: init text assets");
-		_assets["text/english/game/pro_crit.msg"].msg = new Array();		// init textIDs
-		for(var l = 0; l < _assets["text/english/game/pro_crit.msg"].data.length; l++) {
-			var split = _assets["text/english/game/pro_crit.msg"].data[l].split("{");
-			for(var k = 0; k < split.length; k++) split[k] = split[k].replace(/({|})/,"");
-			_assets["text/english/game/pro_crit.msg"].msg[split[1]] = {
-				soundID : split[2], text : split[3],
-			}
-		}
-
-		_assets["text/english/game/pro_item.msg"].msg = new Array();
-		for(var l = 0; l < _assets["text/english/game/pro_item.msg"].data.length; l++) {
-			var split = _assets["text/english/game/pro_item.msg"].data[l].split("{");
-			for(var k = 0; k < split.length; k++) split[k] = split[k].replace(/({|})/,"");
-			_assets["text/english/game/pro_item.msg"].msg[split[1]] = {
-				soundID : split[2], text : split[3],
-			}
-		}
-
-		_assets["text/english/game/pro_wall.msg"].msg = new Array();
-		for(var l = 0; l < _assets["text/english/game/pro_wall.msg"].data.length; l++) {
-			var split = _assets["text/english/game/pro_wall.msg"].data[l].split("{");
-			for(var k = 0; k < split.length; k++) split[k] = split[k].replace(/({|})/,"");
-			_assets["text/english/game/pro_wall.msg"].msg[split[1]] = {
-				soundID : split[2], text : split[3],
-			}
-		}
-
-		_assets["text/english/game/pro_misc.msg"].msg = new Array();
-		for(var l = 0; l < _assets["text/english/game/pro_misc.msg"].data.length; l++) {
-			var split = _assets["text/english/game/pro_misc.msg"].data[l].split("{");
-			for(var k = 0; k < split.length; k++) split[k] = split[k].replace(/({|})/,"");
-			_assets["text/english/game/pro_misc.msg"].msg[split[1]] = {
-				soundID : split[2], text : split[3],
-			}
-		}
-
-		_assets["text/english/game/pro_tile.msg"].msg = new Array();
-		for(var l = 0; l < _assets["text/english/game/pro_tile.msg"].data.length; l++) {
-			var split = _assets["text/english/game/pro_tile.msg"].data[l].split("{");
-			for(var k = 0; k < split.length; k++) split[k] = split[k].replace(/({|})/,"");
-			_assets["text/english/game/pro_tile.msg"].msg[split[1]] = {
-				soundID : split[2], text : split[3],
-			}
-		}
-
-		_assets["text/english/game/pro_scen.msg"].msg = new Array();
-		for(var l = 0; l < _assets["text/english/game/pro_scen.msg"].data.length; l++) {
-			var split = _assets["text/english/game/pro_scen.msg"].data[l].split("{");
-			for(var k = 0; k < split.length; k++) split[k] = split[k].replace(/({|})/,"");
-			_assets["text/english/game/pro_scen.msg"].msg[split[1]] = {
-				soundID : split[2], text : split[3],
-			}
-		}			
+		asset_parseLoadData(evt.target.responseText);
 			
 		console.log("MainLoadState: mainState context menuItems init");
 		
@@ -223,4 +152,4 @@ MainLoadState.prototype.render = function() {
 
 	_context.globalAlpha = 1;	
 	
-}
+};

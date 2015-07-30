@@ -4,6 +4,7 @@ sys.path.insert(0, '/home/protected/py/lib/python3.4/site-packages/')
 def loadMSG(msgFile):
 	msgInfo = {}
 
+	msgInfo['type'] = "msg"
 	msgInfo['lines'] = []
 	
 	msgLines = []

@@ -19,6 +19,7 @@ def getFiletype(typeID):
 
 def loadPRO(proFile):
 	proInfo = {}
+	proInfo["type"] = "pro"
 
 	temp = struct.unpack('>3i3I',proFile.read(6*4))	#common header
 	proInfo['PID'] = temp[0]

@@ -9,11 +9,13 @@ import io
 
 def loadFRM(frmFile,pal):
 	frmInfo = {}
+	frmInfo['type'] = "frm"
 	
 	temp = struct.unpack('>I3H', frmFile.read(10))
 	
 	version = temp[0]
 	
+
 	frmInfo['fps'] = temp[1]
 	frmInfo['actionFrame'] = temp[2]
 	frmInfo['nFrames'] = temp[3]

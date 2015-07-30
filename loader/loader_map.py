@@ -43,6 +43,7 @@ def loadMAP(mapIndex):
 
 	mapInfo = {}
 
+	mapInfo['type'] = "map"
 	mapInfo['map_version'] = struct.unpack('>I', mapFile.read(4))[0]
 	mapInfo['filename'] = str(mapFile.read(16))
 

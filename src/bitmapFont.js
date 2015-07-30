@@ -8,31 +8,38 @@ var bitmapFontRenderer = {
 	rF_baseline: 0,
 	rF_img: 0,
 	
-	createColourImg(_font, _colour) {	// creates canvas element with coloured font
-		if(_font.hasOwnProperty("img_" + _colour)) return;
+	createColorImg(_font, _color) {	// creates canvas element with coloured font
 	
-		_font["img_" + _colour] = document.createElement("canvas");
-		var _fontContext = _font["img_" + _colour].getContext("2d");
+		console.log("Bitmap Font: Creating color surface: " + _color);
 		
-		_font["img_" + _colour].width = _font.img.width;
-		_font["img_" + _colour].height = _font.img.height;
+		_font["img_" + _color] = document.createElement("canvas");
+		_font["img_" + _color].width = _font.img.width;
+		_font["img_" + _color].height = _font.img.height;
+		
+		
+			
+		console.log(_font["img_" + _color].width,_font["img_" + _color].height);
+		console.log(_font.img.width,_font.img.height);
+		
+		var _fontContext = _font["img_" + _color].getContext("2d");
 		
 		if(_font.type == "fon") {
 			_fontContext.globalCompositeOperation = "source-over";
-			_fontContext.fillStyle = _colour;
-			_fontContext.fillRect(0,0,_font["img_" + _colour].width,_font["img_" + _colour].height);
+			_fontContext.fillStyle = _color;
+			_fontContext.fillRect(0,0,_font["img_" + _color].width,_font["img_" + _color].height);
 			
 			_fontContext.globalCompositeOperation = "destination-in";
 			_fontContext.drawImage(_font.img,0,0);
 
 		} else {
 			_fontContext.globalCompositeOperation = "source-over";
-			_fontContext.drawImage(_font.img,0,0);			
-			var imgData1 = _fontContext.getImageData(0,0,_font.img.width,_font.img.height);
+			_fontContext.drawImage(_font.img,0,0);					
 			
+			var imgData1 = _fontContext.getImageData(0,0,_font.img.width,_font.img.height);
+
 			_fontContext.globalCompositeOperation = "source-in";
-			_fontContext.fillStyle = _colour;
-			_fontContext.fillRect(0,0,_font["img_" + _colour].width,_font["img_" + _colour].height);					
+			_fontContext.fillStyle = _color;
+			_fontContext.fillRect(0,0,_font["img_" + _color].width,_font["img_" + _color].height);					
 			var imgData2 = _fontContext.getImageData(0,0,_font.img.width,_font.img.height);
 			
 			for(var i=0; i < imgData2.data.length; i+=4) {	// AAF 0-9 values act as alpha blend
@@ -44,17 +51,17 @@ var bitmapFontRenderer = {
 		
 	},
 	
-	renderString: function(_font, _string, _x, _y, _colour) {
+	renderString: function(_font, _string, _x, _y, _color) {
 		this.rF_stringlength = _string.length;
 		this.rF_totalWidth = 0;
 		this.rF_baseline = _y + _font.height;
 
-		if(_colour) {
-			if(!_font.hasOwnProperty("img_" + _colour)) {	// if no colourized img, create one.
-				this.createColourImg(_font, _colour);
-				this.rF_img = _font["img_" + _colour];
+		if(_color) {
+			if(!_font.hasOwnProperty("img_" + _color)) {	
+				console.log("Bitmap Font: call to font render for surface without color: ", _color);
+				this.createColorImg(_font, _color);	// if no colorized img, create one.
 			}
-			this.rF_img = _font["img_" + _colour];
+			this.rF_img = _font["img_" + _color];
 		} else this.rF_img = _font.img;
 		
 		for(var i = 0; i < this.rF_stringlength; i++) {

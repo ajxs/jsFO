@@ -18,7 +18,7 @@ function Actor() {
 		idleStartTime: 0,
 	};
 	
-}
+};
 
 
 Actor.prototype = new SpriteObject();
@@ -73,7 +73,7 @@ function SpriteObject() {		// REMEMBER TO INIT EVERYTHING
 		
 	}
 	
-}
+};
 
 
 SpriteObject.prototype = {
@@ -108,7 +108,7 @@ SpriteObject.prototype = {
 		shiftY: 0,
 	},
 	
-}
+};
 
 
 function SpriteObject_Door() {
@@ -118,7 +118,7 @@ function SpriteObject_Door() {
 	this.key = 0;
 	this.openState = 0;
 	
-}
+};
 
 SpriteObject_Door.prototype = new SpriteObject();
 SpriteObject_Door.prototype.constructor = SpriteObject_Door;

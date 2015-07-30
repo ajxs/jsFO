@@ -13,6 +13,7 @@ def loadTxt_maps(txtFile):
 		line = lines[i].decode("utf-8").strip()
 		if(line and line[0] == "["):	# get start of sequence
 			mapInfo = {}
+			mapInfo["type"] = "txt_maps"
 			mapInfo["randomStartPoints"] = []
 			
 			innerlines = []

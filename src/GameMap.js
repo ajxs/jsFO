@@ -2,7 +2,7 @@
 
 function GameMap() {
 
-}
+};
 
 GameMap.prototype = {
 	constructor: GameMap,
@@ -16,4 +16,4 @@ GameMap.prototype = {
 	
 	
 
-}
+};
