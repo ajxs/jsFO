@@ -975,21 +975,26 @@ MainState.prototype.update = function() {
 		
 	}	// end mapobjects loop		
 
+	 
 	var playerCoords = this.mapGeometry.h2s(this.player.hexPosition);
-	var playerX = playerCoords.x + 16 + this.player.anim.shiftX - this.camera.x;
-	var playerY = (playerCoords.y + 8) + this.player.anim.shiftY- this.camera.y;
+	this.currentRenderImg = _assets[this.player.anim.img].frameInfo[this.player.orientation][this.player.anim.frameNumber];	
+	
+	var playerX = (playerCoords.x + 16 - ((this.currentRenderImg.width/2)|0)) + this.player.anim.shiftX - this.camera.x;	// actual coords of of objects.
+	var playerY = (playerCoords.y + 8 - this.currentRenderImg.height) + this.player.anim.shiftY - this.camera.y;
+	
 	
 	this.roofRenderState = true;		// check if player is under a roof
 	for(var i = 0; i < 10000; i++) {
 		if(this.map.tileInfo[this.player.currentElevation].roofTiles[i] < 2) continue;
-		var c = this.mapGeometry.c2s(i,this.player.currentElevation);
+		var c = this.mapGeometry.c2s(i);
 		
-		if(intersectTest(c.x - this.camera.x,
-			c.y - this.camera.y - 96,
+		if(intersectTest(c.x - this.camera.x,		// @TODO : potentially use object buffer here.
+			(c.y - 96) - this.camera.y,
 			80, 36,
-			playerX - 40,
-			playerY - 40,		// FIX THIS
-			80, 80)) {
+			playerX,
+			playerY,		
+			this.currentRenderImg.width,
+			this.currentRenderImg.height)) {
 				this.roofRenderState = false;
 				break;
 		}
@@ -1126,6 +1131,7 @@ MainState.prototype.render = function() {
 		
 	}	// end mapObject loop
 
+	
 	if(this.roofRenderState) {		//Render Roofs - check against roofRenderState
 		for(var i = 0; i < 10000; i++) {					
 			//if(this.map.tileInfo[e].roofTiles[i] < 2) continue;
