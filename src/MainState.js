@@ -505,7 +505,7 @@ MainState.prototype.generateFRMstring = function(object) {	// generates FRM stri
 					weaponString = "m";
 					break;
 			}
-		} else weaponString = "a";
+		}
 
 		switch(object.anim.currentAnim) {
 			case "idle":
@@ -613,10 +613,13 @@ MainState.prototype.input = function(e) {
 				if(this.inputState_sub == "command") {
 					if(_mouse.c2) return;
 					this.objectIndex = this.getObjectIndex();
-					var objC = this.mapGeometry.h2s(this.mapObjects[this.player.currentElevation][this.objectIndex].hexPosition);
-					main_openContextMenu(this.objectIndex,
-						objC.x - this.camera.x + 30,
-						objC.y - this.camera.y - 20);
+					if(this.objectIndex != -1) {		// if object under cursor
+						var objC = this.mapGeometry.h2s(this.mapObjects[this.player.currentElevation][this.objectIndex].hexPosition);
+						main_openContextMenu(this.objectIndex,
+							objC.x - this.camera.x + 30,
+							objC.y - this.camera.y - 20);						
+					}
+
 				}
 			}
 			break;
@@ -677,6 +680,7 @@ MainState.prototype.contextMenuAction = function(action,target) {
 	switch(action) {			
 		case "hoverlook":
 		case "look":
+		
 			var textIndex, msgFile;			
 			if(action == "hoverlook") textIndex = this.mapObjects[this.player.currentElevation][target].textID;
 			else if(action == "look") textIndex = this.mapObjects[this.player.currentElevation][target].textID+1;
@@ -766,6 +770,10 @@ MainState.prototype.contextMenuAction = function(action,target) {
 
 
 MainState.prototype.getObjectIndex = function() {
+	// this function stencils screen objects onto an offscreen buffer, with a solid color based upon that object's position in the mapObjects array.
+	// from this function you can accurately find the object under the cursor by blitting the objects 50px around the cursor onto the buffer, then reading the color underneath the centre of the image.
+	// from the formula r*1000 + b*100 + g we can find the index of the object.
+	
 	this.objectBuffer.width = this.objectBufferRect.width;	// hack clear
 	this.objectBufferRect.x = _mouse.x - this.objectBufferRect.width/2;
 	this.objectBufferRect.y = _mouse.y - this.objectBufferRect.height/2;
@@ -807,8 +815,9 @@ MainState.prototype.getObjectIndex = function() {
 	}
 
 	this.objectBufferData = this.objectBufferContext.getImageData(50, 50, 1, 1).data;
+	
+	if(this.objectBufferData[3] == 0) return -1;	// if alpha for pixel == 0, no object under cursor.
 	return this.objectBufferData[0]*1000 + this.objectBufferData[1]*100 + this.objectBufferData[2];
-
 
 };
 
