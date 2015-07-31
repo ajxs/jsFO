@@ -674,56 +674,44 @@ MainState.prototype.input = function(e) {
 
 MainState.prototype.contextMenuAction = function(action,target) {
 
-	var description = function(type,textID) {	// returns description for item	
-		console.log(type + " " + textID);
-		var msgFile = 0;
-		switch(type) {
-			case "items":
-				msgFile = _assets["text/english/game/pro_item.msg"];
-				break;
-			case "critters":
-				msgFile = _assets["text/english/game/pro_crit.msg"];
-				break;
-			case "scenery":
-				msgFile = _assets["text/english/game/pro_scen.msg"];
-				break;
-			case "walls":
-				msgFile = _assets["text/english/game/pro_wall.msg"];
-				break;
-			case "tiles":
-				msgFile = _assets["text/english/game/pro_tile.msg"];
-				break;
-			case "misc":
-				msgFile = _assets["text/english/game/pro_misc.msg"];
-				break;
-		}
-
-		if(msgFile.data[textID]) {
-			return msgFile.data[textID].text;
-		} else return false;		
-		
-	};
-
-	switch(action) {
-		case "hoverlook":		// implement hover look to differentiate between hovering brief desc vs detailed desc. on 'look' action.
-			var type = this.getObjectType(this.mapObjects[this.player.currentElevation][target].objectTypeID);
-			var textIndex = this.mapObjects[this.player.currentElevation][target].textID;
-			var desc = description(type, textIndex);
-			if(desc) {	//@change this so that it reads from text/english/game/proto.msg - line 490.
-				this.console.print("You see: " + desc + ".");			
-			}
-			break;
-	
+	switch(action) {			
+		case "hoverlook":
 		case "look":
-			var type = this.getObjectType(this.mapObjects[this.player.currentElevation][target].objectTypeID);
-			var textIndex = this.mapObjects[this.player.currentElevation][target].textID+1;
-			var desc = description(type, textIndex);
-			if(desc) {	//@change this so that it reads from text/english/game/proto.msg - line 490.
-				this.console.print("You see " + desc + ".");			
-			} else {
-				this.console.print("You see nothing out of the ordinary.");
+			var textIndex, msgFile;			
+			if(action == "hoverlook") textIndex = this.mapObjects[this.player.currentElevation][target].textID;
+			else if(action == "look") textIndex = this.mapObjects[this.player.currentElevation][target].textID+1;
+
+			switch( this.getObjectType(this.mapObjects[this.player.currentElevation][target].objectTypeID) ) {
+				case "items":
+					msgFile = _assets["text/english/game/pro_item.msg"];
+					break;
+				case "critters":
+					msgFile = _assets["text/english/game/pro_crit.msg"];
+					break;
+				case "scenery":
+					msgFile = _assets["text/english/game/pro_scen.msg"];
+					break;
+				case "walls":
+					msgFile = _assets["text/english/game/pro_wall.msg"];
+					break;
+				case "tiles":
+					msgFile = _assets["text/english/game/pro_tile.msg"];
+					break;
+				case "misc":
+					msgFile = _assets["text/english/game/pro_misc.msg"];
+					break;
+				default:
+					return false;
 			}
+
+			if(msgFile.data[textIndex]) {
+				this.console.print(_assets["text/english/game/proto.msg"].data[490].text.replace("%s",msgFile.data[textIndex].text));		// "You see: %s."
+			} else {
+				this.console.print(_assets["text/english/game/proto.msg"].data[493].text);		// "You see nothing out of the ordinary."
+			}
+		
 			break;
+			
 
 		case "use":
 	

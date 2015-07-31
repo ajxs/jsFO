@@ -126,6 +126,7 @@ def loadMain():
 	loadData["font0.fon"] = loader_fon.loadFON(loader_dat.getFile(master_dat_file, master_dat["fileEntries"]["font5.fon"]))	# fonts
 
 	# MSG files
+	loadData["text/english/game/proto.msg"] = loader_msg.loadMSG(loader_dat.getFile(master_dat_file, master_dat["fileEntries"]["text/english/game/proto.msg"]))	# game lines
 	loadData["text/english/game/pro_crit.msg"] = loader_msg.loadMSG(loader_dat.getFile(master_dat_file, master_dat["fileEntries"]["text/english/game/pro_crit.msg"]))	# textfiles
 	loadData["text/english/game/pro_item.msg"] = loader_msg.loadMSG(loader_dat.getFile(master_dat_file, master_dat["fileEntries"]["text/english/game/pro_item.msg"]))	# textfiles
 	loadData["text/english/game/pro_scen.msg"] = loader_msg.loadMSG(loader_dat.getFile(master_dat_file, master_dat["fileEntries"]["text/english/game/pro_scen.msg"]))	# textfiles
