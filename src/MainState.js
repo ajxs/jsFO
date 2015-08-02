@@ -50,15 +50,6 @@ MainState.prototype.scrollCheckIndex = 0;
 MainState.prototype.scrollCheckAdj = 0;
 
 
-MainState.prototype.hIndex_time = 0;
-MainState.prototype.hIndex_test = 0;
-MainState.prototype.hIndex_path = -1;
-
-MainState.prototype.oIndex_time = 0;
-MainState.prototype.oIndex_x = 0;
-MainState.prototype.oIndex_y = 0;
-MainState.prototype.oIndex_state = 0;
-
 MainState.prototype.objectBuffer = 0;
 MainState.prototype.objectBuffer2 = 0;
 MainState.prototype.objectBufferContext = 0;
@@ -202,13 +193,13 @@ MainState.prototype.console = {
 	x: -1, y: -1,		// set in main_setResolution()
 
 	fontHeight: 10,
-	fontColor: "rgb(0,255,0)",
+	fontColor: "#00FF00",
 
 	print: function() {	// accepts n arguments, pushes all to console
 		for(var i = 0; i < arguments.length; i++) {
 			var string = "\x95" + arguments[i];
 			var split = string.match(/.{1,22}/g);	// split string to line width
-			for(var k = 0; k < split.length; k++) this.consoleData.push(split[k]);
+			for(var k = 0; k < split.length; k++) this.consoleData.unshift(split[k]);
 		}
 	},
 
@@ -676,7 +667,8 @@ MainState.prototype.input = function(e) {
 };
 
 MainState.prototype.contextMenuAction = function(action,target) {
-
+	if(target == -1) return;
+	
 	switch(action) {			
 		case "hoverlook":
 		case "look":
@@ -821,8 +813,19 @@ MainState.prototype.getObjectIndex = function() {
 
 };
 
+MainState.prototype.cIndex_time;
+MainState.prototype.cIndex_test;
+MainState.prototype.cIndex_state = false;
+MainState.prototype.cIndex_path = -1;
+
+MainState.prototype.cIndex_x;
+MainState.prototype.cIndex_y;
+
+
+
 MainState.prototype.update = function() {
 
+	// STATE HANDLING
 	this.scrollStates.yNeg = (_mouse.y < (_screenHeight * 0.025));
 	this.scrollStates.yPos = (_mouse.y > (_screenHeight * 0.975));
 	this.scrollStates.xNeg = (_mouse.x < (_screenWidth * 0.05));
@@ -840,7 +843,7 @@ MainState.prototype.update = function() {
 		this.scrollStates.yPosBlocked = (this.map.hexMap[this.player.currentElevation][this.scrollCheckAdj[2]].scrollBlock && this.map.hexMap[this.player.currentElevation][this.scrollCheckAdj[3]].scrollBlock);	
 		this.scrollStates.xNegBlocked = (this.map.hexMap[this.player.currentElevation][this.scrollCheckAdj[4]].scrollBlock);
 
-		if(this.scrollStates.yNeg && !this.scrollStates.yNegBlocked) this.camera.y -= this.scrollDelta;
+		if(this.scrollStates.yNeg && !this.scrollStates.yNegBlocked) this.camera.y -= this.scrollDelta;	// scrolling handling
 		if(this.scrollStates.yPos && !this.scrollStates.yPosBlocked) this.camera.y += this.scrollDelta;
 		if(this.scrollStates.xNeg && !this.scrollStates.xNegBlocked) this.camera.x -= this.scrollDelta;
 		if(this.scrollStates.xPos && !this.scrollStates.xPosBlocked) this.camera.x += this.scrollDelta;
@@ -883,21 +886,37 @@ MainState.prototype.update = function() {
 		this.inputState = "game";
 		
 		if(this.inputState_sub == "move") {
-			this.hIndex_test = this.mapGeometry.s2h(_mouse.x + this.camera.x, _mouse.y + this.camera.y);
-			if(this.hIndex_test != this.hIndex) {
-				this.hIndex = this.hIndex_test;
-				this.hIndex_time = getTicks();
-				this.hIndex_path = -1;
-			} else {		// test for pathfind
-				if(Math.abs(getTicks() - this.hIndex_time) >= 1000 && this.hIndex_path == -1) {	// if user has been hovering the mouse on a specific point for 1 sec.
-					if(this.findPath(this.player.hexPosition,this.hIndex) != 0) this.hIndex_path = 1;
-					else this.hIndex_path = 0;
-				}
-			}			
-			
+			this.hIndex = this.mapGeometry.s2h(_mouse.x + this.camera.x, _mouse.y + this.camera.y);		// hex index calculated here
 			this.hsIndex = this.mapGeometry.h2s(this.hIndex);
+			
+			if(this.cIndex_test != this.hIndex) {		// check if mouse has moved for hover functionality
+				this.cIndex_test = this.hIndex;
+				this.cIndex_time = getTicks();
+				this.cIndex_state = false;
+				this.cIndex_path = -1;
+			}
+			
+		} else if(this.inputState_sub == "command") {
+			if(this.cIndex_x != _mouse.x || this.cIndex_y != _mouse.y) {	// check if mouse has moved for hover functionality
+				this.cIndex_x = _mouse.x;
+				this.cIndex_y = _mouse.y;
+				this.cIndex_time = getTicks();
+				this.cIndex_state = false;
+			}
 		}
-	
+		
+		if(!this.cIndex_state && (Math.abs(getTicks() - this.cIndex_time) >= 1000)) {	// 'hover' functionality timer
+		
+			if(this.inputState_sub == "move") {
+				this.cIndex_path = this.findPath(this.player.hexPosition, this.hIndex);
+				this.cIndex_state = true;
+				
+			} else if(this.inputState_sub == "command") {
+				this.objectIndex = this.getObjectIndex();
+				this.contextMenuAction("hoverlook", this.objectIndex);
+				this.cIndex_state = true;			
+			}
+		}
 	
 	}
 
@@ -906,21 +925,16 @@ MainState.prototype.update = function() {
 		this.inputRunState = true;
 	} else this.inputRunState = false;
 
-	var MainStatePtr = this;	// ffs
 
-	// animation
 	var e = this.player.currentElevation;
-	var mapObjectsLength = this.mapObjects[e].length;
-
-	this.mapObjects[e].sort( function(a, b) {	// z-sort
-		var ret = a.hexPosition - b.hexPosition;
-		if(ret != 0) return ret;
-		else {
-			var hp = MainStatePtr.mapGeometry.h2s(a.hexPosition);
-			return (hp.y + a.anim.shiftY) - (hp.y + b.anim.shiftY);
-		}
+	this.mapObjects[this.player.currentElevation].sort(function(a, b) {	// z-sort
+		return ((a.hexPosition - b.hexPosition) || (a.anim.shiftY - b.anim.shiftY));
 	});
 
+
+	// animation
+	var mapObjectsLength = this.mapObjects[e].length;
+	
 	for(var i=0; i < mapObjectsLength; i++) {	// tasks, framestep
 		this.currentRenderObject = this.mapObjects[e][i];
 
@@ -997,29 +1011,6 @@ MainState.prototype.update = function() {
 			this.currentRenderImg.height)) {
 				this.roofRenderState = false;
 				break;
-		}
-	}
-	
-
-	if(this.inputState == "game" && this.inputState_sub == "command") {		// 'hover' look
-		if(this.oIndex_state) {
-			if(this.oIndex_x == _mouse.x && this.oIndex_y == _mouse.y) return;
-		}
-
-		if(this.oIndex_x != _mouse.x || this.oIndex_y != _mouse.y) {
-			this.oIndex_x = _mouse.x;
-			this.oIndex_y = _mouse.y;
-			this.oIndex_time = getTicks();
-			this.oIndex_state = false;
-		} else {
-			if(Math.abs(getTicks() - this.oIndex_time) >= 1000) {	// if user has been hovering the mouse on a specific point for 1 sec.
-				this.objectIndex = this.getObjectIndex();
-				if(this.objectIndex != -1) {
-					this.contextMenuAction("hoverlook",this.objectIndex);
-					this.oIndex_time = getTicks();
-					this.oIndex_state = true;
-				}
-			}
 		}
 	}
 
@@ -1152,7 +1143,7 @@ MainState.prototype.render = function() {
 		}			
 	}
 
-	if(_debug.drawSpecialHexes) {		// Hex debug 
+	/* if(_debug.drawSpecialHexes) {		// Hex debug 
 		var centreHex = this.mapGeometry.h2s(this.mapGeometry.s2h( 320 + this.camera.x, 190 + this.camera.y));	// hex debug stuff
 		drawHex(centreHex.x - this.camera.x,centreHex.y - this.camera.y,"","#00FFFF");
 		
@@ -1162,8 +1153,7 @@ MainState.prototype.render = function() {
 			if(this.map.hexMap[e][h].blocked) drawHex(cx.x - this.camera.x,cx.y - this.camera.y, "","#FF0000");	
 			if(this.map.hexMap[e][h].scrollBlock) drawHex(cx.x - this.camera.x,cx.y - this.camera.y, "","#FFFF00");	
 		}			
-	}
-
+	} */
 	
 	_context.drawImage(this.eggBuffer,this.eggBufferRect.x,this.eggBufferRect.y);
 
@@ -1224,13 +1214,14 @@ MainState.prototype.render = function() {
 		}		
 	}
 	
-	// console
-	for(var i = 0; i < 5; i++) {	// iterate backwards through console
-		if(!this.console.consoleData[((this.console.consoleData.length-1) - i)]) break;
+	// console	
+	var cl = (this.console.consoleData.length >=5) ? 5 : this.console.consoleData.length;
+	for(var i = 0; i < cl; i++) {
 		bitmapFontRenderer.renderString(_assets["font1.aaf"],
-			this.console.consoleData[((this.console.consoleData.length-1) - i)],
+			this.console.consoleData[i],
 			this.console.x,
-			this.console.y - (i*this.console.fontHeight), "#00FF00");
+			this.console.y - (i*this.console.fontHeight),
+			this.console.fontColor);
 	}
 
 	// cursors
@@ -1287,7 +1278,7 @@ MainState.prototype.render = function() {
 					this.hsIndex.y - this.camera.y - 1);	// top hex overlay img
 				_context.globalAlpha = 1;
 
-				if(this.hIndex_path == 0) {		// render "X" if no path to location
+				if(this.cIndex_path == 0) {		// render "X" if no path to location
 					_context.drawImage(mse_overlay_blocked, this.hsIndex.x - this.camera.x + 11, this.hsIndex.y - this.camera.y + 3);		// top hex overlay img
 				}
 				break;

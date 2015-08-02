@@ -127,6 +127,8 @@ def loadMain():
 
 	# MSG files
 	loadData["text/english/game/proto.msg"] = loader_msg.loadMSG(loader_dat.getFile(master_dat_file, master_dat["fileEntries"]["text/english/game/proto.msg"]))	# game lines
+	loadData["text/english/game/skilldex.msg"] = loader_msg.loadMSG(loader_dat.getFile(master_dat_file, master_dat["fileEntries"]["text/english/game/skilldex.msg"]))	# game lines
+	
 	loadData["text/english/game/pro_crit.msg"] = loader_msg.loadMSG(loader_dat.getFile(master_dat_file, master_dat["fileEntries"]["text/english/game/pro_crit.msg"]))	# textfiles
 	loadData["text/english/game/pro_item.msg"] = loader_msg.loadMSG(loader_dat.getFile(master_dat_file, master_dat["fileEntries"]["text/english/game/pro_item.msg"]))	# textfiles
 	loadData["text/english/game/pro_scen.msg"] = loader_msg.loadMSG(loader_dat.getFile(master_dat_file, master_dat["fileEntries"]["text/english/game/pro_scen.msg"]))	# textfiles
@@ -162,10 +164,9 @@ def loadMain():
 	
 	
 	loadFRM(master_dat_file,master_dat,"art/intrface/actarrow.frm")
+	loadFRM(master_dat_file,master_dat,"art/intrface/stdarrow.frm")
 	
 	loadFRM(master_dat_file,master_dat,"art/intrface/iface.frm")
-	loadFRM(master_dat_file,master_dat,"art/intrface/stdarrow.frm")
-
 	
 	loadFRM(master_dat_file,master_dat,"art/intrface/usegetn.frm")
 	loadFRM(master_dat_file,master_dat,"art/intrface/usegeth.frm")
