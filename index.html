@@ -1,9 +1,14 @@
 <html>
 <head>
-	<link rel="stylesheet" href="inc/main.css">
+
+	<title>jsFallout</title>
+	<link rel="icon" href="inc/favicon.ico"/>
+	<link href='http://fonts.googleapis.com/css?family=Oswald' rel='stylesheet' type='text/css'>
+	<link rel="stylesheet" href="inc/main.css"/>
 
 	<script src="src/assets.js"></script>
 	<script src="src/browser.js"></script>
+	<script src="src/bitmapFont.js"></script>
 	<script src="src/mapObjects.js"></script>
 	<script src="src/global.js"></script>
 	<script src="src/GameState.js"></script>
@@ -22,24 +27,47 @@
 	<script src="src/PipboyState.js"></script>
 	<script src="src/MapscreenState.js"></script>
 	
-	<script src="src/bitmapFont.js"></script>
-
 	<script src="src/main.js"></script>
 
-	<title>jsFallout</title>
-	<link rel="icon" href="inc/favicon.ico" />
+	<script>
+	
+		var mainState_prevState;	// track previous state of mainState.statePause
+	
+		// Page functions
+		function openInfo() {
+			mainState_prevState = mainState.statePause;
+			mainState.statePause = true;
+			document.getElementById('lightbox').style.display = 'block';
+			document.getElementById('info').style.display = 'block';
+		};
+		
+		function openHelp() {
+			mainState_prevState = mainState.statePause;
+			mainState.statePause = true;
+			document.getElementById('lightbox').style.display = 'block';
+			document.getElementById('help').style.display = 'block';
+		};
+		
+		function closeWindows() {
+			mainState.statePause = mainState_prevState;
+			document.getElementById('lightbox').style.display = 'none';
+			document.getElementById('info').style.display = 'none';
+			document.getElementById('help').style.display = 'none';
+		};
+	
+	</script>
 	
 </head>
 
-<!--Entry point defined as window.addEventListener("load", main_init) in main.js -->
+<!--Entry point defined as window.addEventListener("load", main_init); in main.js -->
 <body>
 	<div id="main">
 		<div id="main_header">
 			<img src="inc/main_topLogo.png"/>
 			<div id="main_header_info">
-				<a href="#">Info</a>
-				<a href="#">Help</a>
-				<a href="#">About</a>
+				<a href="#" onclick="openInfo()">Info</a>
+				<a href="#" onclick="openHelp()">Help</a>
+				<a href="https://github.com/ajxs/jsFO" target="_blank">Github</a>
 			</div>
 		</div>
 		<canvas id="mainCanvas" oncontextmenu="javascript: return false;"></canvas>
@@ -54,5 +82,15 @@
 		<img id="MainMenuState_btn" src="inc/MainMenuState_btn.png"/>
 		<img id="MainLoadState_bg" src="inc/MainLoadState_bg.png"/>
 	</div>
-	<canvas id="testCanvas" oncontextmenu="javascript: return false;"></canvas>
+	<div id="lightbox" style="display: none" onclick="closeWindows()"></div>
+	<div id="info" class="infoBox" style="display: none">
+		<div class="infoHeading">jsFO / Info</div>
+		jsFO is an open-source port of Interplay's Fallout2 for the browser, written in Javascript, with conversion of assets from the original Fallout2 handled in Python. jsFO uses the HTML5 canvas API for rendering, and should be compatible with all modern browsers.</br>
+		For more information, as well as access to the source-code, head over to the project's <a href="https://github.com/ajxs/jsFO/">Github Page</a>.
+	</div>
+	<div id="help" class="infoBox" style="display: none">
+		<div class="infoHeading">jsFO / Help</div>
+		All controls and functionality idential to the original Fallout2.</br>
+		Please report any bugs to: <a href="mailto:ajxscc@gmail.com">ajxscc@gmail.com</a>
+	</div>
 </body>
