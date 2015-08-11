@@ -219,10 +219,6 @@ MainState.prototype.mapGeometry = {	// struct for map geometry vars/functions
 
 	m_roofHeight: 96,
 
-	m_origin: {		//screen-space coords of map origin ( upper-right )
-		x: 0, y: 0
-	},
-
 	m_transform: {	// offsets to make hexes and maptiles align
 		x: 48, y: -3,
 	},
@@ -246,8 +242,8 @@ MainState.prototype.mapGeometry = {	// struct for map geometry vars/functions
 	c2s: function(i) {	// maptile index to screen-space
 		var tCol = i%this.m_width, tRow = (i/this.m_width)|0;
 		return {
-			x: this.m_origin.x - this.m_transform.x - (tCol*48) + (tRow*32),
-			y: this.m_origin.y + this.m_transform.y + tCol*12 + (tRow*24),
+			x: 0 - this.m_transform.x - (tCol*48) + (tRow*32),		// map origin { x: 0, y: 0} is at upper right.
+			y: this.m_transform.y + tCol*12 + (tRow*24),
 		}
 	},
 
@@ -317,10 +313,14 @@ MainState.prototype.init = function(_saveState) {		// use arguments here to pass
 
 	this.map.tileInfo = _assets[loadMap].tileInfo;
 
-	
 	console.log("MainState: init: initializing hexGrid");
 	this.map.hexMap = new Array(this.map.nElevations);		// init/reset hexmap
+	this.mapObjects = new Array(this.map.nElevations);		// create / instantiate mapObjects
+
+	console.log("MainState: init: loading mapObjects");
+	
 	for(var n = 0; n < this.map.nElevations; n++) {
+
 		this.map.hexMap[n] = new Array(40000);
 		for(var h = 0; h < 40000; h++) {
 			this.map.hexMap[n][h] = {
@@ -329,12 +329,7 @@ MainState.prototype.init = function(_saveState) {		// use arguments here to pass
 				scrollBlock: false,
 			};
 		}
-	}
-
-	console.log("MainState: init: loading mapObjects");
-	this.mapObjects = new Array(this.map.nElevations);		// create / instantiate mapObjects
-	for(var n = 0; n < this.map.nElevations; n++) {
-
+	
 		var objectInfoLength = _assets[loadMap].objectInfo[n].length;
 		this.mapObjects[n] = new Array(objectInfoLength);
 
@@ -348,13 +343,12 @@ MainState.prototype.init = function(_saveState) {		// use arguments here to pass
 				case "walls":
 					break;
 				case "misc":
-					switch(this.mapObjects[n][i].frmID) {
-						case 1:		// scroll blockers
-							this.map.hexMap[n][this.mapObjects[n][i].hexPosition].scrollBlock = true;
-							break;
-					}
 
 					switch(this.mapObjects[n][i].objectID) {		// this needs massive fixing, need to figure out what value this is meant to be
+						case 12:		// scrollblockers
+							this.map.hexMap[n][this.mapObjects[n][i].hexPosition].scrollBlock = true;
+							break;
+					
 						case 16:	// exit grids
 						case 17:
 						case 18:
@@ -602,7 +596,7 @@ MainState.prototype.input = function(e) {
 				return;
 			} else if(this.inputState == "game") {
 				if(this.inputState_sub == "command") {
-					if(_mouse.c2) return;
+					if(_mouse.c2) return;		// stop mouse2 from triggering commands when in command mode
 					this.objectIndex = this.getObjectIndex();
 					if(this.objectIndex != -1) {		// if object under cursor
 						var objC = this.mapGeometry.h2s(this.mapObjects[this.player.currentElevation][this.objectIndex].hexPosition);
@@ -788,6 +782,17 @@ MainState.prototype.getObjectIndex = function() {
 			this.objectBufferRect.width,
 			this.objectBufferRect.height)) continue;
 
+
+		var cCol = this.currentRenderObject.hexPosition % 100;
+		var pCol = this.player.hexPosition % 100;
+
+		var cRow = (this.currentRenderObject.hexPosition / 100)|0;
+		var pRow = (this.player.hexPosition / 100)|0;			
+
+		if(this.getObjectType(this.currentRenderObject.frmTypeID) == "walls") {	// don't blit walls 'infront' of player.
+			if(!(cRow < pRow || cCol < pCol  )) continue;
+		}
+		
 		this.objectBufferContext2.globalCompositeOperation = "source-over";
 		this.objectBuffer2.width = this.objectBufferRect.width;	// hack clear
 
@@ -927,7 +932,7 @@ MainState.prototype.update = function() {
 
 
 	var e = this.player.currentElevation;
-	this.mapObjects[this.player.currentElevation].sort(function(a, b) {	// z-sort
+	this.mapObjects[e].sort(function(a, b) {	// z-sort
 		return ((a.hexPosition - b.hexPosition) || (a.anim.shiftY - b.anim.shiftY));
 	});
 
@@ -1080,22 +1085,26 @@ MainState.prototype.render = function() {
 		
 		var c = this.mapGeometry.h2s(this.currentRenderObject.hexPosition);
 		this.currentRenderImg = _assets[this.currentRenderObject.anim.img].frameInfo[this.currentRenderObject.orientation][this.currentRenderObject.anim.frameNumber];
-		if(!intersectTest(c.x, c.y,
-			this.currentRenderImg.width,
-			this.currentRenderImg.height,
-			this.camera.x,
-			this.camera.y,
-			_screenWidth,
-			_screenHeight)) continue;		// test if object is on screen. If not - skip.
 		
 		var destX = (c.x + 16 - ((this.currentRenderImg.width/2)|0)) + this.currentRenderObject.anim.shiftX - this.camera.x;	// actual coords of of objects.
 		var destY = (c.y + 8 - this.currentRenderImg.height) + this.currentRenderObject.anim.shiftY - this.camera.y;
+		
+		if(!intersectTest(destX,		// test if object is on screen. If not - skip.		
+			destY,	
+			this.currentRenderImg.width,
+			this.currentRenderImg.height,
+			0,
+			0,
+			_screenWidth,
+			_screenHeight)) continue;		// testing in screen space with dest vars, slower but more accurate.
+		
 		_context.drawImage(this.currentRenderImg.img,
 			destX,
 			destY);	// get dest coords in screen-space and blit.
 
 		// render mapObjects on eggBufferRect.
-		if(intersectTest(destX, destY,
+		if(intersectTest(destX,
+			destY,
 			this.currentRenderImg.width,
 			this.currentRenderImg.height,
 			this.eggBufferRect.x,
@@ -1215,7 +1224,7 @@ MainState.prototype.render = function() {
 	}
 	
 	// console	
-	var cl = (this.console.consoleData.length >=5) ? 5 : this.console.consoleData.length;
+	var cl = (this.console.consoleData.length > 5) ? 5 : this.console.consoleData.length;
 	for(var i = 0; i < cl; i++) {
 		bitmapFontRenderer.renderString(_assets["font1.aaf"],
 			this.console.consoleData[i],
@@ -1279,14 +1288,16 @@ MainState.prototype.render = function() {
 				_context.globalAlpha = 1;
 
 				if(this.cIndex_path == 0) {		// render "X" if no path to location
-					_context.drawImage(mse_overlay_blocked, this.hsIndex.x - this.camera.x + 11, this.hsIndex.y - this.camera.y + 3);		// top hex overlay img
+					_context.drawImage(mse_overlay_blocked,
+						this.hsIndex.x - this.camera.x + 11,
+						this.hsIndex.y - this.camera.y + 3);		// top hex overlay img
 				}
 				break;
 			case "command":
 				_context.drawImage(_assets["art/intrface/actarrow.frm"].frameInfo[0][0].img,
 					_mouse.x,
 					_mouse.y);
-				if(this.oIndex_state) {		
+				if(this.cIndex_state) {
 					_context.drawImage(_assets["art/intrface/lookn.frm"].frameInfo[0][0].img,
 						_mouse.x + 40,
 						_mouse.y);		// "hover look" icon

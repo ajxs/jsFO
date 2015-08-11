@@ -400,7 +400,7 @@ CharacterScreenState.prototype.input = function(e) {
 	};	
 };
 
-CharacterScreenState.prototype.update = function() {
+CharacterScreenState.prototype.update = function() {	//@TODO: FIX THIS MESS
 	
 	this.activeItem = -1;	
 	if(intersectTest(_mouse.x,_mouse.y,0,0,

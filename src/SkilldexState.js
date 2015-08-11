@@ -21,7 +21,7 @@ SkilldexState.prototype.closeButton = {
 	height: 16,		
 };
 
-SkilldexState.prototype.menuItems = [
+SkilldexState.prototype.menuItems = [		// @TODO: replace with strings from skilldex.msg
 	{
 		text: "SNEAK",
 		action: 0,
@@ -85,7 +85,6 @@ SkilldexState.prototype.action = function(action) {
 	}
 	
 }
-
 
 
 SkilldexState.prototype.input = function(e) {

@@ -9,6 +9,7 @@ var bitmapFontRenderer = {
 	rF_img: 0,
 	
 	createColorImg(_font, _color) {	// creates canvas element with coloured font
+		//@TODO - "create check so that you can't create duplicate rgb(r,g,b) and #rgb versions by accident. - Potentially force hex colors as argument.
 	
 		console.log("Bitmap Font: Creating color surface: " + _color);
 		

@@ -7,3 +7,5 @@ python loader_gamestate.py --map=arcaves.map --output=../jsfdata/arcaves.jsf
 python loader_gamestate.py --map=artemple.map --output=../jsfdata/artemple.jsf
 python loader_gamestate.py --map=arvillag.map --output=../jsfdata/arvillag.jsf
 python loader_gamestate.py --map=arvill2.map --output=../jsfdata/arvill2.jsf
+
+python loader_gamestate.py --map=mbclose.map --output=../jsfdata/mbclose.jsf
