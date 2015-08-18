@@ -97,36 +97,38 @@ def loadMAP(mapIndex):
 		nScripts = struct.unpack('>I', mapFile.read(4))[0]
 		scriptInfo = []
 
-		if nScripts > 0:
-			loop = nScripts
-			if nScripts%16 > 0:
-				loop += (16 - nScripts%16)
+		if nScripts == 0:
+			continue
+		
+		loop = nScripts
+		if nScripts%16 > 0:
+			loop += (16 - nScripts%16)
 
-				check = 0
-				for j in range(loop):
+		check = 0
+		for j in range(loop):
 
-					script = {}
+			script = {}
 
-					script['PID'] = struct.unpack('>i', mapFile.read(4))[0]
-					mapFile.seek(4,1)
+			script['PID'] = struct.unpack('>i', mapFile.read(4))[0]
+			mapFile.seek(4,1)
 
-					if ((script['PID'] & 0xFF000000) >> 24) == 1:
-						mapFile.seek((4*2),1)
-					elif ((script['PID'] & 0xFF000000) >> 24) == 2:
-						mapFile.seek(4,1)
+			if ((script['PID'] & 0xFF000000) >> 24) == 1:
+				mapFile.seek((4*2),1)
+			elif ((script['PID'] & 0xFF000000) >> 24) == 2:
+				mapFile.seek(4,1)
 
-					mapFile.seek(4,1)
-					script['scriptID'] = struct.unpack('>i', mapFile.read(4))[0]
+			mapFile.seek(4,1)
+			script['scriptID'] = struct.unpack('>i', mapFile.read(4))[0]
 
-					mapFile.seek((4*12),1)
-					scriptInfo.append(script)
+			mapFile.seek((4*12),1)
+			scriptInfo.append(script)
 
-					if j%16 == 15:    # after every 16 scripts is the check block
-						check += struct.unpack('>I', mapFile.read(4))[0]
-						mapFile.seek(4,1)
+			if j%16 == 15:    # after every 16 scripts is the check block
+				check += struct.unpack('>I', mapFile.read(4))[0]
+				mapFile.seek(4,1)
 
-				if check != nScripts:
-					print("fail")
+		if check != nScripts:
+			print("fail")
 		mapInfo['scriptInfo'].append(scriptInfo)
 
 	mapInfo['objectInfo'] = []
