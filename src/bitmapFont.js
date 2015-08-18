@@ -12,6 +12,9 @@ var bitmapFontRenderer = {
 		//@TODO - "create check so that you can't create duplicate rgb(r,g,b) and #rgb versions by accident. - Potentially force hex colors as argument.
 	
 		console.log("Bitmap Font: Creating color surface: " + _color);
+
+		//console.log(_font["img_" + _color].width,_font["img_" + _color].height);
+		//console.log(_font.img.width,_font.img.height);
 		
 		_font["img_" + _color] = document.createElement("canvas");
 		_font["img_" + _color].width = _font.img.width;
@@ -19,8 +22,7 @@ var bitmapFontRenderer = {
 		
 		
 			
-		console.log(_font["img_" + _color].width,_font["img_" + _color].height);
-		console.log(_font.img.width,_font.img.height);
+
 		
 		var _fontContext = _font["img_" + _color].getContext("2d");
 		
@@ -53,6 +55,9 @@ var bitmapFontRenderer = {
 	},
 	
 	renderString: function(_font, _string, _x, _y, _color) {
+		
+		if(_font.img.width == 0 || _font.img.height == 0) return;		// hack fix for firefox race condition bug.
+		
 		this.rF_stringlength = _string.length;
 		this.rF_totalWidth = 0;
 		this.rF_baseline = _y + _font.height;
