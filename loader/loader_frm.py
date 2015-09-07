@@ -33,7 +33,7 @@ def loadFRM(frmFile,pal):
 	for i in range(6):
 		fileOffset.append(struct.unpack('>I', frmFile.read(4))[0])
 			
-	frameAreaSize = struct.unpack('>I', frmFile.read(4))[0]
+	frmInfo['frameAreaSize'] = struct.unpack('>I', frmFile.read(4))[0]
 	
 	nDir = 1
 	for i in range(6):
@@ -78,3 +78,25 @@ def loadFRM(frmFile,pal):
 		frmInfo['frameInfo'].append(dirInfo)
 	
 	return frmInfo
+	
+if __name__ == "__main__":
+	import loader_dat
+	import loader_pal
+	
+	urlprefix = "../data/"	# use this to point to the directory with the undat'd Fallout2 data
+	master_dat_file = "".join([urlprefix,"master.dat"])
+	master_dat = loader_dat.loadDAT(master_dat_file)
+	
+	color = loader_pal.loadPAL(loader_dat.getFile(master_dat_file, master_dat["fileEntries"]["color.pal"]))
+	
+	testfrm = loadFRM(loader_dat.getFile(master_dat_file,master_dat["fileEntries"]["art/items/ammobox1.frm"]),color)
+	
+	print("FPS: " + str(testfrm['fps']))
+	print("actionFrame: " + str(testfrm['actionFrame']))
+	print("nFrames: " + str(testfrm['nFrames']))
+	
+	for i in range(6):
+		print("x: " + str(testfrm['shift'][i]['x']) + " y: " + str(testfrm['shift'][i]['y']))
+	
+	print("frameAreaSize: " + str(testfrm['frameAreaSize']))
+	

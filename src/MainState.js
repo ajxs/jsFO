@@ -451,7 +451,7 @@ MainState.prototype.generateFRMstring = function(object) {	// generates FRM stri
 		var weaponString = "a";
 		var animString = "a";
 
-		var frmBase = _assets["art/critters/critters.lst"][frmID].base;
+		var frmBase = _assets["art/critters/critters.lst"][frmID].data.base;
 
 		if(object.armorMaleFID || object.armorFemaleFID) {
 			frmBase = FIDtoFRM(object.armorMaleFID);
@@ -507,9 +507,13 @@ MainState.prototype.generateFRMstring = function(object) {	// generates FRM stri
 		}
 	}
 
-	var filename = _assets["art/" + filetype + "/" + filetype + ".lst"][frmID]
+	var filename = _assets["art/" + filetype + "/" + filetype + ".lst"][frmID].data;
 	return "art/" + filetype + "/" + filename;
 
+};
+
+MainState.prototype.generateFRMptr = function(object) {
+	return _assets[this.generateFRMstring(object)];
 };
 
 
@@ -769,7 +773,7 @@ MainState.prototype.getObjectIndex = function() {
 		this.currentRenderObject = this.mapObjects[this.player.currentElevation][i];
 		
 		var c = this.mapGeometry.h2s(this.currentRenderObject.hexPosition);
-		this.currentRenderImg = _assets[this.currentRenderObject.anim.img].frameInfo[this.currentRenderObject.orientation][this.currentRenderObject.anim.frameNumber];
+		this.currentRenderImg = this.currentRenderObject.anim.img.frameInfo[this.currentRenderObject.orientation][this.currentRenderObject.anim.frameNumber];
 
 		var destX = (c.x + 16 - ((this.currentRenderImg.width/2)|0)) + this.currentRenderObject.anim.shiftX - this.camera.x;	// object coords.
 		var destY = (c.y + 8 - this.currentRenderImg.height) + this.currentRenderObject.anim.shiftY- this.camera.y;
@@ -943,7 +947,7 @@ MainState.prototype.update = function() {
 	for(var i=0; i < mapObjectsLength; i++) {	// tasks, framestep
 		this.currentRenderObject = this.mapObjects[e][i];
 
-		this.currentRenderImg = _assets[this.currentRenderObject.anim.img];
+		this.currentRenderImg = this.currentRenderObject.anim.img;
 
 		if(this.currentRenderObject.anim.animActive) {	// framestep and animation functions
 			this.currentRenderObject.anim.animDelta = (getTicks() - this.currentRenderObject.anim.lastFrameTime);
@@ -996,7 +1000,7 @@ MainState.prototype.update = function() {
 
 	 
 	var playerCoords = this.mapGeometry.h2s(this.player.hexPosition);
-	this.currentRenderImg = _assets[this.player.anim.img].frameInfo[this.player.orientation][this.player.anim.frameNumber];	
+	this.currentRenderImg = this.player.anim.img.frameInfo[this.player.orientation][this.player.anim.frameNumber];	
 	
 	var playerX = (playerCoords.x + 16 - ((this.currentRenderImg.width/2)|0)) + this.player.anim.shiftX - this.camera.x;	// actual coords of of objects.
 	var playerY = (playerCoords.y + 8 - this.currentRenderImg.height) + this.player.anim.shiftY - this.camera.y;
@@ -1048,7 +1052,7 @@ MainState.prototype.render = function() {
 			_screenWidth,
 			_screenHeight)) continue;				
 
-		_context.drawImage(_assets[ "art/tiles/" + _assets['art/tiles/tiles.lst'][this.map.tileInfo[e].floorTiles[i]] ].frameInfo[0][0].img,
+		_context.drawImage(_assets['art/tiles/tiles.lst'][this.map.tileInfo[e].floorTiles[i]].ptr.frameInfo[0][0].img,		// use pointer in lst file
 			c.x - this.camera.x,
 			c.y - this.camera.y);
 
@@ -1060,7 +1064,7 @@ MainState.prototype.render = function() {
 			this.eggBufferRect.height)) continue;
 
 		this.eggContext.globalCompositeOperation = "source-atop";	// EGG
-		this.eggContext.drawImage(_assets[ "art/tiles/" + _assets['art/tiles/tiles.lst'][this.map.tileInfo[e].floorTiles[i]] ].frameInfo[0][0].img,
+		this.eggContext.drawImage(_assets['art/tiles/tiles.lst'][this.map.tileInfo[e].floorTiles[i]].ptr.frameInfo[0][0].img,
 			c.x - this.camera.x - this.eggBufferRect.x,
 			c.y - this.camera.y - this.eggBufferRect.y);
 		
@@ -1084,7 +1088,7 @@ MainState.prototype.render = function() {
 		this.currentRenderObject = this.mapObjects[e][i];
 		
 		var c = this.mapGeometry.h2s(this.currentRenderObject.hexPosition);
-		this.currentRenderImg = _assets[this.currentRenderObject.anim.img].frameInfo[this.currentRenderObject.orientation][this.currentRenderObject.anim.frameNumber];
+		this.currentRenderImg = this.currentRenderObject.anim.img.frameInfo[this.currentRenderObject.orientation][this.currentRenderObject.anim.frameNumber];
 		
 		var destX = (c.x + 16 - ((this.currentRenderImg.width/2)|0)) + this.currentRenderObject.anim.shiftX - this.camera.x;	// actual coords of of objects.
 		var destY = (c.y + 8 - this.currentRenderImg.height) + this.currentRenderObject.anim.shiftY - this.camera.y;
@@ -1145,7 +1149,7 @@ MainState.prototype.render = function() {
 				_screenWidth,
 				_screenHeight)) continue;
 			
-			_context.drawImage(_assets[ "art/tiles/" + _assets['art/tiles/tiles.lst'][this.map.tileInfo[e].roofTiles[i]] ].frameInfo[0][0].img,
+			_context.drawImage(_assets['art/tiles/tiles.lst'][this.map.tileInfo[e].roofTiles[i]].ptr.frameInfo[0][0].img,
 				c.x - this.camera.x,
 				c.y - this.mapGeometry.m_roofHeight - this.camera.y);
 

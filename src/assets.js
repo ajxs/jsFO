@@ -17,6 +17,18 @@ function asset_createFontFromJSON(obj) {
 	return fontItem;
 };
 
+function asset_createLSTfromJSON(obj) {
+	var lstItem = new Array(obj.data.length);
+	for(var i = 0; i < obj.data.length; i++) {
+		lstItem[i] = {
+			data: obj.data[i],
+			ptr: 0,
+		}
+	}
+	
+	return lstItem;
+};
+
 function asset_parseLoadData(data) {		// parses loadData as JSON and properly creates all assets.
 	var loadData = JSON.parse(data);
 	
@@ -31,9 +43,10 @@ function asset_parseLoadData(data) {		// parses loadData as JSON and properly cr
 			case "fon":
 				_assets[key] = asset_createFontFromJSON(loadData[key]);
 				break;
-				
-			case "msg":
 			case "lst":
+				_assets[key] = asset_createLSTfromJSON(loadData[key]);
+				break;
+			case "msg":
 			case "int":
 			case "txt":
 			case "pro":

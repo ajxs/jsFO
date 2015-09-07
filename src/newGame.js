@@ -1,6 +1,6 @@
 var newGame = {
-	//map: "geckpwpl.map",
-	map: "mbclose.map",
+	map: "geckpwpl.map",
+	//map: "mbclose.map",
 	playerStartPos: "default",
 	playerStartOrientation: "default",
 	playerStartElevation: "default",

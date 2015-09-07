@@ -168,8 +168,8 @@ MainState.prototype.object_setAnim = function(obj, newAnim, frame, dir, loop, ac
 	obj.anim.animLoop = loop;
 	obj.anim.animDirection = dir;
 	obj.anim.actionFrame = 0;
-	
-	obj.anim.img = this.generateFRMstring(obj);	
+
+	obj.anim.img = this.generateFRMptr(obj);
 	this.object_setFrame(obj,frame);	// reset frame and offset
 	
 	if(obj.hasOwnProperty('ai') && newAnim == "idle") {		// idle
@@ -181,22 +181,22 @@ MainState.prototype.object_setAnim = function(obj, newAnim, frame, dir, loop, ac
 MainState.prototype.object_setFrame = function(obj,frame) {
 	if(!frame) frame = 0;
 	if(frame == -1) {
-		frame = _assets[obj.anim.img].nFrames-1;	// last frame
+		frame = obj.anim.img.nFrames-1;	// last frame
 	}
 	
 	obj.anim.frameNumber = frame;	
-	obj.anim.shiftX = _assets[obj.anim.img].shift[obj.orientation].x;
-	obj.anim.shiftY = _assets[obj.anim.img].shift[obj.orientation].y;
+	obj.anim.shiftX = obj.anim.img.shift[obj.orientation].x;
+	obj.anim.shiftY = obj.anim.img.shift[obj.orientation].y;
 	
-	if(!_assets[obj.anim.img].frameInfo[obj.orientation]) {
+	if(!obj.anim.img.frameInfo[obj.orientation]) {
 		console.log("MainState: object_setFrame: Orientation error");
 		obj.orientation = 0;
 		return;
 	}
 	
 	for(var f = 0; f < obj.anim.frameNumber+1; f++) {	// set offsets
-		obj.anim.shiftX += _assets[obj.anim.img].frameInfo[obj.orientation][f].offsetX;
-		obj.anim.shiftY += _assets[obj.anim.img].frameInfo[obj.orientation][f].offsetY;
+		obj.anim.shiftX += obj.anim.img.frameInfo[obj.orientation][f].offsetX;
+		obj.anim.shiftY += obj.anim.img.frameInfo[obj.orientation][f].offsetY;
 	}
 	
 };
@@ -256,8 +256,8 @@ MainState.prototype.actor_moveStep = function(actor) {
 	actor.ai.moveNext = actor.ai.pathQ.shift();
 	actor.orientation = this.mapGeometry.findOrientation(actor.hexPosition,actor.ai.moveNext);
 	
-	actor.anim.shiftX = _assets[actor.anim.img].shift[actor.orientation].x;
-	actor.anim.shiftY = _assets[actor.anim.img].shift[actor.orientation].y;
+	actor.anim.shiftX = actor.anim.img.shift[actor.orientation].x;
+	actor.anim.shiftY = actor.anim.img.shift[actor.orientation].y;
 
 	if(actor.ai.runState) {
 		switch(actor.anim.actionFrame) {

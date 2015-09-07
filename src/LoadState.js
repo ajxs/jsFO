@@ -35,6 +35,29 @@ LoadState.prototype.init = function(_saveState) {		// use arguments here to pass
 		console.log("LoadState: download complete - parsing loadData");
 		asset_parseLoadData(evt.target.responseText);
 		
+		
+		var lstLength = _assets["art/tiles/tiles.lst"].length;
+		for(var i = 0; i < lstLength; i++) {
+			_assets["art/tiles/tiles.lst"][i].ptr = _assets["art/tiles/" + _assets["art/tiles/tiles.lst"][i].data];
+		}
+		
+		lstLength = _assets["art/items/items.lst"].length;
+		for(var i = 0; i < lstLength; i++) {
+			_assets["art/items/items.lst"][i].ptr = _assets["art/items/" + _assets["art/items/items.lst"][i].data];
+		}		
+		
+		lstLength = _assets["art/scenery/scenery.lst"].length;
+		for(var i = 0; i < lstLength; i++) {
+			_assets["art/scenery/scenery.lst"][i].ptr = _assets["art/scenery/" + _assets["art/scenery/scenery.lst"][i].data];
+		}
+
+		lstLength = _assets["art/misc/misc.lst"].length;
+		for(var i = 0; i < lstLength; i++) {
+			_assets["art/misc/misc.lst"][i].ptr = _assets["art/misc/" + _assets["art/misc/misc.lst"][i].data];
+		}
+		
+		
+		
 		console.log("LoadState: load complete");
 		LoadStatePtr.gameInit(_saveState);		
 	};

@@ -114,32 +114,45 @@ def loadGameState(loadVars):
 
 
 	lstFile = loader_dat.getFile(master_dat_file,master_dat["fileEntries"]["art/items/items.lst"])
-	loadData["art/items/items.lst"] = []
+	loadData["art/items/items.lst"] = {}
+	loadData["art/items/items.lst"]["type"] = "lst"
+	loadData["art/items/items.lst"]["data"] = []
 	for line in lstFile:
-		loadData["art/items/items.lst"].append(line.decode("utf-8").strip().lower())
+		loadData["art/items/items.lst"]["data"].append(line.decode("utf-8").strip().lower())
 
 	lstFile = loader_dat.getFile(master_dat_file,master_dat["fileEntries"]["art/walls/walls.lst"])
-	loadData["art/walls/walls.lst"] = []
+	loadData["art/walls/walls.lst"] = {}
+	loadData["art/walls/walls.lst"]["type"] = "lst"
+	loadData["art/walls/walls.lst"]["data"] = []
 	for line in lstFile:
-		loadData["art/walls/walls.lst"].append(line.decode("utf-8").strip().lower())
+		loadData["art/walls/walls.lst"]["data"].append(line.decode("utf-8").strip().lower())
 
 	lstFile = loader_dat.getFile(master_dat_file,master_dat["fileEntries"]["art/tiles/tiles.lst"])
-	loadData["art/tiles/tiles.lst"] = []
+	loadData["art/tiles/tiles.lst"] = {}
+	loadData["art/tiles/tiles.lst"]["type"] = "lst"
+	loadData["art/tiles/tiles.lst"]["data"] = []
+	
 	for line in lstFile:
-		loadData["art/tiles/tiles.lst"].append(line.decode("utf-8").strip().lower())
+		loadData["art/tiles/tiles.lst"]["data"].append(line.decode("utf-8").strip().lower())
 
 	lstFile = loader_dat.getFile(master_dat_file,master_dat["fileEntries"]["art/scenery/scenery.lst"])	
-	loadData["art/scenery/scenery.lst"] = []
+	loadData["art/scenery/scenery.lst"] = {}
+	loadData["art/scenery/scenery.lst"]["type"] = "lst"
+	loadData["art/scenery/scenery.lst"]["data"] = []
 	for line in lstFile:
-		loadData["art/scenery/scenery.lst"].append(line.decode("utf-8").strip().lower())
+		loadData["art/scenery/scenery.lst"]["data"].append(line.decode("utf-8").strip().lower())
 
 	lstFile = loader_dat.getFile(master_dat_file,master_dat["fileEntries"]["art/misc/misc.lst"])	
-	loadData["art/misc/misc.lst"] = []
+	loadData["art/misc/misc.lst"] = {}
+	loadData["art/misc/misc.lst"]["type"] = "lst"
+	loadData["art/misc/misc.lst"]["data"] = []
 	for line in lstFile:
-		loadData["art/misc/misc.lst"].append(line.decode("utf-8").strip().lower())
+		loadData["art/misc/misc.lst"]["data"].append(line.decode("utf-8").strip().lower())
 		
 	lstFile = loader_dat.getFile(critter_dat_file,critter_dat["fileEntries"]["art/critters/critters.lst"])	
-	loadData["art/critters/critters.lst"] = []
+	loadData["art/critters/critters.lst"] = {}
+	loadData["art/critters/critters.lst"]["type"] = "lst"
+	loadData["art/critters/critters.lst"]["data"] = []
 	for line in lstFile:
 		line = line.decode("utf-8").strip().lower()
 		split = line.split(',')
@@ -153,7 +166,7 @@ def loadGameState(loadVars):
 		else:
 			critter = line
 		
-		loadData["art/critters/critters.lst"].append(critter)
+		loadData["art/critters/critters.lst"]["data"].append(critter)
 	
 		
 	def getFiletype(typeID):
@@ -174,12 +187,12 @@ def loadGameState(loadVars):
 	for e in range(loadData[mapIndex]['nElevations']):		# load tile FRM
 		for i in range(10000):
 			index = loadData[mapIndex]['tileInfo'][e]['floorTiles'][i]
-			filename = "".join(["art/tiles/", loadData['art/tiles/tiles.lst'][index] ]).lower()
+			filename = "".join(["art/tiles/", loadData['art/tiles/tiles.lst']["data"][index] ]).lower()
 		
 			loadFRM(master_dat_file,master_dat,filename)
 
 			index = loadData[mapIndex]['tileInfo'][e]['roofTiles'][i]
-			filename = "".join(["art/tiles/", loadData['art/tiles/tiles.lst'][index] ]).lower()
+			filename = "".join(["art/tiles/", loadData['art/tiles/tiles.lst']["data"][index] ]).lower()
 		
 			loadFRM(master_dat_file,master_dat,filename)
 	
@@ -189,10 +202,10 @@ def loadGameState(loadVars):
 			filetype = getFiletype(loadData[mapIndex]['objectInfo'][e][i]['frmTypeID'])
 			
 			if(filetype == "critters"):
-				loadCritter(loadData['art/critters/critters.lst'][index]['base'])
+				loadCritter(loadData['art/critters/critters.lst']["data"][index]['base'])
 			else:	
 				lstname = "".join(["art/",filetype,"/",filetype,".lst"])
-				filename = "".join(["art/",filetype,"/", loadData[lstname][index] ]).lower()
+				filename = "".join(["art/",filetype,"/", loadData[lstname]["data"][index] ]).lower()
 				loadFRM(master_dat_file,master_dat,filename)
 			
 			for k in range(loadData[mapIndex]['objectInfo'][e][i]['inventorySize']):
@@ -200,10 +213,10 @@ def loadGameState(loadVars):
 				invindex = loadData[mapIndex]['objectInfo'][e][i]['inventory'][k]['frmID']
 				
 				if(invfiletype == "critters"):
-					loadCritter(loadData['art/critters/critters.lst'][invindex]['base'])
+					loadCritter(loadData['art/critters/critters.lst']["data"][invindex]['base'])
 				else:
 					lstname = "".join(["art/",invfiletype,"/",invfiletype,".lst"])
-					filename = "".join(["art/",invfiletype,"/", loadData[lstname][invindex] ]).lower()
+					filename = "".join(["art/",invfiletype,"/", loadData[lstname]["data"][invindex] ]).lower()
 					loadFRM(master_dat_file,master_dat,filename)
 			
 			
