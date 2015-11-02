@@ -19,8 +19,12 @@ function MainState() {
 	this.objectBuffer2.height = this.objectBufferRect.height;
 
 	this.eggBuffer = document.createElement("canvas");
-	this.eggBuffer.width = this.eggBufferRect.width;
-	this.eggBuffer.height = this.eggBufferRect.height;
+	//this.eggBuffer.width = this.eggBufferRect.width;
+	//this.eggBuffer.height = this.eggBufferRect.height;
+	
+	this.eggBuffer.width = 300;		// @TODO: FIX - this is a crude fix placed in to fix an issue with Chrome v46+ - see https://code.google.com/p/chromium/issues/detail?id=543342
+	this.eggBuffer.height = 300;
+	
 	this.eggContext = this.eggBuffer.getContext("2d");
 	this.transEgg = document.getElementById("trans_egg");
 
@@ -1028,14 +1032,14 @@ MainState.prototype.update = function() {
 
 MainState.prototype.render = function() {
 	this.eggContext.globalCompositeOperation = 'source-over';		// draw egg mask onto egg context.
-	this.eggContext.drawImage(this.transEgg,0,0);	
+	this.eggContext.drawImage(this.transEgg,0,0);
 
 	var playerCoords = this.mapGeometry.h2s(this.player.hexPosition);
 	var playerX = playerCoords.x + 16 + this.player.anim.shiftX - this.camera.x;
 	var playerY = (playerCoords.y + 8) + this.player.anim.shiftY- this.camera.y;
 
 	this.eggBufferRect.x = playerX - (this.eggBufferRect.width/2)|0;
-	this.eggBufferRect.y = playerY - ((this.eggBufferRect.height/2)|0) - 35;	// fix this
+	this.eggBufferRect.y = playerY - ((this.eggBufferRect.height/2)|0) - 35;	// @TODO: fix this
 	
 	var e = this.player.currentElevation;
 	
