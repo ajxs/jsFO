@@ -54,6 +54,11 @@
 			document.getElementById('info').style.display = 'none';
 			document.getElementById('help').style.display = 'none';
 		};
+		
+		function browserTestFail() {
+			document.getElementById("mainCanvas").style.display = 'none';
+			document.getElementById("main_failed").style.display = 'block';
+		};
 	
 	</script>
 	
@@ -71,6 +76,9 @@
 			</div>
 		</div>
 		<canvas id="mainCanvas" oncontextmenu="javascript: return false;"></canvas>
+		<div id="main_failed" style="display: none">
+			<img src="inc/main_failed.png"/>
+		</div>
 	</div>
 	
 	<div id="mainStorage">
