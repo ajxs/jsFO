@@ -76,8 +76,8 @@ InventoryState.prototype.render = function() {
 	_context.drawImage((this.activeItem == "closeButton" && this.mouseState == 1) ? _assets["art/intrface/lilreddn.frm"].frameInfo[0][0].img : _assets["art/intrface/lilredup.frm"].frameInfo[0][0].img,
 		this.x + this.closeButton.x, this.y + this.closeButton.y);	// bg	
 	
-	_context.drawImage(_assets[mainState.player.anim.img].frameInfo[this.playerAnimOrientation][0].img,
-		this.x + 190 + _assets[mainState.player.anim.img].shift[this.playerAnimOrientation].x, this.y + 45 + _assets[mainState.player.anim.img].shift[this.playerAnimOrientation].y);
+	_context.drawImage(mainState.player.anim.img.frameInfo[this.playerAnimOrientation][0].img,
+		this.x + 190 + mainState.player.anim.img.shift[this.playerAnimOrientation].x, this.y + 45 + mainState.player.anim.img.shift[this.playerAnimOrientation].y);
 	
 	_context.drawImage(_assets["art/intrface/hand.frm"].frameInfo[0][0].img, _mouse.x, _mouse.y);		// cursor
 };
