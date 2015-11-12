@@ -53,6 +53,11 @@ MainState.prototype.scrollCheckIndex = 0;
 
 MainState.prototype.scrollCheckAdj = 0;
 
+/*
+objectBuffer and objectBuffer2 are utilized for picking the pixel precise screen object the cursor is over during an action.
+It works by 'stenciling' sprites to the buffer in a 'paint by numbers' manner, painting a unique colour for each object. This can then be reversed to find the object under the cursor.
+object buffer canvas size CAN be modified with few ill effects.
+*/
 
 MainState.prototype.objectBuffer = 0;
 MainState.prototype.objectBuffer2 = 0;
@@ -128,6 +133,10 @@ MainState.prototype.path_adjList = 0;
 MainState.prototype.mapLightLevel = 1;
 MainState.prototype.scrollimg = 0;
 
+
+/*
+Do not modify transEgg canvas size, it's position is centered around the player by it's width. This may be fixed at a later date by hardcoding the width.
+*/
 MainState.prototype.transEgg = 0;
 MainState.prototype.eggBuffer = 0;
 MainState.prototype.eggContext = 0;
@@ -186,8 +195,7 @@ MainState.prototype.interfaceRect = {
 		y: 61,
 		width: 34,
 		height: 34,		
-	},	
-
+	},
 	
 };
 
@@ -286,6 +294,10 @@ MainState.prototype.mapGeometry = {	// struct for map geometry vars/functions
 		return orientation;
 	},
 
+	
+	/* default function used for heuristic score in pathfinding algorith,
+	can be replaced with better one as needed */
+	
 	hDistance: function(_a,_b) {	// pythagorean distance
 		var ha = this.h2s(_a);
 		var hb = this.h2s(_b);
@@ -841,8 +853,8 @@ MainState.prototype.update = function() {
 	// STATE HANDLING
 	this.scrollStates.yNeg = (_mouse.y < (_screenHeight * 0.025));
 	this.scrollStates.yPos = (_mouse.y > (_screenHeight * 0.975));
-	this.scrollStates.xNeg = (_mouse.x < (_screenWidth * 0.05));
-	this.scrollStates.xPos = (_mouse.x > (_screenWidth * 0.95));
+	this.scrollStates.xNeg = (_mouse.x < (_screenWidth * 0.025));
+	this.scrollStates.xPos = (_mouse.x > (_screenWidth * 0.975));
 	this.scrollState = (this.scrollStates.yNeg || this.scrollStates.yPos || this.scrollStates.xNeg || this.scrollStates.xPos);
 
 	if(intersectTest(_mouse.x,_mouse.y,0,0, 0,0,_screenWidth,_screenHeight) && this.scrollState) {
@@ -1031,6 +1043,8 @@ MainState.prototype.update = function() {
 
 
 MainState.prototype.render = function() {
+	
+	this.eggBuffer.width = 300;		// clear eggBuffer hack. @TODO: Replace with a version hardcoded to eggBufferRect.width - resolve once issue with Chrome rendering is fixed.
 	this.eggContext.globalCompositeOperation = 'source-over';		// draw egg mask onto egg context.
 	this.eggContext.drawImage(this.transEgg,0,0);
 
