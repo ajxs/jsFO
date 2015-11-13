@@ -5,40 +5,8 @@ import sys
 
 urlprefix = "../data/"
 
-def loadMAP(mapIndex):
+def loadMAP(mapFile, dat_file, loadData):
 
-	master_dat_file = "".join([urlprefix,"master.dat"])
-	master_dat = loader_dat.loadDAT(master_dat_file)
-
-	mapFile = loader_dat.getFile(master_dat_file,master_dat["fileEntries"][mapIndex])
-	
-		
-	lst_pro = {"items":[], "walls":[], "tiles":[], "scenery":[], "critters":[], "misc":[]}
-
-	lstFile = loader_dat.getFile(master_dat_file,master_dat["fileEntries"]["proto/items/items.lst"])
-	for line in lstFile:
-		lst_pro["items"].append(line.decode("utf-8").strip())
-
-	lstFile = lstFile = loader_dat.getFile(master_dat_file,master_dat["fileEntries"]["proto/walls/walls.lst"])
-	for line in lstFile:
-		lst_pro["walls"].append(line.decode("utf-8").strip())
-
-	lstFile = lstFile = loader_dat.getFile(master_dat_file,master_dat["fileEntries"]["proto/tiles/tiles.lst"])
-	for line in lstFile:
-		lst_pro["tiles"].append(line.decode("utf-8").strip())
-
-	lstFile = lstFile = loader_dat.getFile(master_dat_file,master_dat["fileEntries"]["proto/scenery/scenery.lst"])
-	for line in lstFile:
-		lst_pro["scenery"].append(line.decode("utf-8").strip())
-
-	lstFile = lstFile = loader_dat.getFile(master_dat_file,master_dat["fileEntries"]["proto/critters/critters.lst"])
-	for line in lstFile:
-		lst_pro["critters"].append(line.decode("utf-8").strip())
-
-	lstFile = lstFile = loader_dat.getFile(master_dat_file,master_dat["fileEntries"]["proto/misc/misc.lst"])
-	for line in lstFile:
-		lst_pro["misc"].append(line.decode("utf-8").strip())
-		
 	proCache = {}
 
 	mapInfo = {}
@@ -186,12 +154,13 @@ def loadMAP(mapIndex):
 			filetype = "misc"
 		else:
 			sys.exit("".join(["unrecognized filetype: ",str(object['objectTypeID'])]))
-
-		filename = "".join(["proto/",filetype,"/",lst_pro[filetype][object['objectID']-1].lower()])	# caching
+		
+		loadDataPRO = loadData[ "".join(["proto/",filetype,"/",filetype,".lst"]) ]
+		filename = "".join(["proto/",filetype,"/",loadDataPRO[object['objectID']-1].lower()])	# caching
 		if filename in proCache:
 			proto = proCache[filename]
 		else:
-			proCache[filename] = loader_pro.loadPRO(loader_dat.getFile(master_dat_file, master_dat["fileEntries"][filename]) )
+			proCache[filename] = loader_pro.loadPRO(dat_file.getFile(filename))		# @TODO: Fix tight coupling issue here
 			proto = proCache[filename]
 			
 			

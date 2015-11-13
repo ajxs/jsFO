@@ -8,6 +8,7 @@ import base64
 import io
 
 def loadFRM(frmFile,pal):
+
 	frmInfo = {}
 	frmInfo['type'] = "frm"
 	
