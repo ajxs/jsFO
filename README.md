@@ -12,5 +12,5 @@ All code for this project is released under the MIT license, meaning that you - 
 
 ##Running jsFO
 To run jsFO for yourself, simply download the source files to your computer and run index.html.
-The source in this hub contains pre-packaged data files for the Arroyo temple of trials, which will allow you to test the engine's functionality. To convert and run additional maps in jsFO, you will need a copy of the original game's data files, being 'master.dat' and 'critter.dat' for conversion of the game's original assets.
+The source in this hub contains pre-packaged data files for several maps, which will allow you to test the engine's functionality. To convert and run additional maps in jsFO, you will need a copy of the original game's data files, being 'master.dat' and 'critter.dat' for conversion of the game's original assets.
 For information relating to converting and loading maps yourself, please see the relevant wiki article.
