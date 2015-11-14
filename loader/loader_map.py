@@ -3,8 +3,6 @@ import loader_pro
 import loader_dat
 import sys
 
-urlprefix = "../data/"
-
 def loadMAP(mapFile, dat_file, loadData):
 
 	proCache = {}
@@ -155,8 +153,9 @@ def loadMAP(mapFile, dat_file, loadData):
 		else:
 			sys.exit("".join(["unrecognized filetype: ",str(object['objectTypeID'])]))
 		
-		loadDataPRO = loadData[ "".join(["proto/",filetype,"/",filetype,".lst"]) ]
-		filename = "".join(["proto/",filetype,"/",loadDataPRO[object['objectID']-1].lower()])	# caching
+		#loadDataPRO = loadData[ "".join(["proto/",filetype,"/",filetype,".lst"]) ]
+		loadDataPRO = loadData.getFile( "".join(["proto/",filetype,"/",filetype,".lst"]) )
+		filename = "".join(["proto/",filetype,"/",loadDataPRO['data'][object['objectID']-1].lower()])	# caching
 		if filename in proCache:
 			proto = proCache[filename]
 		else:
