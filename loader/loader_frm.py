@@ -15,7 +15,6 @@ def loadFRM(frmFile,pal):
 	temp = struct.unpack('>I3H', frmFile.read(10))
 	
 	version = temp[0]
-	
 
 	frmInfo['fps'] = temp[1]
 	frmInfo['actionFrame'] = temp[2]
@@ -55,17 +54,13 @@ def loadFRM(frmFile,pal):
 			
 			imgInfo['offsetX'] = temp[3]
 			imgInfo['offsetY'] = temp[4]
-			
-			imgData = numpy.empty([imgInfo['height'],imgInfo['width']],numpy.uint8)
 
-			for h in range(imgInfo['height']):
-				for w in range(imgInfo['width']):
-					imgData[h][w] = struct.unpack('>B', frmFile.read(1))[0]				
-			
+			pixels = struct.unpack("".join(['>',str(totalPixels),'B']), frmFile.read(totalPixels))
+			pixelData = numpy.asarray(pixels, numpy.uint8).reshape((imgInfo['height'], imgInfo['width']))
 
-			img = Image.fromarray(imgData,'P')
+			img = Image.fromarray(pixelData,'P')
 			img.putpalette(pal)
-			
+
 			output = io.BytesIO()
 			img.save(output, "GIF", transparency=0)
 			
@@ -85,12 +80,11 @@ if __name__ == "__main__":
 	import loader_pal
 	
 	urlprefix = "../data/"	# use this to point to the directory with the undat'd Fallout2 data
-	master_dat_file = "".join([urlprefix,"master.dat"])
-	master_dat = loader_dat.loadDAT(master_dat_file)
 	
-	color = loader_pal.loadPAL(loader_dat.getFile(master_dat_file, master_dat["fileEntries"]["color.pal"]))
-	
-	testfrm = loadFRM(loader_dat.getFile(master_dat_file,master_dat["fileEntries"]["art/items/ammobox1.frm"]),color)
+	master_dat = loader_dat.DATFile("".join([urlprefix,"master.dat"]))
+	critter_dat = loader_dat.DATFile("".join([urlprefix,"critter.dat"]))
+	color = loader_pal.loadPAL(master_dat.getFile("color.pal")) 
+	testfrm = loadFRM(critter_dat.getFile("art/critters/hmjmpsaa.frm"), color) 
 	
 	print("FPS: " + str(testfrm['fps']))
 	print("actionFrame: " + str(testfrm['actionFrame']))

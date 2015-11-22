@@ -1,1 +1,1 @@
-python loader_main.py --maps=geckpwpl.map,gecksetl.map --outputDir=../jsfdata/
+python loader.py --maps=geckpwpl.map,gecksetl.map --outputDir=../jsfdata/
