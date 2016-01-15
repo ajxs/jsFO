@@ -12,10 +12,10 @@ def loadINT(intFile):
 	
 	intInfo['header'] = {}
 	
-	nProcedures = struct.unpack('>I', intFile.read(4))[0]
-	procedures = []
+	intInfo['nProcedures'] = struct.unpack('>I', intFile.read(4))[0]
+	intInfo['procedures'] = []
 	
-	for i in range(nProcedures):
+	for i in range(intInfo['nProcedures']):
 		procedure = {}
 		
 		temp = struct.unpack('>6I', intFile.read(24))
@@ -27,9 +27,9 @@ def loadINT(intFile):
 		procedure['functionOffset'] = temp[4]
 		procedure['nArguments'] = temp[5]
 		
-		procedures.append(procedure)
+		intInfo['procedures'].append(procedure)
 	
-	names = {}
+	intInfo['names'] = {}
 	tableSize = struct.unpack('>I', intFile.read(4))[0]
 	j = 0
 	while(j < tableSize):
@@ -38,11 +38,11 @@ def loadINT(intFile):
 		name = struct.unpack("".join([str(nameSize),'s']), intFile.read(nameSize))[0].decode('UTF-8','ignore').strip()
 		
 		j+=(nameSize + 2)
-		names[nameOffset] = name
+		intInfo['names'][nameOffset] = name
 		
 	struct.unpack('>I', intFile.read(4))[0]	#0xFFFFFFFF	
 	
-	strings = {}
+	intInfo['strings'] = {}
 	tableSize = struct.unpack('>I', intFile.read(4))[0]
 	if(tableSize != 0xFFFFFFFF):		#if strings table not empty
 		j = 0
@@ -52,27 +52,46 @@ def loadINT(intFile):
 			string = struct.unpack("".join([str(stringSize),'s']), intFile.read(stringSize))[0].decode('UTF-8','ignore').strip()
 			
 			j+=(stringSize + 2)
-			strings[stringOffset] = string	
+			intInfo['strings'][stringOffset] = string	
 		
 		struct.unpack('>I', intFile.read(4))[0]	#0xFFFFFFFF
 	
+	intInfo['body'] = {}
+	opcode = 0
 	
-	for key in names:
-		print(str(key) + " " + names[key])
-		
-	print("\n\nSTRINGS\n\n")
-		
-	for key in strings:
-		print(str(key) + " " + strings[key])
+	while True:
+		try:
+			address = intFile.tell()
+			opcode = struct.unpack('>H', intFile.read(2))[0]
+			intInfo['body'][address] = opcode
+		except:
+			break
 	
 	
-	
-	
-	
+	return intInfo
 	
 if __name__ == "__main__":
 	import loader_dat
 	
-	master_dat_file = "../data/master.dat"
-	master_dat = loader_dat.loadDAT(master_dat_file)	
-	int = loadINT(loader_dat.getFile(master_dat_file, master_dat["fileEntries"]["scripts/acmorlis.int"]))
+
+	master_dat = loader_dat.DATFile("../data/master.dat")
+	int = loadINT(master_dat.getFile("scripts/ahhakun.int")) 
+	
+	
+	print("\n\nPROCEDURES\n\n")
+	for i in range(int['nProcedures']):
+		print(int['procedures'][i])	
+	
+	print("\n\nNAMES\n\n")
+	for key in int['names']:
+		print(str(key) + " " + int['names'][key])
+		
+	print("\n\nSTRINGS\n\n")
+		
+	for key in int['strings']:
+		print(str(key) + " " + int['strings'][key])
+	
+	print("\n\nBODY\n\n")
+	
+	for key in int['body']:
+		print(str(key) + " " + str(hex(int['body'][key])))

@@ -71,6 +71,7 @@ class AssetContainer:
 				if path == "art/critters/critters.lst":
 					for line in fileItem:
 						line = line.decode("utf-8").strip().lower()
+
 						split = line.split(',')
 						
 						if(len(split) > 1):
@@ -82,7 +83,16 @@ class AssetContainer:
 						else:
 							critter = line
 						
-						assetItem["data"].append(critter)					
+						assetItem["data"].append(critter)
+				elif path == "scripts/scripts.lst":
+					for line in fileItem:
+						if line[0] == ';':
+							continue
+							
+						split = line.split(';')
+						line = split[0]
+						
+						assetItem["data"].append(line.decode("utf-8").strip().lower())					
 				else:
 					for line in fileItem:
 						assetItem["data"].append(line.decode("utf-8").strip().lower())
@@ -587,6 +597,7 @@ if __name__ == "__main__":
 		mapPreloadData.loadFile(master_dat, "art/scenery/scenery.lst")
 		mapPreloadData.loadFile(master_dat, "art/misc/misc.lst")
 		mapPreloadData.loadFile(critter_dat, "art/critters/critters.lst")
+		mapPreloadData.loadFile(critter_dat, "scripts/scripts.lst")
 		
 		
 		for map in loadVars["maps"]:

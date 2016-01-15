@@ -36,13 +36,15 @@ function MainState() {
 	this.mse_overlay = document.getElementById("mse_overlay");		// WHY FALLOUT WHY
 	this.mse_overlay_blocked = document.getElementById("mse_overlay_blocked");
 
-
+	this.vm = new ScriptVM();
 };
 
 MainState.prototype = new GameState();
 MainState.prototype.constructor = MainState;
 
 MainState.prototype.map = 0;
+
+MainState.prototype.vm = 0;
 
 
 MainState.prototype.currentRenderObject = 0;
