@@ -1071,12 +1071,15 @@ MainState.prototype.render = function() {
 			this.camera.y,
 			_screenWidth,
 			_screenHeight)) continue;				
-
-		_context.drawImage(_assets['art/tiles/tiles.lst'][this.map.tileInfo[e].floorTiles[i]].ptr.frameInfo[0][0].img,		// use pointer in lst file
+			
+		
+		blit(_assets['art/tiles/tiles.lst'][this.map.tileInfo[e].floorTiles[i]].ptr.frameInfo[0][0].imgdata,
 			c.x - this.camera.x,
-			c.y - this.camera.y);
-
-		if(!intersectTest(c.x - this.camera.x, c.y - this.camera.y,		// camera test
+			c.y - this.camera.y,
+			80,
+			36);
+			
+		/* if(!intersectTest(c.x - this.camera.x, c.y - this.camera.y,		// camera test
 			80, 36,
 			this.eggBufferRect.x,
 			this.eggBufferRect.y,
@@ -1087,17 +1090,20 @@ MainState.prototype.render = function() {
 		this.eggContext.drawImage(_assets['art/tiles/tiles.lst'][this.map.tileInfo[e].floorTiles[i]].ptr.frameInfo[0][0].img,
 			c.x - this.camera.x - this.eggBufferRect.x,
 			c.y - this.camera.y - this.eggBufferRect.y);
-		
+		*/
 	}
 
 	if(this.inputState == "game" && this.inputState_sub == "move") {	// lower hex cursor
-		_context.drawImage(_assets["art/intrface/msef000.frm"].frameInfo[0][0].img,
-			this.hsIndex.x - this.camera.x,
-			this.hsIndex.y - this.camera.y);
 			
-		this.eggContext.drawImage(_assets["art/intrface/msef000.frm"].frameInfo[0][0].img,
+		blit(_assets["art/intrface/msef000.frm"].frameInfo[0][0].imgdata,
+			this.hsIndex.x - this.camera.x,
+			this.hsIndex.y - this.camera.y,
+			32,
+			16);
+			
+		/* this.eggContext.drawImage(_assets["art/intrface/msef000.frm"].frameInfo[0][0].img,
 			this.hsIndex.x - this.camera.x - this.eggBufferRect.x,
-			this.hsIndex.y - this.camera.y - this.eggBufferRect.y);
+			this.hsIndex.y - this.camera.y - this.eggBufferRect.y); */
 	}
 
 	// render map objects.
@@ -1121,13 +1127,16 @@ MainState.prototype.render = function() {
 			0,
 			_screenWidth,
 			_screenHeight)) continue;		// testing in screen space with dest vars, slower but more accurate.
-		
-		_context.drawImage(this.currentRenderImg.img,
-			destX,
-			destY);	// get dest coords in screen-space and blit.
 
+
+		blit(this.currentRenderImg.imgdata,
+			destX,
+			destY,
+			this.currentRenderImg.width,
+			this.currentRenderImg.height);
+			
 		// render mapObjects on eggBufferRect.
-		if(intersectTest(destX,
+		/* if(intersectTest(destX,
 			destY,
 			this.currentRenderImg.width,
 			this.currentRenderImg.height,
@@ -1150,8 +1159,8 @@ MainState.prototype.render = function() {
 				destX - this.eggBufferRect.x,
 				destY - this.eggBufferRect.y);
 			
-			_context.globalCompositeOperation = 'source-over';
-		}
+			_context.globalCompositeOperation = 'source-over'; 
+		} */
 		
 	}	// end mapObject loop
 
@@ -1168,11 +1177,13 @@ MainState.prototype.render = function() {
 				this.camera.y,
 				_screenWidth,
 				_screenHeight)) continue;
-			
-			_context.drawImage(_assets['art/tiles/tiles.lst'][this.map.tileInfo[e].roofTiles[i]].ptr.frameInfo[0][0].img,
-				c.x - this.camera.x,
-				c.y - this.mapGeometry.m_roofHeight - this.camera.y);
 
+			blit(_assets['art/tiles/tiles.lst'][this.map.tileInfo[e].roofTiles[i]].ptr.frameInfo[0][0].imgdata,
+				c.x - this.camera.x,
+				c.y - this.mapGeometry.m_roofHeight - this.camera.y,
+				80,
+				36);
+				
 		}			
 	}
 
@@ -1188,10 +1199,10 @@ MainState.prototype.render = function() {
 		}			
 	} */
 	
-	_context.drawImage(this.eggBuffer,this.eggBufferRect.x,this.eggBufferRect.y);
+	// _context.drawImage(this.eggBuffer,this.eggBufferRect.x,this.eggBufferRect.y);
 
 	// Render brightmap over the top of the main screen buffer.
-	if(this.mapLightLevel < 1) {
+	/* if(this.mapLightLevel < 1) {
 		// blit main light level to brightmap buffer.
 		this.brightmapContext.fillStyle = "rgb("+((255*this.mapLightLevel)|0)+","+((255*this.mapLightLevel)|0)+","+((255*this.mapLightLevel)|0)+")";
 		this.brightmapContext.fillRect(0,0,_screenWidth,_screenHeight);
@@ -1203,14 +1214,17 @@ MainState.prototype.render = function() {
 		_context.drawImage(this.brightmap,0,0);
 
 		_context.globalCompositeOperation = "source-over";	// reset
-	}
+	} */
 
-	// interface
-	_context.drawImage(_assets["art/intrface/iface.frm"].frameInfo[0][0].img,
-		this.interfaceRect.x,
-		this.interfaceRect.y);	// interface
+	// interface	
 	
-	if(this.inputState == "interface" && this.interfaceRect.mouseState == 1) {
+	blit(_assets["art/intrface/iface.frm"].frameInfo[0][0].imgdata,
+		this.interfaceRect.x,
+		this.interfaceRect.y,
+		this.interfaceRect.width,
+		this.interfaceRect.height);
+	
+	/* if(this.inputState == "interface" && this.interfaceRect.mouseState == 1) {
 		switch(this.interfaceRect.activeItem) {
 			case -1:
 				break;
@@ -1245,17 +1259,17 @@ MainState.prototype.render = function() {
 					this.interfaceRect.y + this.interfaceRect.menuButton.y);	// interface
 				break;
 		}		
-	}
+	} */
 	
 	// console	
-	var cl = (this.console.consoleData.length > 5) ? 5 : this.console.consoleData.length;
+	/* var cl = (this.console.consoleData.length > 5) ? 5 : this.console.consoleData.length;
 	for(var i = 0; i < cl; i++) {
 		bitmapFontRenderer.renderString(_assets["font1.aaf"],
 			this.console.consoleData[i],
 			this.console.x,
 			this.console.y - (i*this.console.fontHeight),
 			this.console.fontColor);
-	}
+	} */
 
 	// cursors
 	if(this.statePause) return;		// don't render cursors if state is paused.
@@ -1293,19 +1307,25 @@ MainState.prototype.render = function() {
 			if(this.scrollStates.yPosBlocked || this.scrollStates.xNegBlocked) this.scrollimg = _assets["art/intrface/scrsex.frm"];
 			else this.scrollimg = _assets["art/intrface/scrseast.frm"];
 		}
-		_context.drawImage(this.scrollimg.frameInfo[0][0].img,
+
+		blit(this.scrollimg.frameInfo[0][0].imgdata,
 			_mouse.x,
-			_mouse.y);
+			_mouse.y,
+			this.scrollimg.frameInfo[0][0].width,
+			this.scrollimg.frameInfo[0][0].height);
 
 	} else if(this.inputState == "interface") {		// if not scrolling	
-		_context.drawImage(_assets["art/intrface/stdarrow.frm"].frameInfo[0][0].img,
+	
+		blit(_assets["art/intrface/stdarrow.frm"].frameInfo[0][0].imgdata,
 			_mouse.x,
-			_mouse.y);
+			_mouse.y,
+			18,
+			18);	
 		
 	} else if(this.inputState == "game") {	// if not in HUD - on map
 		switch(this.inputState_sub) {
 			case "move":
-				_context.globalAlpha = 0.5;
+				/* _context.globalAlpha = 0.5;
 				_context.drawImage(mse_overlay,
 					this.hsIndex.x - this.camera.x - 1,
 					this.hsIndex.y - this.camera.y - 1);	// top hex overlay img
@@ -1315,16 +1335,22 @@ MainState.prototype.render = function() {
 					_context.drawImage(mse_overlay_blocked,
 						this.hsIndex.x - this.camera.x + 11,
 						this.hsIndex.y - this.camera.y + 3);		// top hex overlay img
-				}
+				} */
 				break;
 			case "command":
-				_context.drawImage(_assets["art/intrface/actarrow.frm"].frameInfo[0][0].img,
+				blit(_assets["art/intrface/actarrow.frm"].frameInfo[0][0].imgdata,
 					_mouse.x,
-					_mouse.y);
-				if(this.cIndex_state) {
-					_context.drawImage(_assets["art/intrface/lookn.frm"].frameInfo[0][0].img,
+					_mouse.y,
+					29,
+					23);	
+					
+				if(this.cIndex_state) {						
+					blit(_assets["art/intrface/actarrow.frm"].frameInfo[0][0].imgdata,
 						_mouse.x + 40,
-						_mouse.y);		// "hover look" icon
+						_mouse.y,
+						40,
+						40);		// "hover look" icon
+						
 				}
 				break;
 		}	// end switch

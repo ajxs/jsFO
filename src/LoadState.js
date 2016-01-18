@@ -100,7 +100,7 @@ LoadState.prototype.update = function() { }
 
 
 LoadState.prototype.render = function() {
-	_context.globalAlpha = 1;
+	/* _context.globalAlpha = 1;
 	_context.fillStyle = "rgb(0,10,0)";
 	_context.fillRect(0,0,_screenWidth,_screenHeight);
 	
@@ -144,5 +144,5 @@ LoadState.prototype.render = function() {
 	
 	}
 
-	_context.globalAlpha = 1;
+	_context.globalAlpha = 1; */
 };

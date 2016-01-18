@@ -176,6 +176,8 @@ def loadMain():
 
 	loadData = AssetContainer()
 	
+	loadData.loadFile(master_dat, "color.pal")
+	
 	loadData.loadFile(master_dat, "data/maps.txt")
 	
 	loadData.loadFile(master_dat, "font0.aaf")		# fonts

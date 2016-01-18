@@ -95,7 +95,7 @@ MainMenuState.prototype.update = function() {
 }
 
 MainMenuState.prototype.render = function() {	
-	_context.globalAlpha = 1;
+	/* _context.globalAlpha = 1;
 	
 	_context.drawImage(this.backgroundImage, 0, 0, 1024, 768, 0,0,_screenWidth, _screenHeight);	// bg
 		
@@ -111,6 +111,6 @@ MainMenuState.prototype.render = function() {
 			this.menu.y + this.menu.elements[i].y + this.menu.elements[i].textY,
 			(this.menu.elements[i].mouseState == 0) ? "#b89c28" : "#a99028");
 	}
-	_context.drawImage(_assets["art/intrface/stdarrow.frm"].frameInfo[0][0].img, _mouse.x, _mouse.y);		// cursor
+	_context.drawImage(_assets["art/intrface/stdarrow.frm"].frameInfo[0][0].img, _mouse.x, _mouse.y);		// cursor */
 	
 }

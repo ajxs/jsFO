@@ -6,6 +6,7 @@
 	<link href='http://fonts.googleapis.com/css?family=Oswald' rel='stylesheet' type='text/css'>
 	<link rel="stylesheet" href="inc/main.css"/>
 
+	<script src="src/renderer.js"></script>
 	<script src="src/assets.js"></script>
 	<script src="src/browser.js"></script>
 	<script src="src/bitmapFont.js"></script>
@@ -30,7 +31,31 @@
 	<script src="src/vm_op.js"></script>
 	
 	<script src="src/main.js"></script>
-
+	<script src="http://greggman.github.com/webgl-fundamentals/webgl/resources/webgl-utils.js"></script>
+	<script id="vshader" type="whatever">
+		attribute vec4 a_position;
+		varying vec2 v_texcoord;
+		void main() {
+		  gl_Position = a_position;
+		
+		  // assuming a unit quad for position we
+		  // can just use that for texcoords. Flip Y though so we get the top at 0
+		  v_texcoord = a_position.xy * vec2(0.5, -0.5) + 0.5;
+		}    
+	</script>
+	<script id="fshader" type="whatever">
+		precision mediump float;
+		varying vec2 v_texcoord;
+		uniform sampler2D u_image;
+		uniform sampler2D u_palette;
+			
+		void main() {
+			float index = texture2D(u_image, v_texcoord).a;
+			gl_FragColor = texture2D(u_palette, vec2(index, 0.5));
+		}
+	</script>
+	
+	
 	<script>
 	
 		var mainState_prevState;	// track previous state of mainState.statePause

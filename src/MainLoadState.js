@@ -81,7 +81,10 @@ MainLoadState.prototype.init = function() {		// use arguments here to pass saved
 			};
 		
 		console.log("MainLoadState: load complete");
-		main_menu();	// launch main menu
+		//main_menu();	// launch main menu			// @TODO: FIX
+		
+		main_loadGame(newGame);
+		
 	};
 
 	var transferFailed = function(evt) { };
@@ -121,7 +124,7 @@ MainLoadState.prototype.update = function() { }
 
 
 MainLoadState.prototype.render = function() {
-	_context.globalAlpha = 1;
+	/* _context.globalAlpha = 1;
 	
 	var fullWidth = ((_screenWidth/2)|0);
 	var barWidth = fullWidth * this.loadPercentage;
@@ -144,6 +147,6 @@ MainLoadState.prototype.render = function() {
 	_context.fillStyle = "#afb1a7";
 	_context.fillRect(barX,barY,barWidth,64);
 
-	_context.globalAlpha = 1;	
+	_context.globalAlpha = 1;	 */
 	
 };

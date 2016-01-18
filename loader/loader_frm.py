@@ -56,18 +56,19 @@ def loadFRM(frmFile,pal):
 			imgInfo['offsetY'] = temp[4]
 
 			pixels = struct.unpack("".join(['>',str(totalPixels),'B']), frmFile.read(totalPixels))
-			pixelData = numpy.asarray(pixels, numpy.uint8).reshape((imgInfo['height'], imgInfo['width']))
+			#pixelData = numpy.asarray(pixels, numpy.uint8).reshape((imgInfo['height'], imgInfo['width']))
 
-			img = Image.fromarray(pixelData,'P')
-			img.putpalette(pal)
+			#img = Image.fromarray(pixelData,'P')
+			#img.putpalette(pal)
 
-			output = io.BytesIO()
-			img.save(output, "GIF", transparency=0)
+			#output = io.BytesIO()
+			#img.save(output, "GIF", transparency=0)
 			
-			datastring = str( base64.b64encode( output.getvalue()) )
-			datastring_length = len(datastring)		
+			#datastring = str( base64.b64encode( output.getvalue()) )
+			#datastring_length = len(datastring)		
 			
-			imgInfo['imgdata'] = "".join(["data:image/gif;base64,",datastring[2: datastring_length-1] ])
+			#imgInfo['imgdata'] = "".join(["data:image/gif;base64,",datastring[2: datastring_length-1] ])
+			imgInfo['imgdata'] = pixels
 			
 			dirInfo.append(imgInfo)
 		

@@ -12,6 +12,7 @@ var _mouse = {		// struct for mouse info
 	c2: false
 };	
 
+var _renderMethod = 'gl';
 
 var _keyboardStates = [];	// array to hold keycode states
 
