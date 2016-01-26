@@ -25,13 +25,12 @@ function asset_createLSTfromJSON(obj) {
 			ptr: 0,
 		}
 	}
-	
+
 	return lstItem;
 };
 
-function asset_parseLoadData(data) {		// parses loadData as JSON and properly creates all assets.
-	var loadData = JSON.parse(data);
-	
+function asset_parseLoadData(loadData) {		// parses loadData as JSON and properly creates all assets.
+
 	for(var key in loadData) {
 		switch(loadData[key].type) {
 			case "frm":
@@ -50,11 +49,11 @@ function asset_parseLoadData(data) {		// parses loadData as JSON and properly cr
 			case "int":
 			case "txt":
 			case "pro":
-			
+
 			default:
 				_assets[key] = loadData[key];
 				break;
-				
+
 		}
 	}
 };
