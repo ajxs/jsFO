@@ -29,37 +29,37 @@
 	<script src="src/MapscreenState.js"></script>
 	<script src="src/vm.js"></script>
 	<script src="src/vm_op.js"></script>
-	
+
 	<script src="src/main.js"></script>
+	<script src="src/main_gl.js"></script>
+
 	<script src="http://greggman.github.com/webgl-fundamentals/webgl/resources/webgl-utils.js"></script>
-	<script id="vshader" type="whatever">
+	<script id="vshader" type="x-shader/x-fragment">
 		attribute vec4 a_position;
 		varying vec2 v_texcoord;
 		void main() {
-		  gl_Position = a_position;
-		
-		  // assuming a unit quad for position we
-		  // can just use that for texcoords. Flip Y though so we get the top at 0
-		  v_texcoord = a_position.xy * vec2(0.5, -0.5) + 0.5;
-		}    
+			gl_Position = a_position;
+			v_texcoord = a_position.xy * vec2(0.5, -0.5) + 0.5;
+		}
 	</script>
-	<script id="fshader" type="whatever">
+
+	<script id="fshader" type="x-shader/x-fragment">
 		precision mediump float;
 		varying vec2 v_texcoord;
 		uniform sampler2D u_image;
 		uniform sampler2D u_palette;
-			
+
 		void main() {
 			float index = texture2D(u_image, v_texcoord).a;
 			gl_FragColor = texture2D(u_palette, vec2(index, 0.5));
 		}
 	</script>
-	
-	
+
+
 	<script>
-	
+
 		var mainState_prevState;	// track previous state of mainState.statePause
-	
+
 		// Page functions
 		function openInfo() {
 			mainState_prevState = mainState.statePause;
@@ -67,28 +67,28 @@
 			document.getElementById('lightbox').style.display = 'block';
 			document.getElementById('info').style.display = 'block';
 		};
-		
+
 		function openHelp() {
 			mainState_prevState = mainState.statePause;
 			mainState.statePause = true;
 			document.getElementById('lightbox').style.display = 'block';
 			document.getElementById('help').style.display = 'block';
 		};
-		
+
 		function closeWindows() {
 			mainState.statePause = mainState_prevState;
 			document.getElementById('lightbox').style.display = 'none';
 			document.getElementById('info').style.display = 'none';
 			document.getElementById('help').style.display = 'none';
 		};
-		
+
 		function browserTestFail() {
 			document.getElementById("mainCanvas").style.display = 'none';
 			document.getElementById("main_failed").style.display = 'block';
 		};
-	
+
 	</script>
-	
+
 </head>
 
 <!--Entry point defined as window.addEventListener("load", main_init); in main.js -->
@@ -107,7 +107,7 @@
 			<img src="inc/main_failed.png"/>
 		</div>
 	</div>
-	
+
 	<div id="mainStorage">
 		<img id="mse_overlay" src="inc/mse_overlay.gif"/>
 		<img id="mse_overlay_blocked" src="inc/mse_overlay_blocked.gif"/>
