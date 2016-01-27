@@ -101,11 +101,10 @@ ContextMenuState.prototype.input = function(e) {
 		case "mousedown":
 			break;
 		case "mouseup":
-			console.log(this.objectIndex);
 			mainState.contextMenuAction(this.activeItems[this.targetItem].action, this.objectIndex );	// context menu action
 			_mouse.x = this.prevX;	// reset to previous stored mouse location
 			_mouse.y = this.prevY;
-			main_closeContextMenu();
+			main_gameStateFunction('closeContextMenu');
 
 			break;
 

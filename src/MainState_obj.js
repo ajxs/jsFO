@@ -1,6 +1,8 @@
+'use strict';
+
 MainState.prototype.createMapObject = function(source) {
 
-	var newObject;	// create objects
+	let newObject;	// create objects
 
 	if(source.objectTypeID == 1) {		// actor
 		newObject = new Actor();
@@ -13,13 +15,13 @@ MainState.prototype.createMapObject = function(source) {
 		newObject.armor = 0;
 
 	} else {		// static
-	
+
 		switch(this.getObjectType(source.objectTypeID)) {
 			case "items": 	// items
-			
+
 				newObject = new SpriteObject();
-				
-				switch(source.subtypeID) {			
+
+				switch(source.subtypeID) {
 					case 0:		//armor
 						newObject.armorMaleFID = source.armorMaleFID;
 						newObject.armorFemaleFID = source.armorFemaleFID;
@@ -28,7 +30,7 @@ MainState.prototype.createMapObject = function(source) {
 						newObject.weaponAnimCode = source.animCode;
 						break;
 				}
-				
+
 				break;
 			case "scenery":		//scenery
 				switch(source.subtypeID) {
@@ -37,7 +39,7 @@ MainState.prototype.createMapObject = function(source) {
 						newObject.objectType = "door";	// temp
 						break;
 					case 1:		// stairs
-						newObject = new SpriteObject();				
+						newObject = new SpriteObject();
 						break;
 					case 2:		// elevator
 						newObject = new SpriteObject();
@@ -45,7 +47,7 @@ MainState.prototype.createMapObject = function(source) {
 					default:
 						newObject = new SpriteObject();
 						break;
-				}			
+				}
 				break;
 			case "misc":
 				newObject = new SpriteObject();
@@ -65,17 +67,17 @@ MainState.prototype.createMapObject = function(source) {
 							break;
 						default:
 							break;
-					}				
-				
+					}
+
 				break;
-				
+
 			default:
 				newObject = new SpriteObject();
 				break;
-				
-		} 
 
-			
+		}
+
+
 		newObject.subtypeID = source.subtypeID;
 	}
 
@@ -93,8 +95,8 @@ MainState.prototype.createMapObject = function(source) {
 
 
 	newObject.inventory = new Array(source.inventorySize);
-	for(var m = 0; m < source.inventorySize; m++) {
-		newObject.inventory[m] = this.createMapObject(source.inventory[m]);		
+	for(let m = 0; m < source.inventorySize; m++) {
+		newObject.inventory[m] = this.createMapObject(source.inventory[m]);
 		if(newObject.inventory[m].objectTypeID == 0) {		// item
 			switch(newObject.inventory[m].subtypeID) {
 				case 0:		// armor
@@ -113,7 +115,7 @@ MainState.prototype.createMapObject = function(source) {
 					break;
 				default:
 					break;
-					
+
 			}
 		}
 	}
@@ -139,18 +141,18 @@ MainState.prototype.object_playAnim = function(obj, newAnim, frame, actionFrame,
 		frame = 0;
 	}
 	if(!loop) loop = false;
-	
+
 	this.object_setAnim(obj, newAnim, frame, dir, loop, true);
 
 	obj.anim.actionFrame = actionFrame;
-	
+
 	if(actionCallback == endCallback) {
-		if(isFunction(actionCallback) && isFunction(endCallback)) this.actor_addAction(obj,actionCallback,"onActionFrame|onAnimEnd");		
+		if(isFunction(actionCallback) && isFunction(endCallback)) this.actor_addAction(obj,actionCallback,"onActionFrame|onAnimEnd");
 	} else {
 		if(isFunction(actionCallback)) this.actor_addAction(obj,actionCallback,"onActionFrame");
 		if(isFunction(endCallback)) this.actor_addAction(obj,endCallback,"onAnimEnd");
 	}
-	
+
 };
 
 
@@ -171,11 +173,11 @@ MainState.prototype.object_setAnim = function(obj, newAnim, frame, dir, loop, ac
 
 	obj.anim.img = this.generateFRMptr(obj);
 	this.object_setFrame(obj,frame);	// reset frame and offset
-	
+
 	if(obj.hasOwnProperty('ai') && newAnim == "idle") {		// idle
 		obj.ai.idleStartTime = getTicks();
 	}
-		
+
 };
 
 MainState.prototype.object_setFrame = function(obj,frame) {
@@ -183,41 +185,41 @@ MainState.prototype.object_setFrame = function(obj,frame) {
 	if(frame == -1) {
 		frame = obj.anim.img.nFrames-1;	// last frame
 	}
-	
-	obj.anim.frameNumber = frame;	
+
+	obj.anim.frameNumber = frame;
 	obj.anim.shiftX = obj.anim.img.shift[obj.orientation].x;
 	obj.anim.shiftY = obj.anim.img.shift[obj.orientation].y;
-	
+
 	if(!obj.anim.img.frameInfo[obj.orientation]) {
 		console.log("MainState: object_setFrame: Orientation error");
 		obj.orientation = 0;
 		return;
 	}
-	
-	for(var f = 0; f < obj.anim.frameNumber+1; f++) {	// set offsets
+
+	for(let f = 0; f < obj.anim.frameNumber+1; f++) {	// set offsets
 		obj.anim.shiftX += obj.anim.img.frameInfo[obj.orientation][f].offsetX;
 		obj.anim.shiftY += obj.anim.img.frameInfo[obj.orientation][f].offsetY;
 	}
-	
+
 };
 
 MainState.prototype.actor_beginMoveState = function(actor, dest, runState, pathCompleteCallback) {
-	var mState = this;
+	let mState = this;
 
 	if(actor.ai.moveState) {		// if already in anim
-		var newMoveState = function() {
+		let newMoveState = function() {
 			mState.actor_moveStep(actor);
 			mState.actor_endMoveState(actor);
 			mState.actor_cancelAction(actor);
-			mState.actor_beginMoveState(actor,dest,mState.inputRunState);			
+			mState.actor_beginMoveState(actor,dest,mState.inputRunState);
 		}
-		
+
 		mState.actor_addActionToFront(actor,newMoveState,"onAnimEnd|onActionFrame");
-		
-		
+
+
 		return;
 	}
-	
+
 	actor.ai.pathQ = mState.findPath(actor.hexPosition,dest);
 	if(!actor.ai.pathQ) return;
 
@@ -227,9 +229,9 @@ MainState.prototype.actor_beginMoveState = function(actor, dest, runState, pathC
 
 	actor.ai.moveNext = actor.ai.pathQ.shift();
 	actor.orientation = this.mapGeometry.findOrientation(actor.hexPosition,actor.ai.moveNext);
-	
-	
-	var moveStep = function() {
+
+
+	let moveStep = function() {
 		mState.actor_moveStep(actor);
 	};
 
@@ -238,24 +240,24 @@ MainState.prototype.actor_beginMoveState = function(actor, dest, runState, pathC
 	} else {	// walk
 		this.object_playAnim(actor,"walk",0,4,0,true);
 	}
-	
+
 	mState.actor_addActionToFront(actor,moveStep,"onAnimEnd|onActionFrame");
-	
+
 };
 
 
 MainState.prototype.actor_moveStep = function(actor) {
-	var mState = this;
+	let mState = this;
 	actor.hexPosition = actor.ai.moveNext;
 
 	if(actor.hexPosition == actor.ai.moveDest) {		// destination reached
-		this.actor_endMoveState(actor);		
+		this.actor_endMoveState(actor);
 		return;
 	}
 
 	actor.ai.moveNext = actor.ai.pathQ.shift();
 	actor.orientation = this.mapGeometry.findOrientation(actor.hexPosition,actor.ai.moveNext);
-	
+
 	actor.anim.shiftX = actor.anim.img.shift[actor.orientation].x;
 	actor.anim.shiftY = actor.anim.img.shift[actor.orientation].y;
 
@@ -278,14 +280,14 @@ MainState.prototype.actor_moveStep = function(actor) {
 				break;
 		}
 	}
-	
-	var moveStep = function() {
+
+	let moveStep = function() {
 		mState.actor_moveStep(actor);
 	};
 
 	mState.actor_addActionToFront(actor,moveStep,"onAnimEnd|onActionFrame");
-	
-	
+
+
 	if(actor == mState.player) {
 		if(mState.map.hexMap[actor.currentElevation][actor.hexPosition].exitGrid) {		// exit map
 			mState.exitMap(mState.map.hexMap[actor.currentElevation][actor.hexPosition].exitGrid_map,
@@ -294,7 +296,7 @@ MainState.prototype.actor_moveStep = function(actor) {
 				mState.map.hexMap[actor.currentElevation][actor.hexPosition].exitGrid_orientation);
 		}
 	}
-	
+
 };
 
 MainState.prototype.actor_endMoveState = function(actor) {
@@ -304,7 +306,7 @@ MainState.prototype.actor_endMoveState = function(actor) {
 	this.object_setAnim(actor,"idle",0,0,false,false);
 	actor.anim.actionFrameCallback = 0;
 	actor.anim.animEndCallback = 0;
-	
+
 	this.actor_nextAction(actor,"endMoveState");
 };
 
@@ -333,48 +335,48 @@ MainState.prototype.actor_addActionToFront = function(actor,action,trigger,delay
 
 MainState.prototype.actor_checkTimedAction = function(actor) {
 	if(!actor.actionQ.length) return false;
-	
+
 	actionTriggers = actor.actionQ[0].trigger.split("|");	// allow logical OR
-	for(var i = 0; i < actionTriggers.length; i++) {
+	for(let i = 0; i < actionTriggers.length; i++) {
 		if(actionTriggers[i] == "timed") {
-			
-			var currentTime = getTicks();
-			var endTime = actor.actionQ[0].timeStart + (actor.actionQ[0].delay*1000);
-			
+
+			let currentTime = getTicks();
+			let endTime = actor.actionQ[0].timeStart + (actor.actionQ[0].delay*1000);
+
 			if(currentTime > endTime) {
-				var nextAction = actor.actionQ.shift();
+				let nextAction = actor.actionQ.shift();
 				nextAction.action.call(this);
-				return true;			
+				return true;
 			}
-				
-		}		
+
+		}
 	}
 	return false;
-	
+
 }
 
 MainState.prototype.actor_nextAction = function(actor, trigger) {
 	if(!actor.actionQ.length) return false;
-	
-	actionTriggers = actor.actionQ[0].trigger.split("|");	// allow logical OR
-	for(var i = 0; i < actionTriggers.length; i++) {
+
+	let actionTriggers = actor.actionQ[0].trigger.split("|");	// allow logical OR
+	for(let i = 0; i < actionTriggers.length; i++) {
 		if(actionTriggers[i] == trigger) {
-			var nextAction = actor.actionQ.shift();
+			let nextAction = actor.actionQ.shift();
 			nextAction.action.call(this);
-			return true;			
-		}		
+			return true;
+		}
 	}
 	return false;
 
 };
 
 MainState.prototype.actor_cancelAction = function(actor) {
-	actor.actionQ = [];	
+	actor.actionQ = [];
 };
 
 
 MainState.prototype.object_openDoor = function(obj) {
-	var mState = this;
+	let mState = this;
 	mState.object_playAnim(obj,0,0,0,0,false,0,function() {
 		obj.openState = 1;
 		mState.map.hexMap[mState.player.currentElevation][obj.hexPosition].blocked = false;	// FIX FOR ELEVATION
@@ -382,10 +384,10 @@ MainState.prototype.object_openDoor = function(obj) {
 };
 
 MainState.prototype.object_closeDoor = function(obj) {
-	var mState = this;		
+	let mState = this;
 	mState.object_playAnim(obj,0,-1,0,1,false,0,function() {
 		obj.openState = 0;
 		mState.map.hexMap[mState.player.currentElevation][obj.hexPosition].blocked = true;	// FIX FOR ELEVATION
 	});
-	
+
 };

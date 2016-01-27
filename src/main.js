@@ -14,6 +14,11 @@ function main_init() {
 	_canvas = document.getElementById('mainCanvas');
 	_canvas.style.cursor = "none";
 
+	document.getElementById("main").style.width = _screenWidth;
+
+	_canvas.width = _screenWidth;
+	_canvas.height = _screenHeight;
+
 	_context = _canvas.getContext("2d");
 	_context.imageSmoothingEnabled = false;
 
@@ -49,8 +54,6 @@ function main_init() {
 	pipboyState = new PipboyState();
 	mapScreenState = new MapScreenState();
 
-	main_setResolution(640,480);	// set after init states
-
 	callFrame(main_loop);	// init loop
 	_canvas.focus();
 
@@ -66,19 +69,19 @@ function main_loadMain() {
 
 
 function main_menu() {
-	main_ingameMenu_close();
+	main_gameStateFunction('closeIngameMenu');
 
-	var mainLoadState_index = stateQ.indexOf(mainLoadState);
+	let mainLoadState_index = stateQ.indexOf(mainLoadState);
 	if(mainLoadState_index > -1) {	//	remove mainState
 		stateQ.splice(mainLoadState_index,1);
 	}
 
-	var loadState_index = stateQ.indexOf(loadState);
+	let loadState_index = stateQ.indexOf(loadState);
 	if(loadState_index > -1) {	//	remove mainState
 		stateQ.splice(loadState_index,1);
 	}
 
-	var mainState_index = stateQ.indexOf(mainState);
+	let mainState_index = stateQ.indexOf(mainState);
 	if(mainState_index > -1) {	//	remove mainState
 		stateQ.splice(mainState_index,1);
 	}
@@ -88,19 +91,19 @@ function main_menu() {
 
 
 function main_loadGame(_saveState) {
-	main_ingameMenu_close();
+	main_gameStateFunction('closeIngameMenu');
 
-	var mainMenuState_index = stateQ.indexOf(mainMenuState);
+	let mainMenuState_index = stateQ.indexOf(mainMenuState);
 	if(mainMenuState_index > -1) {	//	remove mainState
 		stateQ.splice(mainMenuState_index,1);
 	}
 
-	var mainState_index = stateQ.indexOf(mainState);
+	let mainState_index = stateQ.indexOf(mainState);
 	if(mainState_index > -1) {	//	remove mainState
 		stateQ.splice(mainState_index,1);
 	}
 
-	var loadState_index = stateQ.indexOf(loadState);
+	let loadState_index = stateQ.indexOf(loadState);
 	if(loadState_index > -1) {	//	remove mainState
 		stateQ.splice(loadState_index,1);
 	}
@@ -116,9 +119,9 @@ function main_input(e) {
 
 	switch(e.type) {
 		case "mousemove":
-			var rect = _canvas.getBoundingClientRect();
-			_mouse.x = (e.clientX - rect.left)|0;
-			_mouse.y = (e.clientY - rect.top)|0;
+			clientBoundingRect = _canvas.getBoundingClientRect();
+			_mouse.x = (e.clientX - clientBoundingRect.left)|0;
+			_mouse.y = (e.clientY - clientBoundingRect.top)|0;
 			break;
 		case "mousedown":
 			if(e.which == 1) {
@@ -139,7 +142,7 @@ function main_input(e) {
 			break;
 	};
 
-	for(var i = 0; i < stateQ.length; i++) {
+	for(let i = 0; i < stateQ.length; i++) {
 		if(!stateQ[i].statePause) stateQ[i].input.call(stateQ[i],e);
 	}
 
@@ -150,7 +153,7 @@ function main_input(e) {
 function main_update() {
 	fps_currentTime = Date.now();
 
-	for(var i = 0; i < stateQ.length; i++) {
+	for(let i = 0; i < stateQ.length; i++) {
 		if(!stateQ[i].statePause) stateQ[i].update.call(stateQ[i]);
 	}
 
@@ -160,64 +163,32 @@ function main_update() {
 function main_render() {
 	_canvas.width = _screenWidth;	// hack clear
 
-	for(var i = 0; i < stateQ.length; i++) {
+	for(let i = 0; i < stateQ.length; i++) {
 		stateQ[i].render.call(stateQ[i]);
 	}
 
 };
 
 
-function main_setResolution(width,height) {		// realtime resolution change
-	//@TODO: Hardcode these for const usage
-	_screenWidth = width;
-	_screenHeight = height;
 
-	_canvas.width = width;
-	_canvas.height = height;
-
-	document.getElementById("main").style.width = width;
-
-	mainState.interfaceRect.x = ((_screenWidth / 2)|0) - 320;
-	mainState.interfaceRect.y = _screenHeight - 99;
-
-	skilldexState.x = _screenWidth  - 190;
-	skilldexState.y = 5;
-
-	inventoryState.x = ((_screenWidth / 2)|0) - 250;
-	inventoryState.y = 0;
-
-	mainState.console.x = (((_screenWidth / 2)|0) - 320) + 30;	// recompute coords
-	mainState.console.y = _screenHeight - 26;
-
-	mapScreenState.x = (((_screenWidth / 2)|0) - 260);
-	mapScreenState.y = 0;
-
-
-	ingameMenuState.menu.x = ((_screenWidth/2)|0) - 82;
-	ingameMenuState.menu.y = ((_screenHeight/2)|0) - 108;
-
-	mainMenuState.menu.x = (_screenWidth*0.05)|0;
-	mainMenuState.menu.y = (_screenWidth*0.185)|0;
-
-	mainState.camera.trackToCoords(mainState.mapGeometry.h2s(mainState.player.hexPosition));
-
-};
-
-function main_openInventory() {
+function main_openActiveState(state) {
 	mainState.statePause = true;
-	inventoryState.playerAnimLastRotationTime = getTicks();
-	stateQ.push(inventoryState);
-
+	stateQ.push(state);
+	_keyboardStates[27] = false;	// LOL - sets ESC key state to false to prevent the next iteration of the gamestate stack from capturing the input.
 };
 
-function main_closeInventory() {
-	mainState.statePause = false;
-	stateQ.splice(stateQ.indexOf(inventoryState),1);
-
+function main_closeActiveState(state) {
+	if(mainState.statePause) mainState.statePause = false;
+	let statePosition = stateQ.indexOf(state);
+	if(statePosition) {
+		stateQ.splice(stateQ.indexOf(state),1);
+	} else {
+		console.log("main_closeActiveState: Invalid state");
+	}
 };
+
 
 function main_openContextMenu(obj,x,y) {
-	mainState.statePause = true;
 	contextMenuState.objectIndex = obj;
 	contextMenuState.x = x;
 	contextMenuState.y = y;
@@ -226,7 +197,7 @@ function main_openContextMenu(obj,x,y) {
 
 	contextMenuState.activeItems = [];		// reset active items
 
-	var targetObject = mainState.mapObjects[mainState.player.currentElevation][obj];
+	let targetObject = mainState.mapObjects[mainState.player.currentElevation][obj];
 
 	switch(mainState.getObjectType(targetObject.objectTypeID)) {
 		case "items":
@@ -257,66 +228,79 @@ function main_openContextMenu(obj,x,y) {
 
 	contextMenuState.activeItems.push(contextMenuState.menu_cancel);
 
-	stateQ.push(contextMenuState);
+	main_openActiveState(contextMenuState);
 
 };
 
-function main_closeContextMenu() {
-	if(mainState.statePause) mainState.statePause = false;
-	stateQ.splice(stateQ.indexOf(contextMenuState),1);
+
+function main_gameStateFunction(f, ...extra) {
+	switch(f) {
+		case "openContextMenu":
+			main_openContextMenu(extra[0], extra[1], extra[2]);		//@TODO: FIX
+			break;
+		case "closeContextMenu":
+			main_closeActiveState(contextMenuState);
+			break;
+		case "openInventory":
+			main_openActiveState(inventoryState);
+			break;
+		case "closeInventory":
+			main_closeActiveState(inventoryState);
+			break;
+		case "openIngameMenu":
+			main_openActiveState(ingameMenuState);
+			break;
+		case "closeIngameMenu":
+			main_closeActiveState(ingameMenuState);
+			break;
+		case "openSkilldex":
+			main_closeActiveState(skilldexState);
+			break;
+		case "openCharacterScreen":
+			main_openActiveState(characterScreenState);
+			break;
+		case "closeCharacterScreen":
+			main_closeActiveState(characterScreenState);
+			break;
+		case "openPipBoy":
+			main_openActiveState(pipboyState);
+			break;
+		case "closePipBoy":
+			main_closeActiveState(pipboyState);
+			break;
+		case "openMap":
+			main_openActiveState(mapScreenState);
+			break;
+		case "closeMap":
+			main_closeActiveState(mapScreenState);
+			break;
+		default:
+			console.log('main_gameStateFunction: improper arguments supplied');
+			break;
+	}
 };
 
-function main_ingameMenu() {
-	mainState.statePause = true;
-	stateQ.push(ingameMenuState);
-	_keyboardStates[27] = false;	// LOL - sets ESC key state to false to prevent the next iteration of the gamestate stack from capturing the input.
+
+function main_payloadError(error) {
+	console.log(error);
 };
 
-function main_ingameMenu_close() {
-	if(mainState.statePause) mainState.statePause = false;
-	stateQ.splice(stateQ.indexOf(ingameMenuState),1);
-};
+function main_loadJsonPayload(url) {
+	return new Promise(
+		function(resolve, reject) {
+			let payloadXHR = new XMLHttpRequest();
 
-function main_openSkilldex() {
-	mainState.statePause = true;
-	stateQ.push(skilldexState);
-	_keyboardStates[27] = false;	// LOL - sets ESC key state to false to prevent the next iteration of the gamestate stack from capturing the input.
-};
+			payloadXHR.onload = function() {
+				resolve(this.response);
+			};
 
-function main_closeSkilldex() {
-	if(mainState.statePause) mainState.statePause = false;
-	stateQ.splice(stateQ.indexOf(skilldexState),1);
-};
+			payloadXHR.onerror = function() {
+				reject(this.statusText);
+			};
 
-function main_openCharacterScreen() {
-	mainState.statePause = true;
-	stateQ.push(characterScreenState);
-};
-
-function main_closeCharacterScreen() {
-	if(mainState.statePause) mainState.statePause = false;
-	stateQ.splice(stateQ.indexOf(characterScreenState),1);
-};
-
-function main_openPipboy() {
-	mainState.statePause = true;
-	stateQ.push(pipboyState);
-
-};
-
-function main_closePipboy() {
-	if(mainState.statePause) mainState.statePause = false;
-	stateQ.splice(stateQ.indexOf(pipboyState),1);
-};
-
-
-function main_openMap() {
-	mainState.statePause = true;
-	stateQ.push(mapScreenState);
-
-};
-
-function main_closeMap() {
-	if(mainState.statePause) mainState.statePause = false;
-	stateQ.splice(stateQ.indexOf(mapScreenState),1);
+			payloadXHR.open("GET", url, true);
+			payloadXHR.responseType = 'json';
+			payloadXHR.send();
+		}
+	);
 };

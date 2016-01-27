@@ -2,6 +2,11 @@
 
 function SkilldexState() {
 	GameState.call(this);
+
+	this.x = _screenWidth  - 190;
+	this.y = 5;
+
+
 }
 
 SkilldexState.prototype = new GameState();
@@ -18,7 +23,7 @@ SkilldexState.prototype.closeButton = {
 	x: 48,
 	y: 338,
 	width: 15,
-	height: 16,		
+	height: 16,
 };
 
 SkilldexState.prototype.menuItems = [		// @TODO: replace with strings from skilldex.msg
@@ -70,20 +75,20 @@ SkilldexState.prototype.menuItems = [		// @TODO: replace with strings from skill
 		x: 14, y: 296,
 		width: 86, height: 33,
 		textX: 13, textY: 6,
-	},	
+	},
 ];
 
 SkilldexState.prototype.init = function() {}
 
-SkilldexState.prototype.action = function(action) {	
-	main_closeSkilldex();	
+SkilldexState.prototype.action = function(action) {
+	main_gameStateFunction('closeSkilldex');
 	switch(action) {
 		case 0:
 			//sneak
 			break;
-		
+
 	}
-	
+
 }
 
 
@@ -93,7 +98,7 @@ SkilldexState.prototype.input = function(e) {
 			break;
 		case "keydown":
 			if(_keyboardStates[27]) {
-				main_closeSkilldex();
+				main_gameStateFunction('closeSkilldex');
 				return;
 			}
 			break;
@@ -106,27 +111,27 @@ SkilldexState.prototype.input = function(e) {
 
 		case "click":
 			switch(this.activeItem) {
-				case -1: 
+				case -1:
 					break;
-				case 0: 
+				case 0:
 					this.action("sneak");
 					break;
-				case 1: 
+				case 1:
 					this.action("lockpick");
 					break;
 				case "closeButton":
-					main_closeSkilldex();
+					main_gameStateFunction('closeSkilldex');
 					this.activeItem = -1;	// reset this so that it mouse event doesn't propagate through on reopen
 					break;
 			}
 			break;
 		case 'contextmenu':	// switch input modes on mouse2
 			break;
-	};	
+	};
 }
 
 SkilldexState.prototype.update = function() {
-	this.activeItem = -1;	
+	this.activeItem = -1;
 	if(intersectTest(_mouse.x,_mouse.y,0,0,
 		this.x + this.closeButton.x,
 		this.y + this.closeButton.y,
@@ -148,9 +153,9 @@ SkilldexState.prototype.update = function() {
 	}
 }
 
-SkilldexState.prototype.render = function() {	
+SkilldexState.prototype.render = function() {
 	_context.drawImage(_assets["art/intrface/skldxbox.frm"].frameInfo[0][0].img, this.x, this.y);	// interface
-	
+
 	bitmapFontRenderer.renderString(_assets["font3.aaf"], "SKILLDEX" ,
 		this.x + 55,
 		this.y + 14,
@@ -159,24 +164,24 @@ SkilldexState.prototype.render = function() {
 	bitmapFontRenderer.renderString(_assets["font3.aaf"], "CANCEL" ,
 		this.x + 72,
 		this.y + 337,
-		(this.mouseState == 1 && this.activeItem == "closeButton") ? "#806814" : "#907824");	
+		(this.mouseState == 1 && this.activeItem == "closeButton") ? "#806814" : "#907824");
 
-	
+
 	_context.drawImage((this.mouseState == 1 && this.activeItem == "closeButton") ? _assets["art/intrface/lilreddn.frm"].frameInfo[0][0].img : _assets["art/intrface/lilredup.frm"].frameInfo[0][0].img,
 		this.x + this.closeButton.x,
 		this.y + this.closeButton.y);
-	
+
 	for(var i = 0; i < this.menuItems.length; i++) {
 		_context.drawImage((this.mouseState == 1 && this.activeItem == i) ? _assets["art/intrface/skldxon.frm"].frameInfo[0][0].img : _assets["art/intrface/skldxoff.frm"].frameInfo[0][0].img,
 			this.x + this.menuItems[i].x,
 			this.y + this.menuItems[i].y);
-			
+
 		bitmapFontRenderer.renderString(_assets["font3.aaf"], this.menuItems[i].text ,
 			this.x + this.menuItems[i].x + this.menuItems[i].textX,
 			this.y + this.menuItems[i].y + this.menuItems[i].textY,
-			(this.mouseState == 1 && this.activeItem == i) ? "#806814" : "#907824");			
+			(this.mouseState == 1 && this.activeItem == i) ? "#806814" : "#907824");
 	}
-	
+
 	_context.drawImage(_assets["art/intrface/stdarrow.frm"].frameInfo[0][0].img, _mouse.x, _mouse.y);
-	
+
 }

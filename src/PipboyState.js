@@ -67,7 +67,7 @@ PipboyState.prototype.input = function(e) {
 					this.activeItem = -1;	// reset this so that it mouse event doesn't propagate through on reopen
 					break;
 				case "closeButton":
-					main_closePipboy();
+					main_gameStateFunction('closePipBoy');
 					this.activeItem = -1;	// reset this so that it mouse event doesn't propagate through on reopen
 					break;
 			}

@@ -6,6 +6,13 @@ function MainState() {
 	// instantiate all static assets here
 	this.map = new GameMap();
 
+	this.interfaceRect.x = ((_screenWidth / 2)|0) - 320;
+	this.interfaceRect.y = _screenHeight - 99;
+
+	this.console.x = (((_screenWidth / 2)|0) - 320) + 30;	// recompute coords
+	this.console.y = _screenHeight - 26;
+
+
 	this.objectBuffer = document.createElement("canvas");
 	this.objectBufferContext = this.objectBuffer.getContext("2d");
 
@@ -21,10 +28,10 @@ function MainState() {
 	this.eggBuffer = document.createElement("canvas");
 	//this.eggBuffer.width = this.eggBufferRect.width;
 	//this.eggBuffer.height = this.eggBufferRect.height;
-	
+
 	this.eggBuffer.width = 300;		// @TODO: FIX - this is a crude fix placed in to fix an issue with Chrome v46+ - see https://code.google.com/p/chromium/issues/detail?id=543342
 	this.eggBuffer.height = 300;
-	
+
 	this.eggContext = this.eggBuffer.getContext("2d");
 	this.transEgg = document.getElementById("trans_egg");
 
@@ -156,49 +163,49 @@ MainState.prototype.interfaceRect = {
 	height: 99,
 	activeItem: -1,
 	mouseState: 0,
-	
+
 	skilldexButton: {
 		x: 523,
 		y: 6,
 		width: 22,
 		height: 21,
 	},
-	
+
 	invButton: {
 		x: 211,
 		y: 40,
 		width: 32,
-		height: 21,		
+		height: 21,
 	},
 
 	mapButton: {
 		x: 526,
 		y: 39,
 		width: 41,
-		height: 19,		
+		height: 19,
 	},
-	
+
 	charButton: {
 		x: 526,
 		y: 58,
 		width: 41,
-		height: 19,		
+		height: 19,
 	},
-	
+
 	pipButton: {
 		x: 526,
 		y: 77,
 		width: 41,
-		height: 19,		
+		height: 19,
 	},
-	
+
 	menuButton: {
 		x: 210,
 		y: 61,
 		width: 34,
-		height: 34,		
+		height: 34,
 	},
-	
+
 };
 
 
@@ -236,7 +243,7 @@ MainState.prototype.mapGeometry = {	// struct for map geometry vars/functions
 	m_transform: {	// offsets to make hexes and maptiles align
 		x: 48, y: -3,
 	},
-	
+
 
 	h2s: function(i) {	// hex index to screen-space
 		var q = (i%this.h_width)|0;
@@ -264,7 +271,7 @@ MainState.prototype.mapGeometry = {	// struct for map geometry vars/functions
 	s2h: function(mx,my) {	// screen-space to hex index conversion
 		if(mx < 0) mx -= 32;    // compensate for -0 effect
 		mx *= -1;
-		
+
 		var hCol = (mx/32)|0, hRow = (my/12)|0;
 		if(hRow >0) hCol += Math.abs(hRow/2)|0;
 		hRow -= (hCol/2)|0;
@@ -273,7 +280,7 @@ MainState.prototype.mapGeometry = {	// struct for map geometry vars/functions
 
 	},
 
-	findAdj: function(i) {	// returns array of indexes of hexes adjacent to index		
+	findAdj: function(i) {	// returns array of indexes of hexes adjacent to index
 		return new Array(
 			(i%2) ? i - (this.h_width+1) : i-1,
 			(i%2) ? i-1 : i + (this.h_width-1),
@@ -296,10 +303,10 @@ MainState.prototype.mapGeometry = {	// struct for map geometry vars/functions
 		return orientation;
 	},
 
-	
+
 	/* default function used for heuristic score in pathfinding algorith,
 	can be replaced with better one as needed */
-	
+
 	hDistance: function(_a,_b) {	// pythagorean distance
 		var ha = this.h2s(_a);
 		var hb = this.h2s(_b);
@@ -315,7 +322,7 @@ MainState.prototype.mapGeometry = {	// struct for map geometry vars/functions
 
 MainState.prototype.init = function(_saveState) {		// use arguments here to pass saved state data.
 	console.log("MainState: init: " + _saveState.map);
-	
+
 	var loadMap = "maps/" + _saveState.map;
 	this.map.defaultElevation = _assets[loadMap].defaultElevation;		// copy map vars
 	this.map.elevationAt0 = _assets[loadMap].elevationAt0;
@@ -336,7 +343,7 @@ MainState.prototype.init = function(_saveState) {		// use arguments here to pass
 	this.mapObjects = new Array(this.map.nElevations);		// create / instantiate mapObjects
 
 	console.log("MainState: init: loading mapObjects");
-	
+
 	for(var n = 0; n < this.map.nElevations; n++) {
 
 		this.map.hexMap[n] = new Array(40000);
@@ -347,7 +354,7 @@ MainState.prototype.init = function(_saveState) {		// use arguments here to pass
 				scrollBlock: false,
 			};
 		}
-	
+
 		var objectInfoLength = _assets[loadMap].objectInfo[n].length;
 		this.mapObjects[n] = new Array(objectInfoLength);
 
@@ -356,7 +363,7 @@ MainState.prototype.init = function(_saveState) {		// use arguments here to pass
 			this.mapObjects[n][i] = this.createMapObject(_assets[loadMap].objectInfo[n][i]);
 
 			if(!(this.mapObjects[n][i].itemFlags & 0x00000010)) this.map.hexMap[n][this.mapObjects[n][i].hexPosition].blocked = true;	// check if flags for 'can be walked through' are false.
-			
+
 			switch(this.getObjectType(this.mapObjects[n][i].frmTypeID)) {
 				case "walls":
 					break;
@@ -366,7 +373,7 @@ MainState.prototype.init = function(_saveState) {		// use arguments here to pass
 						case 12:		// scrollblockers
 							this.map.hexMap[n][this.mapObjects[n][i].hexPosition].scrollBlock = true;
 							break;
-					
+
 						case 16:	// exit grids
 						case 17:
 						case 18:
@@ -376,15 +383,15 @@ MainState.prototype.init = function(_saveState) {		// use arguments here to pass
 						case 22:
 						case 23:
 							this.map.hexMap[n][this.mapObjects[n][i].hexPosition].exitGrid = true;
-							
+
 							this.map.hexMap[n][this.mapObjects[n][i].hexPosition].exitGrid_map = this.mapObjects[n][i].exitGrid_map;
 							this.map.hexMap[n][this.mapObjects[n][i].hexPosition].exitGrid_pos = this.mapObjects[n][i].exitGrid_pos;
 							this.map.hexMap[n][this.mapObjects[n][i].hexPosition].exitGrid_elev = this.mapObjects[n][i].exitGrid_elev;
 							this.map.hexMap[n][this.mapObjects[n][i].hexPosition].exitGrid_orientation = this.mapObjects[n][i].exitGrid_orientation;
-							
-							break;						
+
+							break;
 					}
-					
+
 					break;
 			};
 		}
@@ -417,17 +424,17 @@ MainState.prototype.init = function(_saveState) {		// use arguments here to pass
 
 MainState.prototype.createSaveState = function(_map,_pos,_elev,_orientation) {	// creates a gamestate for MainState to load to facilitate switching maps.
 	var saveState = {}
-	
+
 	if(!_pos) _pos == "default";		// fix this to track '0'
 	if(!_orientation) _orientation == "default";
 	if(!_elev) _elev == "default";
-	
+
 	saveState.map = _assets["data/maps.txt"][_map].mapName + ".map";
-	
+
 	saveState.playerStartPos = _pos,
 	saveState.playerStartOrientation = _orientation,
 	saveState.playerStartElevation = _elev,
-	
+
 	saveState.player = this.player;		// save player
 	return saveState;
 };
@@ -598,14 +605,13 @@ MainState.prototype.findPath = function(start,dest) {
 };
 
 
-
 MainState.prototype.input = function(e) {
 	switch(e.type) {
 		case "mousemove":
 			break;
 		case "keydown":
 			if(_keyboardStates[27]) {
-				main_ingameMenu();
+				main_gameStateFunction('openIngameMenu');
 				return;
 			}
 
@@ -622,9 +628,10 @@ MainState.prototype.input = function(e) {
 					this.objectIndex = this.getObjectIndex();
 					if(this.objectIndex != -1) {		// if object under cursor
 						var objC = this.mapGeometry.h2s(this.mapObjects[this.player.currentElevation][this.objectIndex].hexPosition);
-						main_openContextMenu(this.objectIndex,
+						main_gameStateFunction('openContextMenu',
+							this.objectIndex,
 							objC.x - this.camera.x + 30,
-							objC.y - this.camera.y - 20);						
+							objC.y - this.camera.y - 20);
 					}
 
 				}
@@ -638,30 +645,30 @@ MainState.prototype.input = function(e) {
 		case "click":
 			if(this.inputState == "interface") {
 				switch(this.interfaceRect.activeItem) {
-					case -1: 
+					case -1:
 						break;
 					case "skilldexButton":
-						main_openSkilldex();
+						main_gameStateFunction('openSkilldex');
 						this.interfaceRect.activeItem = -1;
 						break;
 					case "invButton":
-						main_openInventory();
+						main_gameStateFunction('openInventory')();
 						this.interfaceRect.activeItem = -1;
 						break;
 					case "charButton":
-						main_openCharacterScreen();
+						main_gameStateFunction('openCharacterScreen');
 						this.interfaceRect.activeItem = -1;
 						break;
 					case "pipButton":
-						main_openPipboy();
+						main_gameStateFunction('openPipBoy');
 						this.interfaceRect.activeItem = -1;
 						break;
 					case "mapButton":
-						main_openMap();
+						main_gameStateFunction('openMap');
 						this.interfaceRect.activeItem = -1;
 						break;
 					case "menuButton":
-						main_ingameMenu();
+						main_gameStateFunction('openIngameMenu');
 						this.interfaceRect.activeItem = -1;
 						break;
 				}
@@ -684,12 +691,12 @@ MainState.prototype.input = function(e) {
 
 MainState.prototype.contextMenuAction = function(action,target) {
 	if(target == -1) return;
-	
-	switch(action) {			
+
+	switch(action) {
 		case "hoverlook":
 		case "look":
-		
-			var textIndex, msgFile;			
+
+			var textIndex, msgFile;
 			if(action == "hoverlook") textIndex = this.mapObjects[this.player.currentElevation][target].textID;
 			else if(action == "look") textIndex = this.mapObjects[this.player.currentElevation][target].textID+1;
 
@@ -721,29 +728,29 @@ MainState.prototype.contextMenuAction = function(action,target) {
 			} else {
 				this.console.print(_assets["text/english/game/proto.msg"].data[493].text);		// "You see nothing out of the ordinary."
 			}
-		
+
 			break;
-			
+
 
 		case "use":
-	
+
 			var mState = this;
 			var useDest = -1;		// find adj hexes
 			var useFunction = 0;
 			var targetItem = mState.mapObjects[mState.player.currentElevation][target];
-			
+
 			console.log(targetItem);
-			
+
 			var useAdj = this.mapGeometry.findAdj(targetItem.hexPosition);
-			
+
 			useDest = useAdj.indexOf(this.player.hexPosition);	// check if player next to item
 			for(var a = 0; a < 6; a++) {
 				if(this.findPath(this.player.hexPosition,useAdj[a])) {
 					useDest = useAdj[a];
 					break;
 				}
-			}				
-			
+			}
+
 			switch(targetItem.objectType) {
 				case "door":
 					useFunction = function() {
@@ -756,13 +763,13 @@ MainState.prototype.contextMenuAction = function(action,target) {
 					};
 					break;
 			}
-			
+
 			if(useFunction) {
 				if(useDest == this.player.hexPosition) useFunction();
 				else if(useDest != -1) {		// fix this to be correctly aligned
 					this.actor_addAction(this.player,useFunction,"endMoveState");
 					this.actor_beginMoveState(this.player, useDest, this.inputRunState);
-					
+
 				}
 			} else {
 				console.log("no useFunction definiton");
@@ -781,7 +788,7 @@ MainState.prototype.getObjectIndex = function() {
 	// this function stencils screen objects onto an offscreen buffer, with a solid color based upon that object's position in the mapObjects array.
 	// from this function you can accurately find the object under the cursor by blitting the objects 50px around the cursor onto the buffer, then reading the color underneath the centre of the image.
 	// from the formula r*1000 + b*100 + g we can find the index of the object.
-	
+
 	this.objectBuffer.width = this.objectBufferRect.width;	// hack clear
 	this.objectBufferRect.x = _mouse.x - this.objectBufferRect.width/2;
 	this.objectBufferRect.y = _mouse.y - this.objectBufferRect.height/2;
@@ -789,7 +796,7 @@ MainState.prototype.getObjectIndex = function() {
 	var mapObjectsLength = this.mapObjects[this.player.currentElevation].length;
 	for(var i = 0; i < mapObjectsLength; i++) {
 		this.currentRenderObject = this.mapObjects[this.player.currentElevation][i];
-		
+
 		var c = this.mapGeometry.h2s(this.currentRenderObject.hexPosition);
 		this.currentRenderImg = this.currentRenderObject.anim.img.frameInfo[this.currentRenderObject.orientation][this.currentRenderObject.anim.frameNumber];
 
@@ -809,18 +816,18 @@ MainState.prototype.getObjectIndex = function() {
 		var pCol = this.player.hexPosition % 100;
 
 		var cRow = (this.currentRenderObject.hexPosition / 100)|0;
-		var pRow = (this.player.hexPosition / 100)|0;			
+		var pRow = (this.player.hexPosition / 100)|0;
 
 		if(this.getObjectType(this.currentRenderObject.frmTypeID) == "walls") {	// don't blit walls 'infront' of player.
 			if(!(cRow < pRow || cCol < pCol  )) continue;
 		}
-		
+
 		this.objectBufferContext2.globalCompositeOperation = "source-over";
 		this.objectBuffer2.width = this.objectBufferRect.width;	// hack clear
 
 		this.objectBufferContext2.drawImage(this.currentRenderImg.img,
-			0, 0);			
-			
+			0, 0);
+
 		this.objectBufferContext2.globalCompositeOperation = "source-in";
 		this.objectBufferContext2.fillStyle = "rgb("+ Math.floor(i/1000) +","+ Math.floor((i%1000)/100) +","+ i%100 +")";
 		this.objectBufferContext2.fillRect(0,0,
@@ -834,7 +841,7 @@ MainState.prototype.getObjectIndex = function() {
 	}
 
 	this.objectBufferData = this.objectBufferContext.getImageData(50, 50, 1, 1).data;
-	
+
 	if(this.objectBufferData[3] == 0) return -1;	// if alpha for pixel == 0, no object under cursor.
 	return this.objectBufferData[0]*1000 + this.objectBufferData[1]*100 + this.objectBufferData[2];
 
@@ -861,20 +868,20 @@ MainState.prototype.update = function() {
 
 	if(intersectTest(_mouse.x,_mouse.y,0,0, 0,0,_screenWidth,_screenHeight) && this.scrollState) {
 		this.inputState = "scroll";
-		
+
 		this.scrollCheckAdj = this.mapGeometry.findAdj(this.mapGeometry.s2h( 320 + this.camera.x, 190 + this.camera.y));
-		
+
 		this.scrollStates.xPosBlocked = (this.map.hexMap[this.player.currentElevation][this.scrollCheckAdj[1]].scrollBlock);	// check if these hexes have the scrollBlock attribute.
 		this.scrollStates.yNegBlocked = (this.map.hexMap[this.player.currentElevation][this.scrollCheckAdj[0]].scrollBlock && this.map.hexMap[this.player.currentElevation][this.scrollCheckAdj[5]].scrollBlock);
 		this.scrollStates.yNegBlocked = (this.map.hexMap[this.player.currentElevation][this.scrollCheckAdj[0]].scrollBlock && this.map.hexMap[this.player.currentElevation][this.scrollCheckAdj[5]].scrollBlock);
-		this.scrollStates.yPosBlocked = (this.map.hexMap[this.player.currentElevation][this.scrollCheckAdj[2]].scrollBlock && this.map.hexMap[this.player.currentElevation][this.scrollCheckAdj[3]].scrollBlock);	
+		this.scrollStates.yPosBlocked = (this.map.hexMap[this.player.currentElevation][this.scrollCheckAdj[2]].scrollBlock && this.map.hexMap[this.player.currentElevation][this.scrollCheckAdj[3]].scrollBlock);
 		this.scrollStates.xNegBlocked = (this.map.hexMap[this.player.currentElevation][this.scrollCheckAdj[4]].scrollBlock);
 
 		if(this.scrollStates.yNeg && !this.scrollStates.yNegBlocked) this.camera.y -= this.scrollDelta;	// scrolling handling
 		if(this.scrollStates.yPos && !this.scrollStates.yPosBlocked) this.camera.y += this.scrollDelta;
 		if(this.scrollStates.xNeg && !this.scrollStates.xNegBlocked) this.camera.x -= this.scrollDelta;
 		if(this.scrollStates.xPos && !this.scrollStates.xPosBlocked) this.camera.x += this.scrollDelta;
-	
+
 	} else if(intersectTest(_mouse.x,_mouse.y,0,0, this.interfaceRect.x,this.interfaceRect.y,this.interfaceRect.width,this.interfaceRect.height)) {	// if mouse over interface rect
 		this.inputState = "interface";
 		this.interfaceRect.activeItem = -1;
@@ -908,21 +915,21 @@ MainState.prototype.update = function() {
 			this.interfaceRect.x + this.interfaceRect.menuButton.x, this.interfaceRect.y + this.interfaceRect.menuButton.y,
 			this.interfaceRect.menuButton.width, this.interfaceRect.menuButton.height)) {
 				this.interfaceRect.activeItem = "menuButton";
-		}				
+		}
 	} else {
 		this.inputState = "game";
-		
+
 		if(this.inputState_sub == "move") {
 			this.hIndex = this.mapGeometry.s2h(_mouse.x + this.camera.x, _mouse.y + this.camera.y);		// hex index calculated here
 			this.hsIndex = this.mapGeometry.h2s(this.hIndex);
-			
+
 			if(this.cIndex_test != this.hIndex) {		// check if mouse has moved for hover functionality
 				this.cIndex_test = this.hIndex;
 				this.cIndex_time = getTicks();
 				this.cIndex_state = false;
 				this.cIndex_path = -1;
 			}
-			
+
 		} else if(this.inputState_sub == "command") {
 			if(this.cIndex_x != _mouse.x || this.cIndex_y != _mouse.y) {	// check if mouse has moved for hover functionality
 				this.cIndex_x = _mouse.x;
@@ -931,23 +938,23 @@ MainState.prototype.update = function() {
 				this.cIndex_state = false;
 			}
 		}
-		
+
 		if(!this.cIndex_state && (Math.abs(getTicks() - this.cIndex_time) >= 1000)) {	// 'hover' functionality timer
-		
+
 			if(this.inputState_sub == "move") {
 				this.cIndex_path = this.findPath(this.player.hexPosition, this.hIndex);
 				this.cIndex_state = true;
-				
+
 			} else if(this.inputState_sub == "command") {
 				this.objectIndex = this.getObjectIndex();
 				this.contextMenuAction("hoverlook", this.objectIndex);
-				this.cIndex_state = true;			
+				this.cIndex_state = true;
 			}
 		}
-	
+
 	}
 
-	
+
 	if(_keyboardStates[16]) {	// SHIFT control input for running
 		this.inputRunState = true;
 	} else this.inputRunState = false;
@@ -961,7 +968,7 @@ MainState.prototype.update = function() {
 
 	// animation
 	var mapObjectsLength = this.mapObjects[e].length;
-	
+
 	for(var i=0; i < mapObjectsLength; i++) {	// tasks, framestep
 		this.currentRenderObject = this.mapObjects[e][i];
 
@@ -983,8 +990,8 @@ MainState.prototype.update = function() {
 						this.currentRenderObject.anim.frameNumber--;
 					}
 
-					if(this.currentRenderObject.anim.frameNumber == this.currentRenderObject.anim.actionFrame) {	// if action frame						
-						this.actor_nextAction(this.currentRenderObject,"onActionFrame");	
+					if(this.currentRenderObject.anim.frameNumber == this.currentRenderObject.anim.actionFrame) {	// if action frame
+						this.actor_nextAction(this.currentRenderObject,"onActionFrame");
 					}
 				} else {	// if anim ended
 					if(this.currentRenderObject.anim.animLoop) {
@@ -997,7 +1004,7 @@ MainState.prototype.update = function() {
 					} else {
 						this.currentRenderObject.anim.animActive = false;
 					}
-					
+
 					this.actor_nextAction(this.currentRenderObject,"onAnimEnd");
 
 				}
@@ -1008,32 +1015,32 @@ MainState.prototype.update = function() {
 				if(getTicks() - this.currentRenderObject.ai.idleStartTime > 2000) {
 					if(Math.random() > 0.95) this.object_playAnim(this.currentRenderObject,"idle",0,0,0,false,0,function() {		//(obj, newAnim, frame, actionFrame, dir, loop, actionCallback, endCallback) {
 						this.object_setAnim(this.currentRenderObject,"idle");		// reset to frame zero.
-					});		
+					});
 					this.currentRenderObject.ai.idleStartTime = getTicks();
 				}
 			}
 		}
-		
-	}	// end mapobjects loop		
 
-	 
+	}	// end mapobjects loop
+
+
 	var playerCoords = this.mapGeometry.h2s(this.player.hexPosition);
-	this.currentRenderImg = this.player.anim.img.frameInfo[this.player.orientation][this.player.anim.frameNumber];	
-	
+	this.currentRenderImg = this.player.anim.img.frameInfo[this.player.orientation][this.player.anim.frameNumber];
+
 	var playerX = (playerCoords.x + 16 - ((this.currentRenderImg.width/2)|0)) + this.player.anim.shiftX - this.camera.x;	// actual coords of of objects.
 	var playerY = (playerCoords.y + 8 - this.currentRenderImg.height) + this.player.anim.shiftY - this.camera.y;
-	
-	
+
+
 	this.roofRenderState = true;		// check if player is under a roof
 	for(var i = 0; i < 10000; i++) {
 		if(this.map.tileInfo[this.player.currentElevation].roofTiles[i] < 2) continue;
 		var c = this.mapGeometry.c2s(i);
-		
+
 		if(intersectTest(c.x - this.camera.x,		// @TODO : potentially use object buffer here.
 			(c.y - 96) - this.camera.y,
 			80, 36,
 			playerX,
-			playerY,		
+			playerY,
 			this.currentRenderImg.width,
 			this.currentRenderImg.height)) {
 				this.roofRenderState = false;
@@ -1045,7 +1052,7 @@ MainState.prototype.update = function() {
 
 
 MainState.prototype.render = function() {
-	
+
 	this.eggBuffer.width = 300;		// clear eggBuffer hack. @TODO: Replace with a version hardcoded to eggBufferRect.width - resolve once issue with Chrome rendering is fixed.
 	this.eggContext.globalCompositeOperation = 'source-over';		// draw egg mask onto egg context.
 	this.eggContext.drawImage(this.transEgg,0,0);
@@ -1056,21 +1063,21 @@ MainState.prototype.render = function() {
 
 	this.eggBufferRect.x = playerX - (this.eggBufferRect.width/2)|0;
 	this.eggBufferRect.y = playerY - ((this.eggBufferRect.height/2)|0) - 35;	// @TODO: fix this
-	
+
 	var e = this.player.currentElevation;
-	
+
 	// render floor tiles.
-	for(var i = 0; i < 10000; i++) {	
-	
+	for(var i = 0; i < 10000; i++) {
+
 		//if(this.map.tileInfo[e].floorTiles[i] < 2) continue;
-			
+
 		var c = this.mapGeometry.c2s(i);
 		if(!intersectTest(c.x, c.y,		// camera test
 			80, 36,
 			this.camera.x,
 			this.camera.y,
 			_screenWidth,
-			_screenHeight)) continue;				
+			_screenHeight)) continue;
 
 		_context.drawImage(_assets['art/tiles/tiles.lst'][this.map.tileInfo[e].floorTiles[i]].ptr.frameInfo[0][0].img,		// use pointer in lst file
 			c.x - this.camera.x,
@@ -1087,14 +1094,14 @@ MainState.prototype.render = function() {
 		this.eggContext.drawImage(_assets['art/tiles/tiles.lst'][this.map.tileInfo[e].floorTiles[i]].ptr.frameInfo[0][0].img,
 			c.x - this.camera.x - this.eggBufferRect.x,
 			c.y - this.camera.y - this.eggBufferRect.y);
-		
+
 	}
 
 	if(this.inputState == "game" && this.inputState_sub == "move") {	// lower hex cursor
 		_context.drawImage(_assets["art/intrface/msef000.frm"].frameInfo[0][0].img,
 			this.hsIndex.x - this.camera.x,
 			this.hsIndex.y - this.camera.y);
-			
+
 		this.eggContext.drawImage(_assets["art/intrface/msef000.frm"].frameInfo[0][0].img,
 			this.hsIndex.x - this.camera.x - this.eggBufferRect.x,
 			this.hsIndex.y - this.camera.y - this.eggBufferRect.y);
@@ -1104,24 +1111,24 @@ MainState.prototype.render = function() {
 	this.eggContext.globalCompositeOperation = 'source-over';
 	var mapObjectsLength = this.mapObjects[e].length;
 	for(var i = 0; i < mapObjectsLength; i++) {
-		
+
 		this.currentRenderObject = this.mapObjects[e][i];
-		
+
 		var c = this.mapGeometry.h2s(this.currentRenderObject.hexPosition);
 		this.currentRenderImg = this.currentRenderObject.anim.img.frameInfo[this.currentRenderObject.orientation][this.currentRenderObject.anim.frameNumber];
-		
+
 		var destX = (c.x + 16 - ((this.currentRenderImg.width/2)|0)) + this.currentRenderObject.anim.shiftX - this.camera.x;	// actual coords of of objects.
 		var destY = (c.y + 8 - this.currentRenderImg.height) + this.currentRenderObject.anim.shiftY - this.camera.y;
-		
-		if(!intersectTest(destX,		// test if object is on screen. If not - skip.		
-			destY,	
+
+		if(!intersectTest(destX,		// test if object is on screen. If not - skip.
+			destY,
 			this.currentRenderImg.width,
 			this.currentRenderImg.height,
 			0,
 			0,
 			_screenWidth,
 			_screenHeight)) continue;		// testing in screen space with dest vars, slower but more accurate.
-		
+
 		_context.drawImage(this.currentRenderImg.img,
 			destX,
 			destY);	// get dest coords in screen-space and blit.
@@ -1140,7 +1147,7 @@ MainState.prototype.render = function() {
 			var pCol = this.player.hexPosition % 100;
 
 			var cRow = (this.mapObjects[e][i].hexPosition / 100)|0;
-			var pRow = (this.player.hexPosition / 100)|0;			
+			var pRow = (this.player.hexPosition / 100)|0;
 
 			if(this.getObjectType(this.mapObjects[e][i].frmTypeID) == "walls") {	// don't blit walls 'infront' of player.
 				if(!(cRow < pRow || cCol < pCol  )) continue;
@@ -1149,17 +1156,17 @@ MainState.prototype.render = function() {
 			this.eggContext.drawImage(this.currentRenderImg.img,
 				destX - this.eggBufferRect.x,
 				destY - this.eggBufferRect.y);
-			
+
 			_context.globalCompositeOperation = 'source-over';
 		}
-		
+
 	}	// end mapObject loop
 
-	
+
 	if(this.roofRenderState) {		//Render Roofs - check against roofRenderState
-		for(var i = 0; i < 10000; i++) {					
+		for(var i = 0; i < 10000; i++) {
 			//if(this.map.tileInfo[e].roofTiles[i] < 2) continue;
-				
+
 			var c = this.mapGeometry.c2s(i);
 			if(!intersectTest(c.x, c.y,
 				80,
@@ -1168,26 +1175,26 @@ MainState.prototype.render = function() {
 				this.camera.y,
 				_screenWidth,
 				_screenHeight)) continue;
-			
+
 			_context.drawImage(_assets['art/tiles/tiles.lst'][this.map.tileInfo[e].roofTiles[i]].ptr.frameInfo[0][0].img,
 				c.x - this.camera.x,
 				c.y - this.mapGeometry.m_roofHeight - this.camera.y);
 
-		}			
+		}
 	}
 
-	/* if(_debug.drawSpecialHexes) {		// Hex debug 
+	/* if(_debug.drawSpecialHexes) {		// Hex debug
 		var centreHex = this.mapGeometry.h2s(this.mapGeometry.s2h( 320 + this.camera.x, 190 + this.camera.y));	// hex debug stuff
 		drawHex(centreHex.x - this.camera.x,centreHex.y - this.camera.y,"","#00FFFF");
-		
+
 		for(var h = 0; h < 40000; h++) {
 			var cx = this.mapGeometry.h2s(h);
 			if(this.map.hexMap[e][h].exitGrid) drawHex(cx.x - this.camera.x,cx.y - this.camera.y, "","#00FF00");
-			if(this.map.hexMap[e][h].blocked) drawHex(cx.x - this.camera.x,cx.y - this.camera.y, "","#FF0000");	
-			if(this.map.hexMap[e][h].scrollBlock) drawHex(cx.x - this.camera.x,cx.y - this.camera.y, "","#FFFF00");	
-		}			
+			if(this.map.hexMap[e][h].blocked) drawHex(cx.x - this.camera.x,cx.y - this.camera.y, "","#FF0000");
+			if(this.map.hexMap[e][h].scrollBlock) drawHex(cx.x - this.camera.x,cx.y - this.camera.y, "","#FFFF00");
+		}
 	} */
-	
+
 	_context.drawImage(this.eggBuffer,this.eggBufferRect.x,this.eggBufferRect.y);
 
 	// Render brightmap over the top of the main screen buffer.
@@ -1209,7 +1216,7 @@ MainState.prototype.render = function() {
 	_context.drawImage(_assets["art/intrface/iface.frm"].frameInfo[0][0].img,
 		this.interfaceRect.x,
 		this.interfaceRect.y);	// interface
-	
+
 	if(this.inputState == "interface" && this.interfaceRect.mouseState == 1) {
 		switch(this.interfaceRect.activeItem) {
 			case -1:
@@ -1244,10 +1251,10 @@ MainState.prototype.render = function() {
 					this.interfaceRect.x + this.interfaceRect.menuButton.x,
 					this.interfaceRect.y + this.interfaceRect.menuButton.y);	// interface
 				break;
-		}		
+		}
 	}
-	
-	// console	
+
+	// console
 	var cl = (this.console.consoleData.length > 5) ? 5 : this.console.consoleData.length;
 	for(var i = 0; i < cl; i++) {
 		bitmapFontRenderer.renderString(_assets["font1.aaf"],
@@ -1297,11 +1304,11 @@ MainState.prototype.render = function() {
 			_mouse.x,
 			_mouse.y);
 
-	} else if(this.inputState == "interface") {		// if not scrolling	
+	} else if(this.inputState == "interface") {		// if not scrolling
 		_context.drawImage(_assets["art/intrface/stdarrow.frm"].frameInfo[0][0].img,
 			_mouse.x,
 			_mouse.y);
-		
+
 	} else if(this.inputState == "game") {	// if not in HUD - on map
 		switch(this.inputState_sub) {
 			case "move":

@@ -2,6 +2,10 @@
 
 function MapScreenState() {
 	GameState.call(this);
+
+	this.x = (((_screenWidth / 2)|0) - 260);
+	this.y = 0;
+
 }
 
 MapScreenState.prototype = new GameState();
@@ -25,11 +29,11 @@ MapScreenState.prototype.switchState = "low";
 
 MapScreenState.prototype.closeButton = {
 	x: 277, y: 454,
-	width: 15, height: 16,		
+	width: 15, height: 16,
 };
 MapScreenState.prototype.hiSwitch = {
 	x: 467, y: 322,
-	width: 32, height: 60,		
+	width: 32, height: 60,
 };
 
 
@@ -50,7 +54,7 @@ MapScreenState.prototype.input = function(e) {
 		case "click":
 			switch(this.activeItem) {
 				case "closeButton":
-					main_closeMap();
+					main_gameStateFunction('closeMap');
 					this.activeItem = -1;	// reset this so that it mouse event doesn't propagate through on reopen
 					break;
 				case "hiSwitch":
@@ -62,7 +66,7 @@ MapScreenState.prototype.input = function(e) {
 			break;
 		case 'contextmenu':	// switch input modes on mouse2
 			break;
-	};	
+	};
 }
 
 MapScreenState.prototype.update = function() {
@@ -79,25 +83,25 @@ MapScreenState.prototype.update = function() {
 
 }
 
-MapScreenState.prototype.render = function() {	
+MapScreenState.prototype.render = function() {
 	_context.globalAlpha = 1;
 	_context.drawImage(_assets["art/intrface/automap.frm"].frameInfo[0][0].img, this.x, this.y);	// bg
 
 	if(this.activeItem == "closeButton" && this.mouseState == 1) _context.drawImage(_assets["art/intrface/lilreddn.frm"].frameInfo[0][0].img, this.x + this.closeButton.x, this.y + this.closeButton.y);
-	
+
 	if(this.switchState == "high") _context.drawImage(_assets["art/intrface/autoup.frm"].frameInfo[0][0].img, this.x + 457, this.y + 339);
-	
+
 	for(var i = 0; i < mainState.mapObjects[mainState.player.currentElevation].length; i++) {
 		var h = mainState.mapObjects[mainState.player.currentElevation][i].hexPosition;
 		var cx = h%200;
 		var cy = (h/200)|0;
 		var type = mainState.getObjectType(mainState.mapObjects[mainState.player.currentElevation][i].objectTypeID);
-		
+
 		if(this.switchState == "high") {
 			if(type == "scenery") {
 				_context.fillStyle = "#006c00";
-				_context.fillRect(this.mapX + (this.mapWidth - (cx*2)) , this.mapY + (cy*2),2,1);				
-			}			
+				_context.fillRect(this.mapX + (this.mapWidth - (cx*2)) , this.mapY + (cy*2),2,1);
+			}
 		}
 
 		if(type == "walls") {
@@ -107,13 +111,13 @@ MapScreenState.prototype.render = function() {
 
 		if(mainState.mapObjects[mainState.player.currentElevation][i] == mainState.player) {
 			_context.fillStyle = "#FF0000";
-			_context.fillRect(this.mapX + (this.mapWidth - (cx*2))-1, this.mapY + (cy*2),3,1);		
-			_context.fillRect(this.mapX + (this.mapWidth - (cx*2)), this.mapY + (cy*2)-1,1,3);		
-			
+			_context.fillRect(this.mapX + (this.mapWidth - (cx*2))-1, this.mapY + (cy*2),3,1);
+			_context.fillRect(this.mapX + (this.mapWidth - (cx*2)), this.mapY + (cy*2)-1,1,3);
+
 		}
-		
-	}		
-	
-	
-	_context.drawImage(_assets["art/intrface/stdarrow.frm"].frameInfo[0][0].img, _mouse.x, _mouse.y);		// cursor	
+
+	}
+
+
+	_context.drawImage(_assets["art/intrface/stdarrow.frm"].frameInfo[0][0].img, _mouse.x, _mouse.y);		// cursor
 }

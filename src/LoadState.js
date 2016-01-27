@@ -45,9 +45,9 @@ LoadState.prototype.init = function(_saveState) {		// use arguments here to pass
 	}.bind(this);
 
 	console.log("MainLoadState: loading remotely");
-	loadJsonPayload("jsfdata/" + _saveState.map.split(".")[0] + ".jsf")
+	main_loadJsonPayload("jsfdata/" + _saveState.map.split(".")[0] + ".jsf")
 		.then(payloadSuccess)
-		.catch(payloadError);
+		.catch(main_payloadError);
 
 };
 

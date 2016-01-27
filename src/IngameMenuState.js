@@ -2,6 +2,13 @@
 
 function IngameMenuState() {
 	GameState.call(this);
+
+
+	this.menu.x = ((_screenWidth/2)|0) - 82;
+	this.menu.y = ((_screenHeight/2)|0) - 108;
+
+
+
 }
 
 IngameMenuState.prototype = new GameState();
@@ -9,7 +16,7 @@ IngameMenuState.prototype.constructor = IngameMenuState;
 IngameMenuState.prototype.menu = {
 	x: ((_screenWidth/2)|0) - 82, y: ((_screenHeight/2)|0) - 108,		// set in main_setResolution()
 	activeIndex: -1,
-	
+
 	elements: [{		// Quit to Main Menu
 		x: 13, y: 16,
 		width: 137, height: 34,
@@ -66,7 +73,7 @@ IngameMenuState.prototype.input = function(e) {
 			break;
 		case "keydown":
 			if(_keyboardStates[27]) {
-				main_ingameMenu_close();
+				main_gameStateFunction('closeIngameMenu');
 				return;
 			}
 			break;
@@ -85,7 +92,7 @@ IngameMenuState.prototype.input = function(e) {
 			break;
 		case 'contextmenu':	// switch input modes on mouse2
 			break;
-	};	
+	};
 }
 
 IngameMenuState.prototype.update = function() {
@@ -95,24 +102,24 @@ IngameMenuState.prototype.update = function() {
 		if(intersectTest(_mouse.x,_mouse.y,0,0, this.menu.x + this.menu.elements[i].x, this.menu.y + this.menu.elements[i].y, this.menu.elements[i].width, this.menu.elements[i].height)) {
 			this.menu.activeIndex = i;
 			if(_mouse.c1) this.menu.elements[this.menu.activeIndex].mouseState = 1;
-		}			
+		}
 	}
 }
 
-IngameMenuState.prototype.render = function() {	
+IngameMenuState.prototype.render = function() {
 	_context.globalAlpha = 1;
-	
+
 	_context.drawImage(_assets["art/intrface/opbase.frm"].frameInfo[0][0].img, this.menu.x, this.menu.y);	// bg
-		
+
 	for(var i = 0; i < this.menu.elements.length; i++) {
 		_context.drawImage( (this.menu.elements[i].mouseState == 0) ? _assets["art/intrface/opbtnoff.frm"].frameInfo[0][0].img : _assets["art/intrface/opbtnon.frm"].frameInfo[0][0].img,
 			this.menu.x + this.menu.elements[i].x, this.menu.y + this.menu.elements[i].y);
-			
+
 		bitmapFontRenderer.renderString(_assets["font3.aaf"], this.menu.elements[i].text ,
 			this.menu.x + this.menu.elements[i].x + this.menu.elements[i].textX,
 			this.menu.y + this.menu.elements[i].y + this.menu.elements[i].textY,
 			(this.menu.elements[i].mouseState == 0) ? "#907824" : "#806814");
 	}
 	_context.drawImage(_assets["art/intrface/stdarrow.frm"].frameInfo[0][0].img, _mouse.x, _mouse.y);		// cursor
-	
+
 }

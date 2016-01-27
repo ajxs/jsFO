@@ -5,7 +5,7 @@ var _context;
 
 var callFrame = browser_getCallFrame();
 
-var _screenWidth = 640, _screenHeight = 480;
+const _screenWidth = 640, _screenHeight = 480;
 
 var _mouse = {		// struct for mouse info
 	x: 0,
@@ -14,6 +14,7 @@ var _mouse = {		// struct for mouse info
 	c2: false
 };
 
+var clientBoundingRect;
 
 var _keyboardStates = [];	// array to hold keycode states
 
@@ -44,7 +45,6 @@ var mainMenuState;
 var characterScreenState;
 var pipboyState;
 var mapScreenState;
-
 
 
 function getTicks() {
