@@ -1,63 +1,55 @@
 "use strict";
 
-function MainLoadState() {
-	GameState.call(this);
-};
+class MainLoadState extends GameState {
+	constructor() {
+		super();
 
-MainLoadState.prototype = new GameState();
-MainLoadState.prototype.constructor = MainLoadState;
-MainLoadState.prototype.backgroundImage = 0;
+		MainLoadState.prototype.loadPercentage = 0;
+		this.backgroundImage = document.getElementById("MainLoadState_bg");
 
-MainLoadState.prototype.loadPercentage = 0;
+		let payloadSuccess = function(res) {
+			console.log("MainLoadState: download complete - parsing loadData");
+			asset_parseLoadData(res);
+			contextMenuState.init.call(contextMenuState);		// init contextMenu items
+			main_menu();
+		}.bind(this);
 
-MainLoadState.prototype.init = function() {		// use arguments here to pass saved state data.
+		console.log("MainLoadState: loading remotely");
+		main_loadJsonPayload("jsfdata/main.jsf")
+			.then(payloadSuccess)
+			.catch(main_payloadError);
+	};
 
-	this.backgroundImage = document.getElementById("MainLoadState_bg");
+	init() { };		// use arguments here to pass saved state data.
+	input(e) { };
+	update() { };
 
-	let payloadSuccess = function(res) {
-		console.log("MainLoadState: download complete - parsing loadData");
-		asset_parseLoadData(res);
-		contextMenuState.init.call(contextMenuState);		// init contextMenu items
-		main_menu();
-	}.bind(this);
+	render() {
+		_context.globalAlpha = 1;
 
-	console.log("MainLoadState: loading remotely");
-	main_loadJsonPayload("jsfdata/main.jsf")
-		.then(payloadSuccess)
-		.catch(main_payloadError);
+		var fullWidth = ((_screenWidth/2)|0);
+		var barWidth = fullWidth * this.loadPercentage;
+		var barX = fullWidth - (fullWidth/2)|0;
+		var barY = _screenHeight - 128;
 
-};
+		_context.drawImage(this.backgroundImage,0,0,1024,768,0,0,_screenWidth,_screenHeight);
 
+		_context.beginPath();
+		_context.moveTo(barX-6, barY-6);
+		_context.lineTo((barX-6) + fullWidth + 12, barY-6);
+		_context.lineTo((barX-6) + fullWidth + 12, barY-6+76);
+		_context.lineTo(barX-6, barY-6+76);
+		_context.lineTo(barX-6, barY-6);
+		_context.closePath();
+		_context.lineWidth = 4;
+		_context.strokeStyle = "#afb1a7";
+		_context.stroke();
 
-MainLoadState.prototype.input = function(e) { }
+		_context.fillStyle = "#afb1a7";
+		_context.fillRect(barX,barY,barWidth,64);
 
-MainLoadState.prototype.update = function() { }
+		_context.globalAlpha = 1;
 
-
-MainLoadState.prototype.render = function() {
-	_context.globalAlpha = 1;
-
-	var fullWidth = ((_screenWidth/2)|0);
-	var barWidth = fullWidth * this.loadPercentage;
-	var barX = fullWidth - (fullWidth/2)|0;
-	var barY = _screenHeight - 128;
-
-	_context.drawImage(this.backgroundImage,0,0,1024,768,0,0,_screenWidth,_screenHeight);
-
-	_context.beginPath();
-	_context.moveTo(barX-6, barY-6);
-	_context.lineTo((barX-6) + fullWidth + 12, barY-6);
-	_context.lineTo((barX-6) + fullWidth + 12, barY-6+76);
-	_context.lineTo(barX-6, barY-6+76);
-	_context.lineTo(barX-6, barY-6);
-	_context.closePath();
-	_context.lineWidth = 4;
-	_context.strokeStyle = "#afb1a7";
-	_context.stroke();
-
-	_context.fillStyle = "#afb1a7";
-	_context.fillRect(barX,barY,barWidth,64);
-
-	_context.globalAlpha = 1;
+	};
 
 };
