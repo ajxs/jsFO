@@ -20,19 +20,15 @@ class MainLoadState extends GameState {
 			.catch(main_payloadError);
 	};
 
-	init() { };		// use arguments here to pass saved state data.
-	input(e) { };
-	update() { };
-
 	render() {
 		_context.globalAlpha = 1;
 
-		var fullWidth = ((_screenWidth/2)|0);
+		var fullWidth = ((SCREEN_WIDTH/2)|0);
 		var barWidth = fullWidth * this.loadPercentage;
 		var barX = fullWidth - (fullWidth/2)|0;
-		var barY = _screenHeight - 128;
+		var barY = SCREEN_HEIGHT - 128;
 
-		_context.drawImage(this.backgroundImage,0,0,1024,768,0,0,_screenWidth,_screenHeight);
+		_context.drawImage(this.backgroundImage,0,0,1024,768,0,0,SCREEN_WIDTH,SCREEN_HEIGHT);
 
 		_context.beginPath();
 		_context.moveTo(barX-6, barY-6);

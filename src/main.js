@@ -14,10 +14,10 @@ function main_init() {
 	_canvas = document.getElementById('mainCanvas');
 	_canvas.style.cursor = "none";
 
-	document.getElementById("main").style.width = _screenWidth;
+	document.getElementById("main").style.width = SCREEN_WIDTH;
 
-	_canvas.width = _screenWidth;
-	_canvas.height = _screenHeight;
+	_canvas.width = SCREEN_WIDTH;
+	_canvas.height = SCREEN_HEIGHT;
 
 	_context = _canvas.getContext("2d");
 	_context.imageSmoothingEnabled = false;
@@ -63,7 +63,7 @@ function main_init() {
 
 
 function main_loadMain() {
-	stateQ.push(mainLoadState);
+	activeGameStates.push(mainLoadState);
 	mainLoadState.init();
 };
 
@@ -71,44 +71,44 @@ function main_loadMain() {
 function main_menu() {
 	main_gameStateFunction('closeIngameMenu');
 
-	let mainLoadState_index = stateQ.indexOf(mainLoadState);
+	let mainLoadState_index = activeGameStates.indexOf(mainLoadState);
 	if(mainLoadState_index > -1) {	//	remove mainState
-		stateQ.splice(mainLoadState_index,1);
+		activeGameStates.splice(mainLoadState_index,1);
 	}
 
-	let loadState_index = stateQ.indexOf(loadState);
+	let loadState_index = activeGameStates.indexOf(loadState);
 	if(loadState_index > -1) {	//	remove mainState
-		stateQ.splice(loadState_index,1);
+		activeGameStates.splice(loadState_index,1);
 	}
 
-	let mainState_index = stateQ.indexOf(mainState);
+	let mainState_index = activeGameStates.indexOf(mainState);
 	if(mainState_index > -1) {	//	remove mainState
-		stateQ.splice(mainState_index,1);
+		activeGameStates.splice(mainState_index,1);
 	}
 
-	stateQ.push(mainMenuState);
+	activeGameStates.push(mainMenuState);
 };
 
 
 function main_loadGame(_saveState) {
 	main_gameStateFunction('closeIngameMenu');
 
-	let mainMenuState_index = stateQ.indexOf(mainMenuState);
+	let mainMenuState_index = activeGameStates.indexOf(mainMenuState);
 	if(mainMenuState_index > -1) {	//	remove mainState
-		stateQ.splice(mainMenuState_index,1);
+		activeGameStates.splice(mainMenuState_index,1);
 	}
 
-	let mainState_index = stateQ.indexOf(mainState);
+	let mainState_index = activeGameStates.indexOf(mainState);
 	if(mainState_index > -1) {	//	remove mainState
-		stateQ.splice(mainState_index,1);
+		activeGameStates.splice(mainState_index,1);
 	}
 
-	let loadState_index = stateQ.indexOf(loadState);
+	let loadState_index = activeGameStates.indexOf(loadState);
 	if(loadState_index > -1) {	//	remove mainState
-		stateQ.splice(loadState_index,1);
+		activeGameStates.splice(loadState_index,1);
 	}
 
-	stateQ.push(loadState);
+	activeGameStates.push(loadState);
 	loadState.init(_saveState);
 };
 
@@ -142,8 +142,8 @@ function main_input(e) {
 			break;
 	};
 
-	for(let i = 0; i < stateQ.length; i++) {
-		if(!stateQ[i].statePause) stateQ[i].input.call(stateQ[i],e);
+	for(let i = 0; i < activeGameStates.length; i++) {
+		if(!activeGameStates[i].statePause) activeGameStates[i].input.call(activeGameStates[i],e);
 	}
 
 	return false;
@@ -153,18 +153,18 @@ function main_input(e) {
 function main_update() {
 	fps_currentTime = Date.now();
 
-	for(let i = 0; i < stateQ.length; i++) {
-		if(!stateQ[i].statePause) stateQ[i].update.call(stateQ[i]);
+	for(let i = 0; i < activeGameStates.length; i++) {
+		if(!activeGameStates[i].statePause) activeGameStates[i].update.call(activeGameStates[i]);
 	}
 
 };
 
 
 function main_render() {
-	_canvas.width = _screenWidth;	// hack clear
+	_canvas.width = SCREEN_WIDTH;	// hack clear
 
-	for(let i = 0; i < stateQ.length; i++) {
-		stateQ[i].render.call(stateQ[i]);
+	for(let i = 0; i < activeGameStates.length; i++) {
+		activeGameStates[i].render.call(activeGameStates[i]);
 	}
 
 };
@@ -173,15 +173,15 @@ function main_render() {
 
 function main_openActiveState(state) {
 	mainState.statePause = true;
-	stateQ.push(state);
+	activeGameStates.push(state);
 	_keyboardStates[27] = false;	// LOL - sets ESC key state to false to prevent the next iteration of the gamestate stack from capturing the input.
 };
 
 function main_closeActiveState(state) {
 	if(mainState.statePause) mainState.statePause = false;
-	let statePosition = stateQ.indexOf(state);
+	let statePosition = activeGameStates.indexOf(state);
 	if(statePosition) {
-		stateQ.splice(stateQ.indexOf(state),1);
+		activeGameStates.splice(activeGameStates.indexOf(state),1);
 	} else {
 		console.log("main_closeActiveState: Invalid state");
 	}
@@ -199,7 +199,7 @@ function main_openContextMenu(obj,x,y) {
 
 	let targetObject = mainState.mapObjects[mainState.player.currentElevation][obj];
 
-	switch(mainState.getObjectType(targetObject.objectTypeID)) {
+	switch(getObjectType(targetObject.objectTypeID)) {
 		case "items":
 			contextMenuState.activeItems.push(contextMenuState.menu_get);
 			contextMenuState.activeItems.push(contextMenuState.menu_look);

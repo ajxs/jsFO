@@ -5,7 +5,7 @@ class IngameMenuState extends GameState {
 		super();
 
 		this.menu = {
-			x: ((_screenWidth/2)|0) - 82, y: ((_screenHeight/2)|0) - 108,		// set in main_setResolution()
+			x: ((SCREEN_WIDTH/2)|0) - 82, y: ((SCREEN_HEIGHT/2)|0) - 108,		// set in main_setResolution()
 			activeIndex: -1,
 
 			elements: [{		// Quit to Main Menu

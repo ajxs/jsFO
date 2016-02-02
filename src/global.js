@@ -5,7 +5,13 @@ var _context;
 
 var callFrame = browser_getCallFrame();
 
-const _screenWidth = 640, _screenHeight = 480;
+const SCREEN_WIDTH = 640, SCREEN_HEIGHT = 480;
+
+const DEBUG_FLAGS = {
+	drawSpecialHexes: false,
+};
+
+
 
 var _mouse = {		// struct for mouse info
 	x: 0,
@@ -18,21 +24,13 @@ var clientBoundingRect;
 
 var _keyboardStates = [];	// array to hold keycode states
 
-var _debug = {
-	remoteLoading: false,
-	enableKeyboardScroll: true,
-	drawSpecialHexes: false,
-};
-
 
 var _assets = {};		// main asset hashtable
 
 
 var fps_currentTime;
 
-var _context_clearcolour = "#000000";
-
-var stateQ = [];		// states
+var activeGameStates = [];		// state stack
 
 var loadState;
 var mainState;
@@ -49,17 +47,17 @@ var mapScreenState;
 
 function getTicks() {
 	return fps_currentTime;
-}
+};
 
 function isObject(_o) {
 	if(_o !== null && typeof _o === 'object') return true;
 	else return false;
-}
+};
 
 function isFunction(functionToCheck) {
 	var getType = {};
 	return functionToCheck && getType.toString.call(functionToCheck) === '[object Function]';
-}
+};
 
 function intersectTest(ax,ay,aw,ah, bx,by,bw,bh) {
     return !(bx > (ax+aw)
@@ -91,8 +89,7 @@ function drawHex(_x,_y,_text,_col) {
 		_context.fillStyle = _col;
 		_context.fillText(_text,_x+4,_y+10);
 	}
-
-}
+};
 
 function drawTile(_x,_y,_text,_col) {
 	if(!_col) _col = "#00FF00";
@@ -114,39 +111,13 @@ function drawTile(_x,_y,_text,_col) {
 		_context.fillStyle = _col;
 		_context.fillText(_text,_x+4,_y+10);
 	}
+};
 
-}
-
-
-function xhr(_file,_type,_callback,_progressHandler,_failHandler) {
-
-	var xhr = new XMLHttpRequest();
-
-	var updateProgress = function(e) {
-		if(isFunction(_progressHandler)) _progressHandler(xhr.response);
+function getObjectType(_id) {		// returns type from typeID
+	if(_id < 0 || _id > 5) {
+		console.log("getObjectType: Can't read objectTypeID: " + _id);
+		return false;
+	} else {
+		return ["items","critters","scenery","walls","tiles","misc"][_id];
 	}
-
-	var transferComplete = function(e) {
-		if(isFunction(_callback)) _callback(xhr.response); // trigger callback
-	}
-
-	var transferFailed = function(e) {
-		if(isFunction(_failHandler)) _failHandler(xhr.response);
-		console.log("xhr: transfer failed");
-	}
-
-	var transferCanceled = function(e) {
-		console.log("xhr: transfer canceled");
-	}
-
-	xhr.open('GET', _file, true);
-	xhr.responseType = _type;
-
-	xhr.addEventListener("progress", updateProgress, false);
-	xhr.addEventListener("load", transferComplete, false);
-	xhr.addEventListener("error", transferFailed, false);
-	xhr.addEventListener("abort", transferCanceled, false);
-
-
-	xhr.send();
-}
+};

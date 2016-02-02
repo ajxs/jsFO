@@ -10,8 +10,8 @@ class MainMenuState extends GameState {
 		this.buttonImage = document.getElementById('MainMenuState_btn');
 
 		this.menu = {
-			x: (_screenWidth*0.05)|0,
-			y: (_screenWidth*0.185)|0,		// set in main_setResolution()
+			x: (SCREEN_WIDTH*0.05)|0,
+			y: (SCREEN_WIDTH*0.185)|0,		// set in main_setResolution()
 			activeIndex: -1,
 
 			elements: [{		// Quit to Main Menu
@@ -54,10 +54,6 @@ class MainMenuState extends GameState {
 		};
 	};
 
-
-	init() {};
-
-
 	input(e) {
 		switch(e.type) {
 			case "mousemove":
@@ -95,7 +91,7 @@ class MainMenuState extends GameState {
 	render() {
 		_context.globalAlpha = 1;
 
-		_context.drawImage(this.backgroundImage, 0, 0, 1024, 768, 0,0,_screenWidth, _screenHeight);	// bg
+		_context.drawImage(this.backgroundImage, 0, 0, 1024, 768, 0,0,SCREEN_WIDTH, SCREEN_HEIGHT);	// bg
 
 		for(var i = 0; i < this.menu.elements.length; i++) {
 			_context.drawImage(this.buttonImage, this.menu.x + this.menu.elements[i].x, this.menu.y + this.menu.elements[i].y);

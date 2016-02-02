@@ -52,14 +52,14 @@ class LoadState extends GameState {
 	render() {		// @TODO: REMOVE
 		_context.globalAlpha = 1;
 		_context.fillStyle = "rgb(0,10,0)";
-		_context.fillRect(0,0,_screenWidth,_screenHeight);
+		_context.fillRect(0,0,SCREEN_WIDTH,SCREEN_HEIGHT);
 
-		var fullWidth = ((_screenWidth/2)|0);
+		var fullWidth = ((SCREEN_WIDTH/2)|0);
 		var barWidth = fullWidth * this.loadPercentage;
 		var barX = fullWidth - (fullWidth/2)|0;
-		var barY = _screenHeight - 128;
+		var barY = SCREEN_HEIGHT - 128;
 
-		_context.drawImage(this.overlay,0,0,1024,768,0,0,_screenWidth,_screenHeight);
+		_context.drawImage(this.overlay,0,0,1024,768,0,0,SCREEN_WIDTH,SCREEN_HEIGHT);
 
 		_context.fillStyle = "rgb(0,10,0)";
 		_context.fillRect(barX,barY,fullWidth,64);
@@ -82,14 +82,14 @@ class LoadState extends GameState {
 		if(Math.random() > 1-flickerChance) {
 			_context.globalAlpha = Math.random()*0.35;
 			_context.fillStyle = "rgb(255,255,255)";
-			_context.fillRect(0,0,_screenWidth,_screenHeight);
+			_context.fillRect(0,0,SCREEN_WIDTH,SCREEN_HEIGHT);
 		}
 
 		_context.globalAlpha = 0.07;	// scanlines, consider replacing with hardcoded image
 		_context.fillStyle = "rgb(255,255,255)";
 		var lines = 0;
-		while(lines < _screenHeight) {
-			_context.fillRect(0,lines,_screenWidth,4);
+		while(lines < SCREEN_HEIGHT) {
+			_context.fillRect(0,lines,SCREEN_WIDTH,4);
 			lines += 8;
 
 		}
@@ -99,8 +99,8 @@ class LoadState extends GameState {
 
 	gameInit(_saveState) {
 		mainState.init(_saveState);
-		stateQ.splice(stateQ.indexOf(loadState),1);
-		stateQ.push(mainState);
+		activeGameStates.splice(activeGameStates.indexOf(loadState),1);
+		activeGameStates.push(mainState);
 	};
 
 };

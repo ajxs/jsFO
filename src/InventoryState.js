@@ -4,7 +4,7 @@ class InventoryState extends GameState {
 	constructor() {
 		super();
 
-		this.x = ((_screenWidth / 2)|0) - 250;
+		this.x = ((SCREEN_WIDTH / 2)|0) - 250;
 		this.y = 0;
 
 		this.playerAnimLastRotationTime = getTicks();

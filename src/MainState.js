@@ -7,8 +7,8 @@ class MainState extends GameState {
 		this.map = new GameMap();
 
 		this.interfaceRect = {
-			x: ((_screenWidth / 2)|0) - 320,
-			y: _screenHeight - 99,
+			x: ((SCREEN_WIDTH / 2)|0) - 320,
+			y: SCREEN_HEIGHT - 99,
 			width: 640,
 			height: 99,
 			activeItem: -1,
@@ -48,8 +48,8 @@ class MainState extends GameState {
 
 		this.console = {
 			consoleData: [],
-			x: (((_screenWidth / 2)|0) - 320) + 30,
-			y: _screenHeight - 26,
+			x: (((SCREEN_WIDTH / 2)|0) - 320) + 30,
+			y: SCREEN_HEIGHT - 26,
 
 			fontHeight: 10,
 			fontColor: "#00FF00",
@@ -102,9 +102,14 @@ class MainState extends GameState {
 		this.eggContext = this.eggBuffer.getContext("2d");
 		this.transEgg = document.getElementById("trans_egg");
 
+		/*
+		Do not modify transEgg canvas size, it's position is centered around the player by it's width. This may be fixed at a later date by hardcoding the width.
+		*/
+
+
 		this.brightmap = document.createElement("canvas");
-		this.brightmap.width = _screenWidth;
-		this.brightmap.height = _screenHeight;
+		this.brightmap.width = SCREEN_WIDTH;
+		this.brightmap.height = SCREEN_HEIGHT;
 		this.brightmapContext = this.brightmap.getContext("2d");
 
 		this.mse_overlay = document.getElementById("mse_overlay");		// WHY FALLOUT WHY
@@ -123,9 +128,6 @@ class MainState extends GameState {
 
 		this.hIndex = 0;
 		this.hsIndex = 0;
-
-		this.mse_overlay = 0;
-		this.mse_overlay_blocked = 0;
 
 		this.mapObjects = 0;
 
@@ -147,24 +149,31 @@ class MainState extends GameState {
 		this.inputState = "game";
 		this.inputState_sub = "move";
 
-
-		this.brightmap = 0;
-		this.brightmapContext = 0;
-
 		this.roofRenderState = 0;
 
 		this.camera = {
 			x:0, y: 0,
 
-			trackToCoords: function(_c) {	// track camera to coordinates.
-				this.x = _c.x - (_screenWidth*0.5)|0;
-				this.y = _c.y - (_screenHeight*0.5)|0;
+			trackToCoords(_c) {	// track camera to coordinates.
+				this.x = _c.x - (SCREEN_WIDTH*0.5)|0;
+				this.y = _c.y - (SCREEN_HEIGHT*0.5)|0;
 			},
 		};
 
 
+		this.mapLightLevel = 1;
+		this.scrollimg = 0;
 
-		this.path_closedSet = 0;		// findPath lets
+
+		this.cIndex_time;
+		this.cIndex_test;
+		this.cIndex_state = false;
+		this.cIndex_path = -1;
+
+		this.cIndex_x;
+		this.cIndex_y;
+
+		this.path_closedSet = 0;		// findPath vars
 		this.path_frontier = 0;
 		this.path_cameFrom = 0;
 		this.path_g_score = 0;
@@ -177,110 +186,66 @@ class MainState extends GameState {
 		this.path_adjList = 0;
 
 
-		this.mapLightLevel = 1;
-		this.scrollimg = 0;
-
-		/*
-		Do not modify transEgg canvas size, it's position is centered around the player by it's width. This may be fixed at a later date by hardcoding the width.
-		*/
-
-		this.mapGeometry = {	// struct for map geometry lets/functions
-
-			/* note: Hex and Tile sizes are hardcoded as:
-			hex - w: 32, h: 16
-			tile - w: 80: h: 32 */
-
-			m_width: 100,	// nTiles in row
-			h_width: 200,
-
-			m_roofHeight: 96,
-
-			m_transform: {	// offsets to make hexes and maptiles align
-				x: 48, y: -3,
-			},
+	};
 
 
-			h2s: function(i) {	// hex index to screen-space
-				let q = (i%this.h_width)|0;
-				let r = (i/this.h_width)|0;
+	findPath(start,dest) {
+		if(start == dest) return 0;
 
-				let px = 0 - q*32 + r*16, py = r*12;
+		this.path_closedSet = [];
+		this.path_frontier = [start];
+		this.path_cameFrom = [];
+		this.path_g_score = [];
+		this.path_f_score = [];
 
-				let qx = ((q/2)|0)*16;
-				let qy = ((q/2)|0)*12;
+		this.path_g_score[start] = 0;
+		this.path_f_score[start] = mapGeometry.hDistance(start,dest);
 
-				return {
-					x: px + qx,
-					y: py + qy,
+		while(this.path_frontier.length) {
+			this.path_current = this.path_frontier[0];
+
+			for(let k = 0; k < this.path_frontier.length; k++) {	// get lowest f_score - O(1)
+				if(this.path_f_score[this.path_frontier[k]] < this.path_f_score[this.path_current]) this.path_current = this.path_frontier[k];
+			}
+
+			if(this.path_current == dest) {	// if dest reached
+				this.path_path = [];
+
+				this.path_path.unshift(dest);		// iterate backwards through solution, add to path array
+				this.path_current = this.path_cameFrom[dest];
+
+				while(this.path_current != start) {
+					this.path_path.unshift(this.path_current);
+					this.path_current = this.path_cameFrom[this.path_current];
 				}
-			},
+				return this.path_path;
+			}
 
-			c2s: function(i) {	// maptile index to screen-space
-				let tCol = i%this.m_width, tRow = (i/this.m_width)|0;
-				return {
-					x: 0 - this.m_transform.x - (tCol*48) + (tRow*32),		// map origin { x: 0, y: 0} is at upper right.
-					y: this.m_transform.y + tCol*12 + (tRow*24),
+			this.path_adjList = mapGeometry.findAdj(this.path_current);
+			this.path_closedSet.push(this.path_frontier.shift());
+
+			for(let i = 0; i < 6; i++) {
+				this.path_next = this.path_adjList[i];
+
+				if(this.path_next < 0 || this.path_next > 40000) continue;	// if out of bounds
+				if(this.path_closedSet.indexOf(this.path_next) != -1) continue;	// if in closedList
+				if(this.map.hexMap[this.player.currentElevation][this.path_next].blocked) {	// if blocked
+					this.path_closedSet.push(this.path_next);
+					continue;
 				}
-			},
 
-			s2h: function(mx,my) {	// screen-space to hex index conversion
-				if(mx < 0) mx -= 32;    // compensate for -0 effect
-				mx *= -1;
+				this.path_tg_score = this.path_g_score[this.path_current] + mapGeometry.hDistance(this.path_current,this.path_next);
 
-				let hCol = (mx/32)|0, hRow = (my/12)|0;
-				if(hRow >0) hCol += Math.abs(hRow/2)|0;
-				hRow -= (hCol/2)|0;
-
-				return ((hRow*this.h_width)+hCol);
-
-			},
-
-			findAdj: function(i) {	// returns array of indexes of hexes adjacent to index
-				return new Array(
-					(i%2) ? i - (this.h_width+1) : i-1,
-					(i%2) ? i-1 : i + (this.h_width-1),
-					i+this.h_width,
-					(i%2) ? i+1 : i + (this.h_width+1),
-					(i%2) ? i-(this.h_width-1) : i+1,
-					i-this.h_width);
-			},
-
-			findOrientation: function(_origin, _dest) {		// finds orientation between two adjacent hexes
-				if(_origin == _dest) {
-					console.log("MainState: findOrientation error: origin and dest identical");
-					return 0;
+				if(this.path_frontier.indexOf(this.path_next) == -1 || this.path_tg_score < this.path_g_score[this.path_next]) {
+					this.path_cameFrom[this.path_next] = this.path_current;
+					this.path_g_score[this.path_next] = this.path_tg_score;
+					this.path_f_score[this.path_next] = this.path_g_score[this.path_next] + mapGeometry.hDistance(this.path_next,dest);
+					if(this.path_frontier.indexOf(this.path_next) == -1) this.path_frontier.push(this.path_next);
 				}
-				let orientation = this.findAdj(_origin).indexOf(_dest);
-				if(orientation == -1) {
-					console.log("MainState: findOrientation error: -1");
-					return 0;
-				}
-				return orientation;
-			},
+			}
+		}
 
-			/* default function used for heuristic score in pathfinding algorith,
-			can be replaced with better one as needed */
-
-			hDistance: function(_a,_b) {	// pythagorean distance
-				let ha = this.h2s(_a);
-				let hb = this.h2s(_b);
-
-				let dx = Math.abs(hb.x - ha.x);
-				let dy = Math.abs(hb.y - ha.y);
-				return Math.sqrt((dx*dx)+(dy*dy));
-
-			},
-
-		};
-
-
-		this.cIndex_time;
-		this.cIndex_test;
-		this.cIndex_state = false;
-		this.cIndex_path = -1;
-
-		this.cIndex_x;
-		this.cIndex_y;
+		return 0;
 
 	};
 
@@ -296,8 +261,8 @@ class MainState extends GameState {
 		this.map.elevationAt2 = _assets[loadMap].elevationAt2;
 		this.map.nElevations = _assets[loadMap].nElevations;
 
-		this.map.globallets = _assets[loadMap].globallets;
-		this.map.locallets = _assets[loadMap].locallets;
+		this.map.globallets = _assets[loadMap].globalvars;
+		this.map.locallets = _assets[loadMap].localvars;
 
 		this.map.playerStartDir = _assets[loadMap].playerStartDir;
 		this.map.playerStartPos = _assets[loadMap].playerStartPos;
@@ -330,7 +295,7 @@ class MainState extends GameState {
 
 				if(!(this.mapObjects[n][i].itemFlags & 0x00000010)) this.map.hexMap[n][this.mapObjects[n][i].hexPosition].blocked = true;	// check if flags for 'can be walked through' are false.
 
-				switch(this.getObjectType(this.mapObjects[n][i].frmTypeID)) {
+				switch(getObjectType(this.mapObjects[n][i].frmTypeID)) {
 					case "walls":
 						break;
 					case "misc":
@@ -382,7 +347,7 @@ class MainState extends GameState {
 
 		console.log("MainState: init: loading finished");
 
-		this.camera.trackToCoords(this.mapGeometry.h2s(this.player.hexPosition));
+		this.camera.trackToCoords(mapGeometry.h2s(this.player.hexPosition));
 
 		return true;
 
@@ -412,165 +377,6 @@ class MainState extends GameState {
 	};
 
 
-	getObjectType(_id) {		// returns type from typeID
-		switch(_id) {
-			case 0:
-				return "items";
-			case 1:
-				return "critters";
-			case 2:
-				return "scenery";
-			case 3:
-				return "walls";
-			case 4:
-				return "tiles";
-			case 5:
-				return "misc";
-			default:
-				console.log("MainState: getObjectType: Can't read objectTypeID: " + _id);
-				return false;
-		}
-	};
-
-
-	generateFRMstring(object) {	// generates FRM string from mapObject object.
-
-		let frmID = object.FID & 0x00000FFF;
-		let filetype = this.getObjectType(object.FID >> 24);
-
-		if(filetype == "critters") {
-			let weaponString = "a";
-			let animString = "a";
-
-			let frmBase = _assets["art/critters/critters.lst"][frmID].data.base;
-
-			if(object.armorMaleFID || object.armorFemaleFID) {
-				frmBase = FIDtoFRM(object.armorMaleFID);
-			}
-
-			if(object.slot2) {	// ?
-				switch(object.slot2.weaponAnimCode) {
-					case 1: // knife
-						weaponString = "d";
-						break;
-					case 2: // club
-						weaponString = "e";
-						break;
-					case 3: // hammer
-						weaponString = "f";
-						break;
-					case 4: // spear
-						weaponString = "g";
-						break;
-					case 5: // pistol
-						weaponString = "h";
-						break;
-					case 6: // smg
-						weaponString = "i";
-						break;
-					case 7: // rifle
-						weaponString = "j";
-						break;
-					case 8: // big gun
-						weaponString = "k";
-						break;
-					case 9: // minigun
-						weaponString = "l";
-						break;
-					case 10: // rocket launcher
-						weaponString = "m";
-						break;
-				}
-			}
-
-			switch(object.anim.currentAnim) {
-				case "idle":
-					return "art/critters/" + frmBase + weaponString + "a.frm";
-				case "walk":
-					return "art/critters/" + frmBase + weaponString + "b.frm";
-				case "run":
-					return "art/critters/" + frmBase + "at.frm";
-				case "use":
-					return "art/critters/" + frmBase + "al.frm";
-				default:
-					return "art/critters/" + frmBase + "aa.frm";
-
-			}
-		}
-
-		let filename = _assets["art/" + filetype + "/" + filetype + ".lst"][frmID].data;
-		return "art/" + filetype + "/" + filename;
-
-	};
-
-	generateFRMptr(object) {
-		return _assets[this.generateFRMstring(object)];
-	};
-
-
-	findPath(start,dest) {
-		if(start == dest) return 0;
-
-		this.path_closedSet = [];
-		this.path_frontier = [];
-		this.path_cameFrom = [];
-		this.path_g_score = [];
-		this.path_f_score = [];
-
-		this.path_g_score[start] = 0;
-		this.path_f_score[start] = this.mapGeometry.hDistance(start,dest);
-
-		this.path_frontier.push(start);
-
-		while(this.path_frontier.length) {
-			this.path_current = this.path_frontier[0];
-
-			for(let k = 0; k < this.path_frontier.length; k++) {	// get lowest f_score - O(1)
-				if(this.path_f_score[this.path_frontier[k]] < this.path_f_score[this.path_current]) this.path_current = this.path_frontier[k];
-			}
-
-			if(this.path_current == dest) {	// if dest reached
-				this.path_path = [];
-
-				this.path_path.unshift(dest);		// iterate backwards through solution, add to path array
-				this.path_current = this.path_cameFrom[dest];
-
-				while(this.path_current != start) {
-					this.path_path.unshift(this.path_current);
-					this.path_current = this.path_cameFrom[this.path_current];
-				}
-				return this.path_path;
-			}
-
-			this.path_adjList = this.mapGeometry.findAdj(this.path_current);
-			this.path_closedSet.push(this.path_frontier.shift());
-
-			for(let i = 0; i < 6; i++) {
-				this.path_next = this.path_adjList[i];
-
-				if(this.path_next < 0 || this.path_next > 40000) continue;	// if out of bounds
-				if(this.path_closedSet.indexOf(this.path_next) != -1) continue;	// if in closedList
-				if(this.map.hexMap[this.player.currentElevation][this.path_next].blocked) {	// if blocked
-					this.path_closedSet.push(this.path_next);
-					continue;
-				}
-
-				this.path_tg_score = this.path_g_score[this.path_current] + this.mapGeometry.hDistance(this.path_current,this.path_next);
-
-				if(this.path_frontier.indexOf(this.path_next) == -1 || this.path_tg_score < this.path_g_score[this.path_next]) {
-					this.path_cameFrom[this.path_next] = this.path_current;
-					this.path_g_score[this.path_next] = this.path_tg_score;
-					this.path_f_score[this.path_next] = this.path_g_score[this.path_next] + this.mapGeometry.hDistance(this.path_next,dest);
-					if(this.path_frontier.indexOf(this.path_next) == -1) this.path_frontier.push(this.path_next);
-				}
-			}
-		}
-
-		return 0;
-
-	};
-
-
 	input(e) {
 		switch(e.type) {
 			case "mousemove":
@@ -593,7 +399,7 @@ class MainState extends GameState {
 						if(_mouse.c2) return;		// stop mouse2 from triggering commands when in command mode
 						this.objectIndex = this.getObjectIndex();
 						if(this.objectIndex != -1) {		// if object under cursor
-							let objC = this.mapGeometry.h2s(this.mapObjects[this.player.currentElevation][this.objectIndex].hexPosition);
+							let objC = mapGeometry.h2s(this.mapObjects[this.player.currentElevation][this.objectIndex].hexPosition);
 							main_gameStateFunction('openContextMenu',
 								this.objectIndex,
 								objC.x - this.camera.x + 30,
@@ -666,7 +472,7 @@ class MainState extends GameState {
 				if(action == "hoverlook") textIndex = this.mapObjects[this.player.currentElevation][target].textID;
 				else if(action == "look") textIndex = this.mapObjects[this.player.currentElevation][target].textID+1;
 
-				switch( this.getObjectType(this.mapObjects[this.player.currentElevation][target].objectTypeID) ) {
+				switch( getObjectType(this.mapObjects[this.player.currentElevation][target].objectTypeID) ) {
 					case "items":
 						msgFile = _assets["text/english/game/pro_item.msg"];
 						break;
@@ -699,15 +505,13 @@ class MainState extends GameState {
 
 
 			case "use":
-
-				let mState = this;
 				let useDest = -1;		// find adj hexes
 				let useFunction = 0;
-				let targetItem = mState.mapObjects[mState.player.currentElevation][target];
+				let targetItem = this.mapObjects[this.player.currentElevation][target];
 
 				console.log(targetItem);
 
-				let useAdj = this.mapGeometry.findAdj(targetItem.hexPosition);
+				let useAdj = mapGeometry.findAdj(targetItem.hexPosition);
 
 				useDest = useAdj.indexOf(this.player.hexPosition);	// check if player next to item
 				for(let a = 0; a < 6; a++) {
@@ -721,11 +525,11 @@ class MainState extends GameState {
 					case "door":
 						useFunction = function() {
 							//console.log("useFunction: " + targetItem.hexPosition + " / " + mainState.player.hexPosition);
-							mState.player.orientation = mState.mapGeometry.findOrientation(mState.player.hexPosition, targetItem.hexPosition);
-							mState.object_playAnim(mState.player,"use",0,0,0,false,0,function() {
-								if(targetItem.openState == 0) mState.object_openDoor(targetItem);
-								else mState.object_closeDoor(targetItem);
-							});
+							this.player.orientation = mapGeometry.findOrientation(this.player.hexPosition, targetItem.hexPosition);
+							this.object_playAnim(this.player,"use",0,0,0,false,0,function() {
+								if(targetItem.openState == 0) this.object_openDoor(targetItem);
+								else this.object_closeDoor(targetItem);
+							}.bind(this));
 						};
 						break;
 				}
@@ -759,11 +563,10 @@ class MainState extends GameState {
 		this.objectBufferRect.x = _mouse.x - this.objectBufferRect.width/2;
 		this.objectBufferRect.y = _mouse.y - this.objectBufferRect.height/2;
 
-		let mapObjectsLength = this.mapObjects[this.player.currentElevation].length;
-		for(let i = 0; i < mapObjectsLength; i++) {
+		for(let i = 0, mapObjectsLength = this.mapObjects[this.player.currentElevation].length; i < mapObjectsLength; i++) {
 			this.currentRenderObject = this.mapObjects[this.player.currentElevation][i];
 
-			let c = this.mapGeometry.h2s(this.currentRenderObject.hexPosition);
+			let c = mapGeometry.h2s(this.currentRenderObject.hexPosition);
 			this.currentRenderImg = this.currentRenderObject.anim.img.frameInfo[this.currentRenderObject.orientation][this.currentRenderObject.anim.frameNumber];
 
 			let destX = (c.x + 16 - ((this.currentRenderImg.width/2)|0)) + this.currentRenderObject.anim.shiftX - this.camera.x;	// object coords.
@@ -784,7 +587,7 @@ class MainState extends GameState {
 			let cRow = (this.currentRenderObject.hexPosition / 100)|0;
 			let pRow = (this.player.hexPosition / 100)|0;
 
-			if(this.getObjectType(this.currentRenderObject.frmTypeID) == "walls") {	// don't blit walls 'infront' of player.
+			if(getObjectType(this.currentRenderObject.frmTypeID) == "walls") {	// don't blit walls 'infront' of player.
 				if(!(cRow < pRow || cCol < pCol  )) continue;
 			}
 
@@ -817,16 +620,16 @@ class MainState extends GameState {
 	update() {
 
 		// STATE HANDLING
-		this.scrollStates.yNeg = (_mouse.y < (_screenHeight * 0.025));
-		this.scrollStates.yPos = (_mouse.y > (_screenHeight * 0.975));
-		this.scrollStates.xNeg = (_mouse.x < (_screenWidth * 0.025));
-		this.scrollStates.xPos = (_mouse.x > (_screenWidth * 0.975));
+		this.scrollStates.yNeg = (_mouse.y < (SCREEN_HEIGHT * 0.025));
+		this.scrollStates.yPos = (_mouse.y > (SCREEN_HEIGHT * 0.95));
+		this.scrollStates.xNeg = (_mouse.x < (SCREEN_WIDTH * 0.025));
+		this.scrollStates.xPos = (_mouse.x > (SCREEN_WIDTH * 0.95));
 		this.scrollState = (this.scrollStates.yNeg || this.scrollStates.yPos || this.scrollStates.xNeg || this.scrollStates.xPos);
 
-		if(intersectTest(_mouse.x,_mouse.y,0,0, 0,0,_screenWidth,_screenHeight) && this.scrollState) {
+		if(intersectTest(_mouse.x,_mouse.y,0,0, 0,0,SCREEN_WIDTH,SCREEN_HEIGHT) && this.scrollState) {
 			this.inputState = "scroll";
 
-			this.scrollCheckAdj = this.mapGeometry.findAdj(this.mapGeometry.s2h( 320 + this.camera.x, 190 + this.camera.y));
+			this.scrollCheckAdj = mapGeometry.findAdj(mapGeometry.s2h( 320 + this.camera.x, 190 + this.camera.y));
 
 			this.scrollStates.xPosBlocked = (this.map.hexMap[this.player.currentElevation][this.scrollCheckAdj[1]].scrollBlock);	// check if these hexes have the scrollBlock attribute.
 			this.scrollStates.yNegBlocked = (this.map.hexMap[this.player.currentElevation][this.scrollCheckAdj[0]].scrollBlock && this.map.hexMap[this.player.currentElevation][this.scrollCheckAdj[5]].scrollBlock);
@@ -877,8 +680,8 @@ class MainState extends GameState {
 			this.inputState = "game";
 
 			if(this.inputState_sub == "move") {
-				this.hIndex = this.mapGeometry.s2h(_mouse.x + this.camera.x, _mouse.y + this.camera.y);		// hex index calculated here
-				this.hsIndex = this.mapGeometry.h2s(this.hIndex);
+				this.hIndex = mapGeometry.s2h(_mouse.x + this.camera.x, _mouse.y + this.camera.y);		// hex index calculated here
+				this.hsIndex = mapGeometry.h2s(this.hIndex);
 
 				if(this.cIndex_test != this.hIndex) {		// check if mouse has moved for hover functionality
 					this.cIndex_test = this.hIndex;
@@ -924,9 +727,7 @@ class MainState extends GameState {
 
 
 		// animation
-		let mapObjectsLength = this.mapObjects[e].length;
-
-		for(let i=0; i < mapObjectsLength; i++) {	// tasks, framestep
+		for(let i=0, mapObjectsLength = this.mapObjects[e].length; i < mapObjectsLength; i++) {	// tasks, framestep
 			this.currentRenderObject = this.mapObjects[e][i];
 
 			this.currentRenderImg = this.currentRenderObject.anim.img;
@@ -981,7 +782,7 @@ class MainState extends GameState {
 		}	// end mapobjects loop
 
 
-		let playerCoords = this.mapGeometry.h2s(this.player.hexPosition);
+		let playerCoords = mapGeometry.h2s(this.player.hexPosition);
 		this.currentRenderImg = this.player.anim.img.frameInfo[this.player.orientation][this.player.anim.frameNumber];
 
 		let playerX = (playerCoords.x + 16 - ((this.currentRenderImg.width/2)|0)) + this.player.anim.shiftX - this.camera.x;	// actual coords of of objects.
@@ -991,7 +792,7 @@ class MainState extends GameState {
 		this.roofRenderState = true;		// check if player is under a roof
 		for(let i = 0; i < 10000; i++) {
 			if(this.map.tileInfo[this.player.currentElevation].roofTiles[i] < 2) continue;
-			let c = this.mapGeometry.c2s(i);
+			let c = mapGeometry.c2s(i);
 
 			if(intersectTest(c.x - this.camera.x,		// @TODO : potentially use object buffer here.
 				(c.y - 96) - this.camera.y,
@@ -1014,7 +815,7 @@ class MainState extends GameState {
 		this.eggContext.globalCompositeOperation = 'source-over';		// draw egg mask onto egg context.
 		this.eggContext.drawImage(this.transEgg,0,0);
 
-		let playerCoords = this.mapGeometry.h2s(this.player.hexPosition);
+		let playerCoords = mapGeometry.h2s(this.player.hexPosition);
 		let playerX = playerCoords.x + 16 + this.player.anim.shiftX - this.camera.x;
 		let playerY = (playerCoords.y + 8) + this.player.anim.shiftY- this.camera.y;
 
@@ -1028,13 +829,13 @@ class MainState extends GameState {
 
 			//if(this.map.tileInfo[e].floorTiles[i] < 2) continue;
 
-			let c = this.mapGeometry.c2s(i);
+			let c = mapGeometry.c2s(i);
 			if(!intersectTest(c.x, c.y,		// camera test
 				80, 36,
 				this.camera.x,
 				this.camera.y,
-				_screenWidth,
-				_screenHeight)) continue;
+				SCREEN_WIDTH,
+				SCREEN_HEIGHT)) continue;
 
 			_context.drawImage(_assets['art/tiles/tiles.lst'][this.map.tileInfo[e].floorTiles[i]].ptr.frameInfo[0][0].img,		// use pointer in lst file
 				c.x - this.camera.x,
@@ -1066,12 +867,11 @@ class MainState extends GameState {
 
 		// render map objects.
 		this.eggContext.globalCompositeOperation = 'source-over';
-		let mapObjectsLength = this.mapObjects[e].length;
-		for(let i = 0; i < mapObjectsLength; i++) {
+		for(let i = 0, mapObjectsLength = this.mapObjects[e].length; i < mapObjectsLength; i++) {
 
 			this.currentRenderObject = this.mapObjects[e][i];
 
-			let c = this.mapGeometry.h2s(this.currentRenderObject.hexPosition);
+			let c = mapGeometry.h2s(this.currentRenderObject.hexPosition);
 			this.currentRenderImg = this.currentRenderObject.anim.img.frameInfo[this.currentRenderObject.orientation][this.currentRenderObject.anim.frameNumber];
 
 			let destX = (c.x + 16 - ((this.currentRenderImg.width/2)|0)) + this.currentRenderObject.anim.shiftX - this.camera.x;	// actual coords of of objects.
@@ -1083,8 +883,8 @@ class MainState extends GameState {
 				this.currentRenderImg.height,
 				0,
 				0,
-				_screenWidth,
-				_screenHeight)) continue;		// testing in screen space with dest lets, slower but more accurate.
+				SCREEN_WIDTH,
+				SCREEN_HEIGHT)) continue;		// testing in screen space with dest lets, slower but more accurate.
 
 			_context.drawImage(this.currentRenderImg.img,
 				destX,
@@ -1106,7 +906,7 @@ class MainState extends GameState {
 				let cRow = (this.mapObjects[e][i].hexPosition / 100)|0;
 				let pRow = (this.player.hexPosition / 100)|0;
 
-				if(this.getObjectType(this.mapObjects[e][i].frmTypeID) == "walls") {	// don't blit walls 'infront' of player.
+				if(getObjectType(this.mapObjects[e][i].frmTypeID) == "walls") {	// don't blit walls 'infront' of player.
 					if(!(cRow < pRow || cCol < pCol  )) continue;
 				}
 				this.eggContext.globalCompositeOperation = "source-atop";
@@ -1124,28 +924,28 @@ class MainState extends GameState {
 			for(let i = 0; i < 10000; i++) {
 				//if(this.map.tileInfo[e].roofTiles[i] < 2) continue;
 
-				let c = this.mapGeometry.c2s(i);
+				let c = mapGeometry.c2s(i);
 				if(!intersectTest(c.x, c.y,
 					80,
 					36,
 					this.camera.x,
 					this.camera.y,
-					_screenWidth,
-					_screenHeight)) continue;
+					SCREEN_WIDTH,
+					SCREEN_HEIGHT)) continue;
 
 				_context.drawImage(_assets['art/tiles/tiles.lst'][this.map.tileInfo[e].roofTiles[i]].ptr.frameInfo[0][0].img,
 					c.x - this.camera.x,
-					c.y - this.mapGeometry.m_roofHeight - this.camera.y);
+					c.y - mapGeometry.m_roofHeight - this.camera.y);
 
 			}
 		}
 
-		/* if(_debug.drawSpecialHexes) {		// Hex debug
-			let centreHex = this.mapGeometry.h2s(this.mapGeometry.s2h( 320 + this.camera.x, 190 + this.camera.y));	// hex debug stuff
+		/* if(DEBUG_FLAGS.drawSpecialHexes) {		// Hex debug
+			let centreHex = mapGeometry.h2s(mapGeometry.s2h( 320 + this.camera.x, 190 + this.camera.y));	// hex debug stuff
 			drawHex(centreHex.x - this.camera.x,centreHex.y - this.camera.y,"","#00FFFF");
 
 			for(let h = 0; h < 40000; h++) {
-				let cx = this.mapGeometry.h2s(h);
+				let cx = mapGeometry.h2s(h);
 				if(this.map.hexMap[e][h].exitGrid) drawHex(cx.x - this.camera.x,cx.y - this.camera.y, "","#00FF00");
 				if(this.map.hexMap[e][h].blocked) drawHex(cx.x - this.camera.x,cx.y - this.camera.y, "","#FF0000");
 				if(this.map.hexMap[e][h].scrollBlock) drawHex(cx.x - this.camera.x,cx.y - this.camera.y, "","#FFFF00");
@@ -1158,7 +958,7 @@ class MainState extends GameState {
 		if(this.mapLightLevel < 1) {
 			// blit main light level to brightmap buffer.
 			this.brightmapContext.fillStyle = "rgb("+((255*this.mapLightLevel)|0)+","+((255*this.mapLightLevel)|0)+","+((255*this.mapLightLevel)|0)+")";
-			this.brightmapContext.fillRect(0,0,_screenWidth,_screenHeight);
+			this.brightmapContext.fillRect(0,0,SCREEN_WIDTH,SCREEN_HEIGHT);
 
 			//this.brightmapContext.fillStyle = "#FFFFFF";
 			//this.brightmapContext.fillRect(this.eggBufferRect.x,this.eggBufferRect.y,200,200);
@@ -1212,8 +1012,7 @@ class MainState extends GameState {
 		}
 
 		// console
-		let cl = (this.console.consoleData.length > 5) ? 5 : this.console.consoleData.length;
-		for(let i = 0; i < cl; i++) {
+		for(let i = 0,  cl = (this.console.consoleData.length > 5) ? 5 : this.console.consoleData.length; i < cl; i++) {
 			bitmapFontRenderer.renderString(_assets["font1.aaf"],
 				this.console.consoleData[i],
 				this.console.x,
@@ -1225,38 +1024,19 @@ class MainState extends GameState {
 		if(this.statePause) return;		// don't render cursors if state is paused.
 
 		if(this.inputState == "scroll") {		// if scrolling
-			if(this.scrollStates.xPos) {
-				if(this.scrollStates.xPosBlocked) this.scrollimg = _assets["art/intrface/screx.frm"];
-				else this.scrollimg = _assets["art/intrface/screast.frm"];
-			}
-			if(this.scrollStates.xNeg) {
-				if(this.scrollStates.xNegBlocked) this.scrollimg = _assets["art/intrface/scrwx.frm"];
-				else this.scrollimg = _assets["art/intrface/scrwest.frm"];
-			}
-			if(this.scrollStates.yNeg) {
-				if(this.scrollStates.yNegBlocked) this.scrollimg = _assets["art/intrface/scrnx.frm"];
-				else this.scrollimg = _assets["art/intrface/scrnorth.frm"];
-			}
-			if(this.scrollStates.yNeg && this.scrollStates.xNeg) {
-				if(this.scrollStates.yNegBlocked || this.scrollStates.xNegBlocked) this.scrollimg = _assets["art/intrface/scrnwx.frm"];
-				else this.scrollimg = _assets["art/intrface/scrnwest.frm"];
-			}
-			if(this.scrollStates.yNeg && this.scrollStates.xPos) {
-				if(this.scrollStates.yNegBlocked || this.scrollStates.xPosBlocked) this.scrollimg = _assets["art/intrface/scrnex.frm"];
-				else this.scrollimg = _assets["art/intrface/scrneast.frm"];
-			}
-			if(this.scrollStates.yPos) {
-				if(this.scrollStates.yPosBlocked) this.scrollimg = _assets["art/intrface/scrsx.frm"];
-				else this.scrollimg = _assets["art/intrface/scrsouth.frm"];
-			}
-			if(this.scrollStates.yPos && this.scrollStates.xNeg) {
-				if(this.scrollStates.yPosBlocked || this.scrollStates.xNegBlocked) this.scrollimg = _assets["art/intrface/scrswx.frm"];
-				else this.scrollimg = _assets["art/intrface/scrswest.frm"];
-			}
-			if(this.scrollStates.yPos && this.scrollStates.xPos) {
-				if(this.scrollStates.yPosBlocked || this.scrollStates.xNegBlocked) this.scrollimg = _assets["art/intrface/scrsex.frm"];
-				else this.scrollimg = _assets["art/intrface/scrseast.frm"];
-			}
+			if(this.scrollStates.xPos) this.scrollimg = (this.scrollStates.xPosBlocked) ? _assets["art/intrface/screx.frm"] : _assets["art/intrface/screast.frm"];
+			if(this.scrollStates.xNeg) this.scrollimg = (this.scrollStates.xNegBlocked) ? _assets["art/intrface/scrwx.frm"] : _assets["art/intrface/scrwest.frm"];
+			if(this.scrollStates.yNeg) this.scrollimg = (this.scrollStates.yNegBlocked) ? _assets["art/intrface/scrnx.frm"] : _assets["art/intrface/scrnorth.frm"];
+			if(this.scrollStates.yNeg && this.scrollStates.xNeg)
+				this.scrollimg = (this.scrollStates.yNegBlocked || this.scrollStates.xNegBlocked) ? _assets["art/intrface/scrnwx.frm"] : _assets["art/intrface/scrnwest.frm"];
+			if(this.scrollStates.yNeg && this.scrollStates.xPos)
+				this.scrollimg = (this.scrollStates.yNegBlocked || this.scrollStates.xPosBlocked) ? _assets["art/intrface/scrnex.frm"] : _assets["art/intrface/scrneast.frm"];
+			if(this.scrollStates.yPos) this.scrollimg = (this.scrollStates.yPosBlocked) ? _assets["art/intrface/scrsx.frm"] : _assets["art/intrface/scrsouth.frm"];
+			if(this.scrollStates.yPos && this.scrollStates.xNeg)
+				this.scrollimg = (this.scrollStates.yPosBlocked || this.scrollStates.xNegBlocked) ? _assets["art/intrface/scrswx.frm"] : _assets["art/intrface/scrswest.frm"];
+			if(this.scrollStates.yPos && this.scrollStates.xPos)
+				this.scrollimg = (this.scrollStates.yPosBlocked || this.scrollStates.xNegBlocked) ? _assets["art/intrface/scrsex.frm"] : _assets["art/intrface/scrseast.frm"];
+
 			_context.drawImage(this.scrollimg.frameInfo[0][0].img,
 				_mouse.x,
 				_mouse.y);
@@ -1312,7 +1092,7 @@ class MainState extends GameState {
 
 		} else {		// static
 
-			switch(this.getObjectType(source.objectTypeID)) {
+			switch(getObjectType(source.objectTypeID)) {
 				case "items": 	// items
 
 					newObject = new SpriteObject();
@@ -1428,18 +1208,10 @@ class MainState extends GameState {
 	};
 
 
-	object_playAnim(obj, newAnim, frame, actionFrame, dir, loop, actionCallback, endCallback) {
+	object_playAnim(obj = null, newAnim = "idle", frame = 0, actionFrame = 0, dir = 0, loop = false, actionCallback = null, endCallback = null) {
 		// playAnim differs from setAnim in that behaviors can be set here, this calls setAnim where the img let is generated, and offsets computed.
-		if(!dir) dir = 0;
-		if(!newAnim) newAnim = "idle";
-		if(!actionFrame) actionFrame = 0;
-		if(!frame) {
-			frame = 0;
-		}
-		if(!loop) loop = false;
 
 		this.object_setAnim(obj, newAnim, frame, dir, loop, true);
-
 		obj.anim.actionFrame = actionFrame;
 
 		if(actionCallback == endCallback) {
@@ -1448,18 +1220,10 @@ class MainState extends GameState {
 			if(isFunction(actionCallback)) this.actor_addAction(obj,actionCallback,"onActionFrame");
 			if(isFunction(endCallback)) this.actor_addAction(obj,endCallback,"onAnimEnd");
 		}
-
 	};
 
 
-	object_setAnim(obj, newAnim, frame, dir, loop, active) {
-		if(!frame) {
-			frame = 0;
-		}
-		if(!dir) dir = 0;
-		if(!newAnim) newAnim = "idle";
-		if(!loop) loop = false;
-		if(!active) active = false;
+	object_setAnim(obj = null, newAnim = "idle", frame = 0, dir = 0, loop = false, active = false) {
 
 		obj.anim.currentAnim = newAnim;
 		obj.anim.animActive = active;
@@ -1467,7 +1231,45 @@ class MainState extends GameState {
 		obj.anim.animDirection = dir;
 		obj.anim.actionFrame = 0;
 
-		obj.anim.img = this.generateFRMptr(obj);
+		let generateFRMstring = function(object) {
+			let frmID = obj.FID & 0x00000FFF;
+			let filetype = getObjectType(obj.FID >> 24);
+
+			if(filetype == "critters") {
+				let weaponString = "a";
+				let animString = "a";
+
+				let frmBase = _assets["art/critters/critters.lst"][frmID].data.base;
+
+				if(object.armorMaleFID || object.armorFemaleFID) {
+					//frmBase = FIDtoFRM(object.armorMaleFID);		// @TODO:WTF
+				}
+
+				if(object.slot2) {	// ?
+					weaponString = String.fromCharCode(99+object.slot2.weaponAnimCode);		// d-m
+				}
+
+				switch(object.anim.currentAnim) {
+					case "idle":
+						return "art/critters/" + frmBase + weaponString + "a.frm";
+					case "walk":
+						return "art/critters/" + frmBase + weaponString + "b.frm";
+					case "run":
+						return "art/critters/" + frmBase + "at.frm";
+					case "use":
+						return "art/critters/" + frmBase + "al.frm";
+					default:
+						return "art/critters/" + frmBase + "aa.frm";
+
+				}
+			}
+
+			let filename = _assets["art/" + filetype + "/" + filetype + ".lst"][frmID].data;
+			return "art/" + filetype + "/" + filename;
+		};
+
+
+		obj.anim.img = _assets[generateFRMstring(obj)];		// Replace old GenerateFRMPtr
 		this.object_setFrame(obj,frame);	// reset frame and offset
 
 		if(obj.hasOwnProperty('ai') && newAnim == "idle") {		// idle
@@ -1500,23 +1302,19 @@ class MainState extends GameState {
 	};
 
 	actor_beginMoveState(actor, dest, runState, pathCompleteCallback) {
-		let mState = this;
-
 		if(actor.ai.moveState) {		// if already in anim
-			let newMoveState = function() {
-				mState.actor_moveStep(actor);
-				mState.actor_endMoveState(actor);
-				mState.actor_cancelAction(actor);
-				mState.actor_beginMoveState(actor,dest,mState.inputRunState);
-			}
 
-			mState.actor_addActionToFront(actor,newMoveState,"onAnimEnd|onActionFrame");
-
+			this.actor_addActionToFront(actor, function() {
+				this.actor_moveStep(actor);
+				this.actor_endMoveState(actor);
+				this.actor_cancelAction(actor);
+				this.actor_beginMoveState(actor,dest,this.inputRunState);
+			}.bind(this), "onAnimEnd|onActionFrame");
 
 			return;
 		}
 
-		actor.ai.pathQ = mState.findPath(actor.hexPosition,dest);
+		actor.ai.pathQ = this.findPath(actor.hexPosition,dest);
 		if(!actor.ai.pathQ) return;
 
 		actor.ai.moveState = true;
@@ -1524,12 +1322,7 @@ class MainState extends GameState {
 		actor.ai.moveDest = dest;
 
 		actor.ai.moveNext = actor.ai.pathQ.shift();
-		actor.orientation = this.mapGeometry.findOrientation(actor.hexPosition,actor.ai.moveNext);
-
-
-		let moveStep = function() {
-			mState.actor_moveStep(actor);
-		};
+		actor.orientation = mapGeometry.findOrientation(actor.hexPosition,actor.ai.moveNext);
 
 		if(actor.ai.runState) {	// run
 			this.object_playAnim(actor,"run",0,2,0,true);
@@ -1537,13 +1330,14 @@ class MainState extends GameState {
 			this.object_playAnim(actor,"walk",0,4,0,true);
 		}
 
-		mState.actor_addActionToFront(actor,moveStep,"onAnimEnd|onActionFrame");
+		this.actor_addActionToFront(actor,
+			this.actor_moveStep.bind(this, actor),
+			"onAnimEnd|onActionFrame");
 
 	};
 
 
 	actor_moveStep(actor) {
-		let mState = this;
 		actor.hexPosition = actor.ai.moveNext;
 
 		if(actor.hexPosition == actor.ai.moveDest) {		// destination reached
@@ -1552,7 +1346,7 @@ class MainState extends GameState {
 		}
 
 		actor.ai.moveNext = actor.ai.pathQ.shift();
-		actor.orientation = this.mapGeometry.findOrientation(actor.hexPosition,actor.ai.moveNext);
+		actor.orientation = mapGeometry.findOrientation(actor.hexPosition,actor.ai.moveNext);
 
 		actor.anim.shiftX = actor.anim.img.shift[actor.orientation].x;
 		actor.anim.shiftY = actor.anim.img.shift[actor.orientation].y;
@@ -1577,19 +1371,17 @@ class MainState extends GameState {
 			}
 		}
 
-		let moveStep = function() {
-			mState.actor_moveStep(actor);
-		};
-
-		mState.actor_addActionToFront(actor,moveStep,"onAnimEnd|onActionFrame");
+		this.actor_addActionToFront(actor,
+			this.actor_moveStep.bind(this, actor),
+			"onAnimEnd|onActionFrame");
 
 
-		if(actor == mState.player) {
-			if(mState.map.hexMap[actor.currentElevation][actor.hexPosition].exitGrid) {		// exit map
-				mState.exitMap(mState.map.hexMap[actor.currentElevation][actor.hexPosition].exitGrid_map,
-					mState.map.hexMap[actor.currentElevation][actor.hexPosition].exitGrid_pos,
-					mState.map.hexMap[actor.currentElevation][actor.hexPosition].exitGrid_elev,
-					mState.map.hexMap[actor.currentElevation][actor.hexPosition].exitGrid_orientation);
+		if(actor == this.player) {
+			if(this.map.hexMap[actor.currentElevation][actor.hexPosition].exitGrid) {		// exit map
+				this.exitMap(this.map.hexMap[actor.currentElevation][actor.hexPosition].exitGrid_map,
+					this.map.hexMap[actor.currentElevation][actor.hexPosition].exitGrid_pos,
+					this.map.hexMap[actor.currentElevation][actor.hexPosition].exitGrid_elev,
+					this.map.hexMap[actor.currentElevation][actor.hexPosition].exitGrid_orientation);
 			}
 		}
 
@@ -1648,7 +1440,6 @@ class MainState extends GameState {
 			}
 		}
 		return false;
-
 	}
 
 	actor_nextAction(actor, trigger) {
@@ -1672,21 +1463,18 @@ class MainState extends GameState {
 
 
 	object_openDoor(obj) {
-		let mState = this;
-		mState.object_playAnim(obj,0,0,0,0,false,0,function() {
+		this.object_playAnim(obj,0,0,0,0,false,0,function() {
 			obj.openState = 1;
-			mState.map.hexMap[mState.player.currentElevation][obj.hexPosition].blocked = false;	// FIX FOR ELEVATION
-		});
+			this.map.hexMap[this.player.currentElevation][obj.hexPosition].blocked = false;	// FIX FOR ELEVATION
+		}.bind(this));
 	};
 
 	object_closeDoor(obj) {
-		let mState = this;
-		mState.object_playAnim(obj,0,-1,0,1,false,0,function() {
+		this.object_playAnim(obj,0,-1,0,1,false,0,function() {
 			obj.openState = 0;
-			mState.map.hexMap[mState.player.currentElevation][obj.hexPosition].blocked = true;	// FIX FOR ELEVATION
-		});
+			this.map.hexMap[this.player.currentElevation][obj.hexPosition].blocked = true;	// FIX FOR ELEVATION
+		}.bind(this));
 
 	};
-
 
 };
