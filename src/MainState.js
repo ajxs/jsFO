@@ -380,27 +380,8 @@ class MainState extends GameState {
 				break;
 			case "click":
 				if(this.inputState == "interface") {
-					switch(this.interfaceRect.clickHandler()) {
-						case "skilldex":
-							main_gameStateFunction('openSkilldex');
-							break;
-						case "inventory":
-							main_gameStateFunction('openInventory')();
-							break;
-						case "character":
-							main_gameStateFunction('openCharacterScreen');
-							break;
-						case "pipboy":
-							main_gameStateFunction('openPipBoy');
-							break;
-						case "map":
-							main_gameStateFunction('openMap');
-							break;
-						case "menu":
-							main_gameStateFunction('openIngameMenu');
-							break;
-					}
-
+					let clickIndex = this.interfaceRect.clickHandler();
+					if(clickIndex) main_gameStateFunction(clickIndex);
 					this.interfaceRect.activeItem = -1;
 
 				} else if(this.inputState == "game") {
@@ -603,6 +584,7 @@ class MainState extends GameState {
 
 		} else if(intersectTest(MOUSE.x,MOUSE.y,0,0, this.interfaceRect.x,this.interfaceRect.y,this.interfaceRect.width,this.interfaceRect.height)) {	// if mouse over interface rect
 			this.inputState = "interface";
+			this.interfaceRect.update();		//@TODO: bug here
 
 		} else {
 			this.inputState = "game";
@@ -902,12 +884,11 @@ class MainState extends GameState {
 			this.interfaceRect.x,
 			this.interfaceRect.y);	// interface
 
-		this.interfaceRect.update();		//@TODO: bug here
 		if(this.inputState == "interface" && this.interfaceRect.mouseState == 1) {
 			if(this.interfaceRect.activeItem > -1) {
-				_context.drawImage(_assets[ this.interfaceRect.buttons[this.interfaceRect.activeItem].downSprite ].frameInfo[0][0].img,
-					this.interfaceRect.x + this.interfaceRect.buttons[this.interfaceRect.activeItem].x,
-					this.interfaceRect.y + this.interfaceRect.buttons[this.interfaceRect.activeItem].y);	// interface
+				_context.drawImage(_assets[ this.interfaceRect.elements[this.interfaceRect.activeItem].downSprite ].frameInfo[0][0].img,
+					this.interfaceRect.x + this.interfaceRect.elements[this.interfaceRect.activeItem].x,
+					this.interfaceRect.y + this.interfaceRect.elements[this.interfaceRect.activeItem].y);	// interface
 			}
 		}
 

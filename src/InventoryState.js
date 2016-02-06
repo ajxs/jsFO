@@ -39,7 +39,7 @@ class InventoryState extends GameState {
 			case "click":
 				switch(this.activeItem) {
 					case "closeButton":
-						main_gameStateFunction('closeInventory')();
+						main_gameStateFunction('closeInventory');
 						this.activeItem = -1;	// reset this so that it mouse event doesn't propagate through on reopen
 						break;
 				}

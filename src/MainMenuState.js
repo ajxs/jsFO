@@ -9,49 +9,11 @@ class MainMenuState extends GameState {
 		this.backgroundImage = document.getElementById('MainMenuState_bg');
 		this.buttonImage = document.getElementById('MainMenuState_btn');
 
-		this.menu = {
-			x: (SCREEN_WIDTH*0.05)|0,
-			y: (SCREEN_WIDTH*0.185)|0,		// set in main_setResolution()
-			activeIndex: -1,
+		this.menu = new Interface('jsfdata/interface/mainMenu.json');
 
-			elements: [{		// Quit to Main Menu
-				x: 0, y: 0,
-				width: 191, height: 35,
-				mouseState: 0,
-				text: "NEW GAME",
-				textX: 50, textY: 5,
-				action: function() {
-					main_loadGame(newGame);
-				},
-			},{		// Quit to Main Menu
-				x: 0, y: 40,
-				width: 191, height: 35,
-				mouseState: 0,
-				text: "MORE",
-				textX: 50, textY: 5,
-				action: function() {
-					console.log("HELP");
-				},
-			},{		// Quit to Main Menu
-				x: 0, y: 80,
-				width: 191, height: 35,
-				mouseState: 0,
-				text: "COMING",
-				textX: 50, textY: 5,
-				action: function() {
-					console.log("HELP");
-				},
-			},{		// Quit to Main Menu
-				x: 0, y: 120,
-				width: 191, height: 35,
-				mouseState: 0,
-				text: "SOON",
-				textX: 50, textY: 5,
-				action: function() {
-					console.log("HELP");
-				},
-			}],
-		};
+		this.menu.x = (SCREEN_WIDTH*0.05)|0;
+		this.menu.y = (SCREEN_WIDTH*0.185)|0;		// set in main_setResolution()
+
 	};
 
 	input(e) {
@@ -63,12 +25,9 @@ class MainMenuState extends GameState {
 			case "mousedown":
 				break;
 			case "mouseup":
-				if(this.menu.activeIndex != -1) {
-					if(isFunction(this.menu.elements[this.menu.activeIndex].action)) {
-						this.menu.elements[this.menu.activeIndex].action();
-						return;
-					}
-				}
+				this.menu.update();
+				main_gameStateFunction(this.menu.clickHandler());
+
 				break;
 			case "click":
 				break;
@@ -78,14 +37,9 @@ class MainMenuState extends GameState {
 	};
 
 	update() {
-		this.menu.activeIndex = -1;
-		for(var i = 0; i < this.menu.elements.length; i++) {
-			this.menu.elements[i].mouseState = 0;
-			if(intersectTest(MOUSE.x,MOUSE.y,0,0, this.menu.x + this.menu.elements[i].x, this.menu.y + this.menu.elements[i].y, this.menu.elements[i].width, this.menu.elements[i].height)) {
-				this.menu.activeIndex = i;
-				if(MOUSE.c1) this.menu.elements[this.menu.activeIndex].mouseState = 1;
-			}
-		}
+		this.menu.update();
+		if(MOUSE.c1) this.menu.mouseState = 1;
+		else this.menu.mouseState = 0;
 	};
 
 	render() {
@@ -93,20 +47,24 @@ class MainMenuState extends GameState {
 
 		_context.drawImage(this.backgroundImage, 0, 0, 1024, 768, 0,0,SCREEN_WIDTH, SCREEN_HEIGHT);	// bg
 
-		for(var i = 0; i < this.menu.elements.length; i++) {
-			_context.drawImage(this.buttonImage, this.menu.x + this.menu.elements[i].x, this.menu.y + this.menu.elements[i].y);
+		let activeState;
+		this.menu.elements.forEach(function(element, index) {
+			_context.drawImage(this.buttonImage, this.menu.x + element.x, this.menu.y + element.y);
 
-			_context.drawImage( (this.menu.elements[i].mouseState == 0) ? _assets["art/intrface/menuup.frm"].frameInfo[0][0].img : _assets["art/intrface/menudown.frm"].frameInfo[0][0].img,
-			this.menu.x + this.menu.elements[i].x + 14,
-			this.menu.y + this.menu.elements[i].y + 4);
+			activeState = (this.menu.mouseState == 1 && this.menu.activeItem == index);
+			_context.drawImage( activeState ? _assets["art/intrface/menudown.frm"].frameInfo[0][0].img : _assets["art/intrface/menuup.frm"].frameInfo[0][0].img,
+				this.menu.x + element.x + 14,
+				this.menu.y + element.y + 4);
 
-			bitmapFontRenderer.renderString(_assets["font4.aaf"], this.menu.elements[i].text ,
-				this.menu.x + this.menu.elements[i].x + this.menu.elements[i].textX,
-				this.menu.y + this.menu.elements[i].y + this.menu.elements[i].textY,
-				(this.menu.elements[i].mouseState == 0) ? "#b89c28" : "#a99028");
-		}
+				bitmapFontRenderer.renderString(_assets["font4.aaf"],
+					element.text ,
+					this.menu.x + element.x + element.textX,
+					this.menu.y + element.y + element.textY,
+					activeState ? "#a99028": "#b89c28");
+
+		}, this);
+
 		_context.drawImage(_assets["art/intrface/stdarrow.frm"].frameInfo[0][0].img, MOUSE.x, MOUSE.y);		// cursor
-
 	};
 
 };

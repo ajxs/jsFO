@@ -235,6 +235,10 @@ function main_openContextMenu(obj,x,y) {
 
 function main_gameStateFunction(f, ...extra) {
 	switch(f) {
+		case "mainMenu_newGame":
+			main_loadGame(newGame);
+			break;
+
 		case "openContextMenu":
 			main_openContextMenu(extra[0], extra[1], extra[2]);		//@TODO: FIX
 			break;

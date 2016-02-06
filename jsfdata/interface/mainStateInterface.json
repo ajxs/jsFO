@@ -3,8 +3,8 @@
 	"y": 0,
 	"width": 640,
 	"height": 99,
-	"buttons": [{
-		"handle": "skilldex",
+	"elements": [{
+		"handle": "openSkilldex",
 		"x": 523,
 		"y": 6,
 		"width": 22,
@@ -12,7 +12,7 @@
 		"upSprite": 0,
 		"downSprite": "art/intrface/bigreddn.frm"
 	}, {
-		"handle": "inventory",
+		"handle": "openInventory",
 		"x": 211,
 		"y": 40,
 		"width": 32,
@@ -20,7 +20,7 @@
 		"upSprite": 0,
 		"downSprite": "art/intrface/invbutdn.frm"
 	}, {
-		"handle": "map",
+		"handle": "openMap",
 		"x": 526,
 		"y": 39,
 		"width": 41,
@@ -28,7 +28,7 @@
 		"upSprite": 0,
 		"downSprite": "art/intrface/mapdn.frm"
 	}, {
-		"handle": "character",
+		"handle": "openCharacterScreen",
 		"x": 526,
 		"y": 58,
 		"width": 41,
@@ -36,7 +36,7 @@
 		"upSprite": 0,
 		"downSprite": "art/intrface/chadn.frm"
 	}, {
-		"handle": "pipboy",
+		"handle": "openPipBoy",
 		"x": 526,
 		"y": 77,
 		"width": 41,
@@ -44,7 +44,7 @@
 		"upSprite": 0,
 		"downSprite": "art/intrface/pipdn.frm"
 	}, {
-		"handle": "menu",
+		"handle": "openIngameMenu",
 		"x": 210,
 		"y": 61,
 		"width": 34,
