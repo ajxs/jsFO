@@ -6,45 +6,9 @@ class MainState extends GameState {
 
 		this.map = new GameMap();
 
-		this.interfaceRect = {
-			x: ((SCREEN_WIDTH / 2)|0) - 320,
-			y: SCREEN_HEIGHT - 99,
-			width: 640,
-			height: 99,
-			activeItem: -1,
-			mouseState: 0,
-
-			skilldexButton: {
-				x: 523, y: 6,
-				width: 22, height: 21,
-			},
-
-			invButton: {
-				x: 211, y: 40,
-				width: 32, height: 21,
-			},
-
-			mapButton: {
-				x: 526, y: 39,
-				width: 41, height: 19,
-			},
-
-			charButton: {
-				x: 526, y: 58,
-				width: 41, height: 19,
-			},
-
-			pipButton: {
-				x: 526, y: 77,
-				width: 41, height: 19,
-			},
-
-			menuButton: {
-				x: 210, y: 61,
-				width: 34, height: 34,
-			},
-
-		};
+		this.interfaceRect = new Interface('jsfdata/interface/mainStateInterface.json');
+		this.interfaceRect.x = ((SCREEN_WIDTH / 2)|0) - 320;
+		this.interfaceRect.y = SCREEN_HEIGHT - 99;
 
 		this.console = {
 			consoleData: [],
@@ -396,7 +360,7 @@ class MainState extends GameState {
 					return;
 				} else if(this.inputState == "game") {
 					if(this.inputState_sub == "command") {
-						if(_mouse.c2) return;		// stop mouse2 from triggering commands when in command mode
+						if(MOUSE.c2) return;		// stop mouse2 from triggering commands when in command mode
 						this.objectIndex = this.getObjectIndex();
 						if(this.objectIndex != -1) {		// if object under cursor
 							let objC = mapGeometry.h2s(this.mapObjects[this.player.currentElevation][this.objectIndex].hexPosition);
@@ -416,34 +380,29 @@ class MainState extends GameState {
 				break;
 			case "click":
 				if(this.inputState == "interface") {
-					switch(this.interfaceRect.activeItem) {
-						case -1:
-							break;
-						case "skilldexButton":
+					switch(this.interfaceRect.clickHandler()) {
+						case "skilldex":
 							main_gameStateFunction('openSkilldex');
-							this.interfaceRect.activeItem = -1;
 							break;
-						case "invButton":
+						case "inventory":
 							main_gameStateFunction('openInventory')();
-							this.interfaceRect.activeItem = -1;
 							break;
-						case "charButton":
+						case "character":
 							main_gameStateFunction('openCharacterScreen');
-							this.interfaceRect.activeItem = -1;
 							break;
-						case "pipButton":
+						case "pipboy":
 							main_gameStateFunction('openPipBoy');
-							this.interfaceRect.activeItem = -1;
 							break;
-						case "mapButton":
+						case "map":
 							main_gameStateFunction('openMap');
-							this.interfaceRect.activeItem = -1;
 							break;
-						case "menuButton":
+						case "menu":
 							main_gameStateFunction('openIngameMenu');
-							this.interfaceRect.activeItem = -1;
 							break;
 					}
+
+					this.interfaceRect.activeItem = -1;
+
 				} else if(this.inputState == "game") {
 					if(this.inputState_sub == "move") {
 						//this.actor_cancelAction(this.player);
@@ -554,14 +513,14 @@ class MainState extends GameState {
 	};
 
 
-	getObjectIndex() {
+	getObjectIndex() {		//@TODO: Refactor
 		// this function stencils screen objects onto an offscreen buffer, with a solid color based upon that object's position in the mapObjects array.
 		// from this function you can accurately find the object under the cursor by blitting the objects 50px around the cursor onto the buffer, then reading the color underneath the centre of the image.
 		// from the formula r*1000 + b*100 + g we can find the index of the object.
 
 		this.objectBuffer.width = this.objectBufferRect.width;	// hack clear
-		this.objectBufferRect.x = _mouse.x - this.objectBufferRect.width/2;
-		this.objectBufferRect.y = _mouse.y - this.objectBufferRect.height/2;
+		this.objectBufferRect.x = MOUSE.x - this.objectBufferRect.width/2;
+		this.objectBufferRect.y = MOUSE.y - this.objectBufferRect.height/2;
 
 		for(let i = 0, mapObjectsLength = this.mapObjects[this.player.currentElevation].length; i < mapObjectsLength; i++) {
 			this.currentRenderObject = this.mapObjects[this.player.currentElevation][i];
@@ -620,13 +579,13 @@ class MainState extends GameState {
 	update() {
 
 		// STATE HANDLING
-		this.scrollStates.yNeg = (_mouse.y < (SCREEN_HEIGHT * 0.025));
-		this.scrollStates.yPos = (_mouse.y > (SCREEN_HEIGHT * 0.95));
-		this.scrollStates.xNeg = (_mouse.x < (SCREEN_WIDTH * 0.025));
-		this.scrollStates.xPos = (_mouse.x > (SCREEN_WIDTH * 0.95));
+		this.scrollStates.yNeg = (MOUSE.y < (SCREEN_HEIGHT * 0.025));
+		this.scrollStates.yPos = (MOUSE.y > (SCREEN_HEIGHT * 0.95));
+		this.scrollStates.xNeg = (MOUSE.x < (SCREEN_WIDTH * 0.025));
+		this.scrollStates.xPos = (MOUSE.x > (SCREEN_WIDTH * 0.95));
 		this.scrollState = (this.scrollStates.yNeg || this.scrollStates.yPos || this.scrollStates.xNeg || this.scrollStates.xPos);
 
-		if(intersectTest(_mouse.x,_mouse.y,0,0, 0,0,SCREEN_WIDTH,SCREEN_HEIGHT) && this.scrollState) {
+		if(intersectTest(MOUSE.x,MOUSE.y,0,0, 0,0,SCREEN_WIDTH,SCREEN_HEIGHT) && this.scrollState) {
 			this.inputState = "scroll";
 
 			this.scrollCheckAdj = mapGeometry.findAdj(mapGeometry.s2h( 320 + this.camera.x, 190 + this.camera.y));
@@ -642,45 +601,14 @@ class MainState extends GameState {
 			if(this.scrollStates.xNeg && !this.scrollStates.xNegBlocked) this.camera.x -= this.scrollDelta;
 			if(this.scrollStates.xPos && !this.scrollStates.xPosBlocked) this.camera.x += this.scrollDelta;
 
-		} else if(intersectTest(_mouse.x,_mouse.y,0,0, this.interfaceRect.x,this.interfaceRect.y,this.interfaceRect.width,this.interfaceRect.height)) {	// if mouse over interface rect
+		} else if(intersectTest(MOUSE.x,MOUSE.y,0,0, this.interfaceRect.x,this.interfaceRect.y,this.interfaceRect.width,this.interfaceRect.height)) {	// if mouse over interface rect
 			this.inputState = "interface";
-			this.interfaceRect.activeItem = -1;
-			// check interface items here
-			if(intersectTest(_mouse.x,_mouse.y,0,0,
-				this.interfaceRect.x + this.interfaceRect.skilldexButton.x, this.interfaceRect.y + this.interfaceRect.skilldexButton.y,
-				this.interfaceRect.skilldexButton.width, this.interfaceRect.skilldexButton.height)) {
-					this.interfaceRect.activeItem = "skilldexButton";
-			}
-			if(intersectTest(_mouse.x,_mouse.y,0,0,
-				this.interfaceRect.x + this.interfaceRect.invButton.x, this.interfaceRect.y + this.interfaceRect.invButton.y,
-				this.interfaceRect.invButton.width, this.interfaceRect.invButton.height)) {
-					this.interfaceRect.activeItem = "invButton";
-			}
-			if(intersectTest(_mouse.x,_mouse.y,0,0,
-				this.interfaceRect.x + this.interfaceRect.charButton.x, this.interfaceRect.y + this.interfaceRect.charButton.y,
-				this.interfaceRect.charButton.width, this.interfaceRect.charButton.height)) {
-					this.interfaceRect.activeItem = "charButton";
-			}
-			if(intersectTest(_mouse.x,_mouse.y,0,0,
-				this.interfaceRect.x + this.interfaceRect.pipButton.x, this.interfaceRect.y + this.interfaceRect.pipButton.y,
-				this.interfaceRect.pipButton.width, this.interfaceRect.pipButton.height)) {
-					this.interfaceRect.activeItem = "pipButton";
-			}
-			if(intersectTest(_mouse.x,_mouse.y,0,0,
-				this.interfaceRect.x + this.interfaceRect.mapButton.x, this.interfaceRect.y + this.interfaceRect.mapButton.y,
-				this.interfaceRect.mapButton.width, this.interfaceRect.mapButton.height)) {
-					this.interfaceRect.activeItem = "mapButton";
-			}
-			if(intersectTest(_mouse.x,_mouse.y,0,0,
-				this.interfaceRect.x + this.interfaceRect.menuButton.x, this.interfaceRect.y + this.interfaceRect.menuButton.y,
-				this.interfaceRect.menuButton.width, this.interfaceRect.menuButton.height)) {
-					this.interfaceRect.activeItem = "menuButton";
-			}
+
 		} else {
 			this.inputState = "game";
 
 			if(this.inputState_sub == "move") {
-				this.hIndex = mapGeometry.s2h(_mouse.x + this.camera.x, _mouse.y + this.camera.y);		// hex index calculated here
+				this.hIndex = mapGeometry.s2h(MOUSE.x + this.camera.x, MOUSE.y + this.camera.y);		// hex index calculated here
 				this.hsIndex = mapGeometry.h2s(this.hIndex);
 
 				if(this.cIndex_test != this.hIndex) {		// check if mouse has moved for hover functionality
@@ -691,9 +619,9 @@ class MainState extends GameState {
 				}
 
 			} else if(this.inputState_sub == "command") {
-				if(this.cIndex_x != _mouse.x || this.cIndex_y != _mouse.y) {	// check if mouse has moved for hover functionality
-					this.cIndex_x = _mouse.x;
-					this.cIndex_y = _mouse.y;
+				if(this.cIndex_x != MOUSE.x || this.cIndex_y != MOUSE.y) {	// check if mouse has moved for hover functionality
+					this.cIndex_x = MOUSE.x;
+					this.cIndex_y = MOUSE.y;
 					this.cIndex_time = getTicks();
 					this.cIndex_state = false;
 				}
@@ -974,40 +902,12 @@ class MainState extends GameState {
 			this.interfaceRect.x,
 			this.interfaceRect.y);	// interface
 
+		this.interfaceRect.update();		//@TODO: bug here
 		if(this.inputState == "interface" && this.interfaceRect.mouseState == 1) {
-			switch(this.interfaceRect.activeItem) {
-				case -1:
-					break;
-				case "skilldexButton":
-					_context.drawImage(_assets["art/intrface/bigreddn.frm"].frameInfo[0][0].img,
-						this.interfaceRect.x + this.interfaceRect.skilldexButton.x,
-						this.interfaceRect.y + this.interfaceRect.skilldexButton.y);	// interface
-					break;
-				case "invButton":
-					_context.drawImage(_assets["art/intrface/invbutdn.frm"].frameInfo[0][0].img,
-						this.interfaceRect.x + this.interfaceRect.invButton.x,
-						this.interfaceRect.y + this.interfaceRect.invButton.y);	// interface
-					break;
-				case "charButton":
-					_context.drawImage(_assets["art/intrface/chadn.frm"].frameInfo[0][0].img,
-						this.interfaceRect.x + this.interfaceRect.charButton.x,
-						this.interfaceRect.y + this.interfaceRect.charButton.y);	// interface
-					break;
-				case "pipButton":
-					_context.drawImage(_assets["art/intrface/pipdn.frm"].frameInfo[0][0].img,
-						this.interfaceRect.x + this.interfaceRect.pipButton.x,
-						this.interfaceRect.y + this.interfaceRect.pipButton.y);	// interface
-					break;
-				case "mapButton":
-					_context.drawImage(_assets["art/intrface/mapdn.frm"].frameInfo[0][0].img,
-						this.interfaceRect.x + this.interfaceRect.mapButton.x,
-						this.interfaceRect.y + this.interfaceRect.mapButton.y);	// interface
-					break;
-				case "menuButton":
-					_context.drawImage(_assets["art/intrface/optidn.frm"].frameInfo[0][0].img,
-						this.interfaceRect.x + this.interfaceRect.menuButton.x,
-						this.interfaceRect.y + this.interfaceRect.menuButton.y);	// interface
-					break;
+			if(this.interfaceRect.activeItem > -1) {
+				_context.drawImage(_assets[ this.interfaceRect.buttons[this.interfaceRect.activeItem].downSprite ].frameInfo[0][0].img,
+					this.interfaceRect.x + this.interfaceRect.buttons[this.interfaceRect.activeItem].x,
+					this.interfaceRect.y + this.interfaceRect.buttons[this.interfaceRect.activeItem].y);	// interface
 			}
 		}
 
@@ -1038,13 +938,13 @@ class MainState extends GameState {
 				this.scrollimg = (this.scrollStates.yPosBlocked || this.scrollStates.xNegBlocked) ? _assets["art/intrface/scrsex.frm"] : _assets["art/intrface/scrseast.frm"];
 
 			_context.drawImage(this.scrollimg.frameInfo[0][0].img,
-				_mouse.x,
-				_mouse.y);
+				MOUSE.x,
+				MOUSE.y);
 
 		} else if(this.inputState == "interface") {		// if not scrolling
 			_context.drawImage(_assets["art/intrface/stdarrow.frm"].frameInfo[0][0].img,
-				_mouse.x,
-				_mouse.y);
+				MOUSE.x,
+				MOUSE.y);
 
 		} else if(this.inputState == "game") {	// if not in HUD - on map
 			switch(this.inputState_sub) {
@@ -1063,12 +963,12 @@ class MainState extends GameState {
 					break;
 				case "command":
 					_context.drawImage(_assets["art/intrface/actarrow.frm"].frameInfo[0][0].img,
-						_mouse.x,
-						_mouse.y);
+						MOUSE.x,
+						MOUSE.y);
 					if(this.cIndex_state) {
 						_context.drawImage(_assets["art/intrface/lookn.frm"].frameInfo[0][0].img,
-							_mouse.x + 40,
-							_mouse.y);		// "hover look" icon
+							MOUSE.x + 40,
+							MOUSE.y);		// "hover look" icon
 					}
 					break;
 			}	// end switch

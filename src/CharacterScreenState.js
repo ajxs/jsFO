@@ -396,191 +396,191 @@ class CharacterScreenState extends GameState {
 	update() {	//@TODO: FIX THIS MESS
 
 		this.activeItem = -1;
-		if(intersectTest(_mouse.x,_mouse.y,0,0,
+		if(intersectTest(MOUSE.x,MOUSE.y,0,0,
 			this.x + this.printButton.x, this.y + this.printButton.y,
 			this.printButton.width, this.printButton.height)) {
 				this.activeItem = "printButton";
-		} else if(intersectTest(_mouse.x,_mouse.y,0,0,
+		} else if(intersectTest(MOUSE.x,MOUSE.y,0,0,
 			this.x + this.cancelButton.x, this.y + this.cancelButton.y,
 			this.cancelButton.width, this.cancelButton.height)) {
 				this.activeItem = "cancelButton";
-		} else if(intersectTest(_mouse.x,_mouse.y,0,0,
+		} else if(intersectTest(MOUSE.x,MOUSE.y,0,0,
 			this.x + this.doneButton.x, this.y + this.doneButton.y,
 			this.doneButton.width, this.doneButton.height)) {
 				this.activeItem = "doneButton";
 		}
 
-		if(intersectTest(_mouse.x,_mouse.y,0,0,
+		if(intersectTest(MOUSE.x,MOUSE.y,0,0,
 			this.x + this.perksTab.x, this.y + this.perksTab.y,
 			this.perksTab.width, this.perksTab.height)) {
 				this.activeItem = "perksTab";
-		} else if(intersectTest(_mouse.x,_mouse.y,0,0,
+		} else if(intersectTest(MOUSE.x,MOUSE.y,0,0,
 			this.x + this.karmaTab.x, this.y + this.karmaTab.y,
 			this.karmaTab.width, this.karmaTab.height)) {
 				this.activeItem = "karmaTab";
-		} else if(intersectTest(_mouse.x,_mouse.y,0,0,
+		} else if(intersectTest(MOUSE.x,MOUSE.y,0,0,
 			this.x + this.killsTab.x, this.y + this.killsTab.y,
 			this.killsTab.width, this.killsTab.height)) {
 				this.activeItem = "killsTab";
 		}
 
-		if(intersectTest(_mouse.x,_mouse.y,0,0,		// check skills. ha
+		if(intersectTest(MOUSE.x,MOUSE.y,0,0,		// check skills. ha
 			this.x + this.smallGunsButton.x, this.y + this.smallGunsButton.y,
 			this.smallGunsButton.width, this.smallGunsButton.height)) {
 				this.activeItem = "smallGunsButton";
-		} else if(intersectTest(_mouse.x,_mouse.y,0,0,
+		} else if(intersectTest(MOUSE.x,MOUSE.y,0,0,
 			this.x + this.bigGunsButton.x, this.y + this.bigGunsButton.y,
 			this.bigGunsButton.width, this.bigGunsButton.height)) {
 				this.activeItem = "bigGunsButton";
-		} else if(intersectTest(_mouse.x,_mouse.y,0,0,
+		} else if(intersectTest(MOUSE.x,MOUSE.y,0,0,
 			this.x + this.energyWeaponsButton.x, this.y + this.energyWeaponsButton.y,
 			this.energyWeaponsButton.width, this.energyWeaponsButton.height)) {
 				this.activeItem = "energyWeaponsButton";
-		} else if(intersectTest(_mouse.x,_mouse.y,0,0,
+		} else if(intersectTest(MOUSE.x,MOUSE.y,0,0,
 			this.x + this.unarmedButton.x, this.y + this.unarmedButton.y,
 			this.unarmedButton.width, this.unarmedButton.height)) {
 				this.activeItem = "unarmedButton";
-		} else if(intersectTest(_mouse.x,_mouse.y,0,0,
+		} else if(intersectTest(MOUSE.x,MOUSE.y,0,0,
 			this.x + this.meleeWeaponsButton.x, this.y + this.meleeWeaponsButton.y,
 			this.meleeWeaponsButton.width, this.meleeWeaponsButton.height)) {
 				this.activeItem = "meleeWeaponsButton";
-		} else if(intersectTest(_mouse.x,_mouse.y,0,0,
+		} else if(intersectTest(MOUSE.x,MOUSE.y,0,0,
 			this.x + this.throwingButton.x, this.y + this.throwingButton.y,
 			this.throwingButton.width, this.throwingButton.height)) {
 				this.activeItem = "throwingButton";
-		} else if(intersectTest(_mouse.x,_mouse.y,0,0,
+		} else if(intersectTest(MOUSE.x,MOUSE.y,0,0,
 			this.x + this.firstAidButton.x, this.y + this.firstAidButton.y,
 			this.firstAidButton.width, this.firstAidButton.height)) {
 				this.activeItem = "firstAidButton";
-		} else if(intersectTest(_mouse.x,_mouse.y,0,0,
+		} else if(intersectTest(MOUSE.x,MOUSE.y,0,0,
 			this.x + this.doctorButton.x, this.y + this.doctorButton.y,
 			this.doctorButton.width, this.doctorButton.height)) {
 				this.activeItem = "doctorButton";
-		} else if(intersectTest(_mouse.x,_mouse.y,0,0,
+		} else if(intersectTest(MOUSE.x,MOUSE.y,0,0,
 			this.x + this.sneakButton.x, this.y + this.sneakButton.y,
 			this.sneakButton.width, this.sneakButton.height)) {
 				this.activeItem = "sneakButton";
-		} else if(intersectTest(_mouse.x,_mouse.y,0,0,
+		} else if(intersectTest(MOUSE.x,MOUSE.y,0,0,
 			this.x + this.lockpickButton.x, this.y + this.lockpickButton.y,
 			this.lockpickButton.width, this.lockpickButton.height)) {
 				this.activeItem = "lockpickButton";
-		} else if(intersectTest(_mouse.x,_mouse.y,0,0,
+		} else if(intersectTest(MOUSE.x,MOUSE.y,0,0,
 			this.x + this.stealButton.x, this.y + this.stealButton.y,
 			this.stealButton.width, this.stealButton.height)) {
 				this.activeItem = "stealButton";
-		} else if(intersectTest(_mouse.x,_mouse.y,0,0,
+		} else if(intersectTest(MOUSE.x,MOUSE.y,0,0,
 			this.x + this.trapsButton.x, this.y + this.trapsButton.y,
 			this.trapsButton.width, this.trapsButton.height)) {
 				this.activeItem = "trapsButton";
-		} else if(intersectTest(_mouse.x,_mouse.y,0,0,
+		} else if(intersectTest(MOUSE.x,MOUSE.y,0,0,
 			this.x + this.scienceButton.x, this.y + this.scienceButton.y,
 			this.scienceButton.width, this.scienceButton.height)) {
 				this.activeItem = "scienceButton";
-		} else if(intersectTest(_mouse.x,_mouse.y,0,0,
+		} else if(intersectTest(MOUSE.x,MOUSE.y,0,0,
 			this.x + this.repairButton.x, this.y + this.repairButton.y,
 			this.repairButton.width, this.repairButton.height)) {
 				this.activeItem = "repairButton";
-		} else if(intersectTest(_mouse.x,_mouse.y,0,0,
+		} else if(intersectTest(MOUSE.x,MOUSE.y,0,0,
 			this.x + this.speechButton.x, this.y + this.speechButton.y,
 			this.speechButton.width, this.speechButton.height)) {
 				this.activeItem = "speechButton";
-		} else if(intersectTest(_mouse.x,_mouse.y,0,0,
+		} else if(intersectTest(MOUSE.x,MOUSE.y,0,0,
 			this.x + this.barterButton.x, this.y + this.barterButton.y,
 			this.barterButton.width, this.barterButton.height)) {
 				this.activeItem = "barterButton";
-		} else if(intersectTest(_mouse.x,_mouse.y,0,0,
+		} else if(intersectTest(MOUSE.x,MOUSE.y,0,0,
 			this.x + this.gamblingButton.x, this.y + this.gamblingButton.y,
 			this.gamblingButton.width, this.gamblingButton.height)) {
 				this.activeItem = "gamblingButton";
-		} else if(intersectTest(_mouse.x,_mouse.y,0,0,
+		} else if(intersectTest(MOUSE.x,MOUSE.y,0,0,
 			this.x + this.outdoorsmanButton.x, this.y + this.outdoorsmanButton.y,
 			this.outdoorsmanButton.width, this.outdoorsmanButton.height)) {
 				this.activeItem = "outdoorsmanButton";
 		}
 
 
-		if(intersectTest(_mouse.x,_mouse.y,0,0,		// check skills. ha
+		if(intersectTest(MOUSE.x,MOUSE.y,0,0,		// check skills. ha
 			this.x + this.strengthButton.x, this.y + this.strengthButton.y,
 			this.strengthButton.width, this.strengthButton.height)) {
 				this.activeItem = "strengthButton";
-		} else if(intersectTest(_mouse.x,_mouse.y,0,0,
+		} else if(intersectTest(MOUSE.x,MOUSE.y,0,0,
 			this.x + this.perceptionButton.x, this.y + this.perceptionButton.y,
 			this.perceptionButton.width, this.perceptionButton.height)) {
 				this.activeItem = "perceptionButton";
-		} else if(intersectTest(_mouse.x,_mouse.y,0,0,
+		} else if(intersectTest(MOUSE.x,MOUSE.y,0,0,
 			this.x + this.enduranceButton.x, this.y + this.enduranceButton.y,
 			this.enduranceButton.width, this.enduranceButton.height)) {
 				this.activeItem = "enduranceButton";
-		} else if(intersectTest(_mouse.x,_mouse.y,0,0,
+		} else if(intersectTest(MOUSE.x,MOUSE.y,0,0,
 			this.x + this.charismaButton.x, this.y + this.charismaButton.y,
 			this.charismaButton.width, this.charismaButton.height)) {
 				this.activeItem = "charismaButton";
-		} else if(intersectTest(_mouse.x,_mouse.y,0,0,
+		} else if(intersectTest(MOUSE.x,MOUSE.y,0,0,
 			this.x + this.intelligenceButton.x, this.y + this.intelligenceButton.y,
 			this.intelligenceButton.width, this.intelligenceButton.height)) {
 				this.activeItem = "intelligenceButton";
-		} else if(intersectTest(_mouse.x,_mouse.y,0,0,
+		} else if(intersectTest(MOUSE.x,MOUSE.y,0,0,
 			this.x + this.agilityButton.x, this.y + this.agilityButton.y,
 			this.agilityButton.width, this.agilityButton.height)) {
 				this.activeItem = "agilityButton";
-		} else if(intersectTest(_mouse.x,_mouse.y,0,0,
+		} else if(intersectTest(MOUSE.x,MOUSE.y,0,0,
 			this.x + this.luckButton.x, this.y + this.luckButton.y,
 			this.luckButton.width, this.luckButton.height)) {
 				this.activeItem = "luckButton";
 		}
 
-		if(intersectTest(_mouse.x,_mouse.y,0,0,		// check skills. ha
+		if(intersectTest(MOUSE.x,MOUSE.y,0,0,		// check skills. ha
 			this.x + this.armorClassButton.x, this.y + this.armorClassButton.y,
 			this.armorClassButton.width, this.armorClassButton.height)) {
 				this.activeItem = "armorClassButton";
-		} else if(intersectTest(_mouse.x,_mouse.y,0,0,
+		} else if(intersectTest(MOUSE.x,MOUSE.y,0,0,
 			this.x + this.actionPointsButton.x, this.y + this.actionPointsButton.y,
 			this.actionPointsButton.width, this.actionPointsButton.height)) {
 				this.activeItem = "actionPointsButton";
-		} else if(intersectTest(_mouse.x,_mouse.y,0,0,
+		} else if(intersectTest(MOUSE.x,MOUSE.y,0,0,
 			this.x + this.carryWeightButton.x, this.y + this.carryWeightButton.y,
 			this.carryWeightButton.width, this.carryWeightButton.height)) {
 				this.activeItem = "carryWeightButton";
-		} else if(intersectTest(_mouse.x,_mouse.y,0,0,
+		} else if(intersectTest(MOUSE.x,MOUSE.y,0,0,
 			this.x + this.meleeDamageButton.x, this.y + this.meleeDamageButton.y,
 			this.meleeDamageButton.width, this.meleeDamageButton.height)) {
 				this.activeItem = "meleeDamageButton";
-		} else if(intersectTest(_mouse.x,_mouse.y,0,0,
+		} else if(intersectTest(MOUSE.x,MOUSE.y,0,0,
 			this.x + this.damageResButton.x, this.y + this.damageResButton.y,
 			this.damageResButton.width, this.damageResButton.height)) {
 				this.activeItem = "damageResButton";
-		} else if(intersectTest(_mouse.x,_mouse.y,0,0,
+		} else if(intersectTest(MOUSE.x,MOUSE.y,0,0,
 			this.x + this.poisonResButton.x, this.y + this.poisonResButton.y,
 			this.poisonResButton.width, this.poisonResButton.height)) {
 				this.activeItem = "poisonResButton";
-		} else if(intersectTest(_mouse.x,_mouse.y,0,0,
+		} else if(intersectTest(MOUSE.x,MOUSE.y,0,0,
 			this.x + this.radiationResButton.x, this.y + this.radiationResButton.y,
 			this.radiationResButton.width, this.radiationResButton.height)) {
 				this.activeItem = "radiationResButton";
-		} else if(intersectTest(_mouse.x,_mouse.y,0,0,
+		} else if(intersectTest(MOUSE.x,MOUSE.y,0,0,
 			this.x + this.sequenceButton.x, this.y + this.sequenceButton.y,
 			this.sequenceButton.width, this.sequenceButton.height)) {
 				this.activeItem = "sequenceButton";
-		} else if(intersectTest(_mouse.x,_mouse.y,0,0,
+		} else if(intersectTest(MOUSE.x,MOUSE.y,0,0,
 			this.x + this.healingRateButton.x, this.y + this.healingRateButton.y,
 			this.healingRateButton.width, this.healingRateButton.height)) {
 				this.activeItem = "healingRateButton";
-		} else if(intersectTest(_mouse.x,_mouse.y,0,0,
+		} else if(intersectTest(MOUSE.x,MOUSE.y,0,0,
 			this.x + this.criticalChanceButton.x, this.y + this.criticalChanceButton.y,
 			this.criticalChanceButton.width, this.criticalChanceButton.height)) {
 				this.activeItem = "criticalChanceButton";
 		}
 
 
-		if(intersectTest(_mouse.x,_mouse.y,0,0,
+		if(intersectTest(MOUSE.x,MOUSE.y,0,0,
 			this.x + this.levelButton.x, this.y + this.levelButton.y,
 			this.levelButton.width, this.levelButton.height)) {
 				this.activeItem = "levelButton";
-		} else if(intersectTest(_mouse.x,_mouse.y,0,0,
+		} else if(intersectTest(MOUSE.x,MOUSE.y,0,0,
 			this.x + this.expButton.x, this.y + this.expButton.y,
 			this.expButton.width, this.expButton.height)) {
 				this.activeItem = "expButton";
-		} else if(intersectTest(_mouse.x,_mouse.y,0,0,
+		} else if(intersectTest(MOUSE.x,MOUSE.y,0,0,
 			this.x + this.nextLevelButton.x, this.y + this.nextLevelButton.y,
 			this.nextLevelButton.width, this.nextLevelButton.height)) {
 				this.activeItem = "nextLevelButton";
@@ -723,7 +723,7 @@ class CharacterScreenState extends GameState {
 
 
 
-		_context.drawImage(_assets["art/intrface/stdarrow.frm"].frameInfo[0][0].img, _mouse.x, _mouse.y);		// cursor
+		_context.drawImage(_assets["art/intrface/stdarrow.frm"].frameInfo[0][0].img, MOUSE.x, MOUSE.y);		// cursor
 	};
 
 };

@@ -121,7 +121,7 @@ class SkilldexState extends GameState {
 
 	update() {
 		this.activeItem = -1;
-		if(intersectTest(_mouse.x,_mouse.y,0,0,
+		if(intersectTest(MOUSE.x,MOUSE.y,0,0,
 			this.x + this.closeButton.x,
 			this.y + this.closeButton.y,
 			this.closeButton.width,
@@ -131,7 +131,7 @@ class SkilldexState extends GameState {
 			}
 
 		for(var i = 0; i < this.menuItems.length; i++) {
-			if(intersectTest(_mouse.x,_mouse.y,0,0,
+			if(intersectTest(MOUSE.x,MOUSE.y,0,0,
 				this.x + this.menuItems[i].x,
 				this.y + this.menuItems[i].y,
 				this.menuItems[i].width,
@@ -171,7 +171,7 @@ class SkilldexState extends GameState {
 				(this.mouseState == 1 && this.activeItem == i) ? "#806814" : "#907824");
 		}
 
-		_context.drawImage(_assets["art/intrface/stdarrow.frm"].frameInfo[0][0].img, _mouse.x, _mouse.y);
+		_context.drawImage(_assets["art/intrface/stdarrow.frm"].frameInfo[0][0].img, MOUSE.x, MOUSE.y);
 
 	};
 

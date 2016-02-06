@@ -38,8 +38,8 @@ class ContextMenuState extends GameState {
 				break;
 			case "mouseup":
 				mainState.contextMenuAction(this.activeItems[this.targetItem].action, this.objectIndex );	// context menu action
-				_mouse.x = this.prevX;	// reset to previous stored mouse location
-				_mouse.y = this.prevY;
+				MOUSE.x = this.prevX;	// reset to previous stored mouse location
+				MOUSE.y = this.prevY;
 				main_gameStateFunction('closeContextMenu');
 
 				break;
@@ -53,7 +53,7 @@ class ContextMenuState extends GameState {
 	};
 
 	update() {
-		this.targetItem = Math.max(0,Math.min( ((_mouse.y - this.y)/10)|0, this.activeItems.length-1));	// context menu action
+		this.targetItem = Math.max(0,Math.min( ((MOUSE.y - this.y)/10)|0, this.activeItems.length-1));	// context menu action
 	};
 
 	render() {

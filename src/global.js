@@ -12,8 +12,7 @@ const DEBUG_FLAGS = {
 };
 
 
-
-var _mouse = {		// struct for mouse info
+var MOUSE = {		// struct for mouse info
 	x: 0,
 	y: 0,
 	c1: false,

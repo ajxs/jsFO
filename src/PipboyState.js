@@ -73,19 +73,19 @@ class PipboyState extends GameState {
 
 	update() {
 		this.activeItem = -1;
-		if(intersectTest(_mouse.x,_mouse.y,0,0,
+		if(intersectTest(MOUSE.x,MOUSE.y,0,0,
 			this.x + this.statusButton.x, this.y + this.statusButton.y,
 			this.statusButton.width, this.statusButton.height)) {
 				this.activeItem = "statusButton";
-		} else if(intersectTest(_mouse.x,_mouse.y,0,0,
+		} else if(intersectTest(MOUSE.x,MOUSE.y,0,0,
 			this.x + this.archiveButton.x, this.y + this.archiveButton.y,
 			this.archiveButton.width, this.archiveButton.height)) {
 				this.activeItem = "archiveButton";
-		} else if(intersectTest(_mouse.x,_mouse.y,0,0,
+		} else if(intersectTest(MOUSE.x,MOUSE.y,0,0,
 			this.x + this.mapButton.x, this.y + this.mapButton.y,
 			this.mapButton.width, this.mapButton.height)) {
 				this.activeItem = "mapButton";
-		} else if(intersectTest(_mouse.x,_mouse.y,0,0,
+		} else if(intersectTest(MOUSE.x,MOUSE.y,0,0,
 			this.x + this.closeButton.x, this.y + this.closeButton.y,
 			this.closeButton.width, this.closeButton.height)) {
 				this.activeItem = "closeButton";
@@ -110,7 +110,7 @@ class PipboyState extends GameState {
 				break;
 		}
 
-		_context.drawImage(_assets["art/intrface/stdarrow.frm"].frameInfo[0][0].img, _mouse.x, _mouse.y);		// cursor
+		_context.drawImage(_assets["art/intrface/stdarrow.frm"].frameInfo[0][0].img, MOUSE.x, MOUSE.y);		// cursor
 	};
 
 };

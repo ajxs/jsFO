@@ -81,9 +81,9 @@ class MainMenuState extends GameState {
 		this.menu.activeIndex = -1;
 		for(var i = 0; i < this.menu.elements.length; i++) {
 			this.menu.elements[i].mouseState = 0;
-			if(intersectTest(_mouse.x,_mouse.y,0,0, this.menu.x + this.menu.elements[i].x, this.menu.y + this.menu.elements[i].y, this.menu.elements[i].width, this.menu.elements[i].height)) {
+			if(intersectTest(MOUSE.x,MOUSE.y,0,0, this.menu.x + this.menu.elements[i].x, this.menu.y + this.menu.elements[i].y, this.menu.elements[i].width, this.menu.elements[i].height)) {
 				this.menu.activeIndex = i;
-				if(_mouse.c1) this.menu.elements[this.menu.activeIndex].mouseState = 1;
+				if(MOUSE.c1) this.menu.elements[this.menu.activeIndex].mouseState = 1;
 			}
 		}
 	};
@@ -105,7 +105,7 @@ class MainMenuState extends GameState {
 				this.menu.y + this.menu.elements[i].y + this.menu.elements[i].textY,
 				(this.menu.elements[i].mouseState == 0) ? "#b89c28" : "#a99028");
 		}
-		_context.drawImage(_assets["art/intrface/stdarrow.frm"].frameInfo[0][0].img, _mouse.x, _mouse.y);		// cursor
+		_context.drawImage(_assets["art/intrface/stdarrow.frm"].frameInfo[0][0].img, MOUSE.x, MOUSE.y);		// cursor
 
 	};
 

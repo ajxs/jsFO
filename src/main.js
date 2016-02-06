@@ -120,17 +120,17 @@ function main_input(e) {
 	switch(e.type) {
 		case "mousemove":
 			clientBoundingRect = _canvas.getBoundingClientRect();
-			_mouse.x = (e.clientX - clientBoundingRect.left)|0;
-			_mouse.y = (e.clientY - clientBoundingRect.top)|0;
+			MOUSE.x = (e.clientX - clientBoundingRect.left)|0;
+			MOUSE.y = (e.clientY - clientBoundingRect.top)|0;
 			break;
 		case "mousedown":
 			if(e.which == 1) {
-				_mouse.c1 = true;
-			} else if(e.which == 3) _mouse.c2 = true;
+				MOUSE.c1 = true;
+			} else if(e.which == 3) MOUSE.c2 = true;
 			break;
 		case "mouseup":
-			if(e.which == 1) _mouse.c1 = false;
-			else if(e.which == 3) _mouse.c2 = false;
+			if(e.which == 1) MOUSE.c1 = false;
+			else if(e.which == 3) MOUSE.c2 = false;
 			break;
 		case "keydown":
 			_keyboardStates[e.which] = true;
@@ -192,8 +192,8 @@ function main_openContextMenu(obj,x,y) {
 	contextMenuState.objectIndex = obj;
 	contextMenuState.x = x;
 	contextMenuState.y = y;
-	contextMenuState.prevX = _mouse.x;
-	contextMenuState.prevY = _mouse.y;
+	contextMenuState.prevX = MOUSE.x;
+	contextMenuState.prevY = MOUSE.y;
 
 	contextMenuState.activeItems = [];		// reset active items
 
