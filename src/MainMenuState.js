@@ -48,11 +48,13 @@ class MainMenuState extends GameState {
 		_context.drawImage(this.backgroundImage, 0, 0, 1024, 768, 0,0,SCREEN_WIDTH, SCREEN_HEIGHT);	// bg
 
 		let activeState;
-		this.menu.elements.forEach(function(element, index) {
+		this.menu.elements.forEach((element, index) => {
 			_context.drawImage(this.buttonImage, this.menu.x + element.x, this.menu.y + element.y);
 
+
 			activeState = (this.menu.mouseState == 1 && this.menu.activeItem == index);
-			_context.drawImage( activeState ? _assets["art/intrface/menudown.frm"].frameInfo[0][0].img : _assets["art/intrface/menuup.frm"].frameInfo[0][0].img,
+			blitFRM(activeState ? _assets["art/intrface/menudown.frm"] : _assets["art/intrface/menuup.frm"],
+				_context,
 				this.menu.x + element.x + 14,
 				this.menu.y + element.y + 4);
 
@@ -62,9 +64,12 @@ class MainMenuState extends GameState {
 					this.menu.y + element.y + element.textY,
 					activeState ? "#a99028": "#b89c28");
 
-		}, this);
+		});
 
-		_context.drawImage(_assets["art/intrface/stdarrow.frm"].frameInfo[0][0].img, MOUSE.x, MOUSE.y);		// cursor
+		blitFRM(_assets["art/intrface/stdarrow.frm"],		// cursor
+			_context,
+			MOUSE.x,
+			MOUSE.y);
 	};
 
 };

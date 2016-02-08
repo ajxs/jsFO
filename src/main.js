@@ -90,30 +90,6 @@ function main_menu() {
 };
 
 
-function main_loadGame(_saveState) {
-	main_gameStateFunction('closeIngameMenu');
-
-	let mainMenuState_index = activeGameStates.indexOf(mainMenuState);
-	if(mainMenuState_index > -1) {	//	remove mainState
-		activeGameStates.splice(mainMenuState_index,1);
-	}
-
-	let mainState_index = activeGameStates.indexOf(mainState);
-	if(mainState_index > -1) {	//	remove mainState
-		activeGameStates.splice(mainState_index,1);
-	}
-
-	let loadState_index = activeGameStates.indexOf(loadState);
-	if(loadState_index > -1) {	//	remove mainState
-		activeGameStates.splice(loadState_index,1);
-	}
-
-	activeGameStates.push(loadState);
-	loadState.init(_saveState);
-};
-
-
-
 function main_input(e) {
 	e.preventDefault();
 
@@ -170,6 +146,28 @@ function main_render() {
 };
 
 
+function main_loadGame(_saveState) {
+	main_gameStateFunction('closeIngameMenu');
+
+	let mainMenuState_index = activeGameStates.indexOf(mainMenuState);
+	if(mainMenuState_index > -1) {	//	remove mainState
+		activeGameStates.splice(mainMenuState_index,1);
+	}
+
+	let mainState_index = activeGameStates.indexOf(mainState);
+	if(mainState_index > -1) {	//	remove mainState
+		activeGameStates.splice(mainState_index,1);
+	}
+
+	let loadState_index = activeGameStates.indexOf(loadState);
+	if(loadState_index > -1) {	//	remove mainState
+		activeGameStates.splice(loadState_index,1);
+	}
+
+	activeGameStates.push(loadState);
+	loadState.init(_saveState);
+};
+
 
 function main_openActiveState(state) {
 	mainState.statePause = true;
@@ -188,59 +186,24 @@ function main_closeActiveState(state) {
 };
 
 
-function main_openContextMenu(obj,x,y) {
-	contextMenuState.objectIndex = obj;
-	contextMenuState.x = x;
-	contextMenuState.y = y;
-	contextMenuState.prevX = MOUSE.x;
-	contextMenuState.prevY = MOUSE.y;
-
-	contextMenuState.activeItems = [];		// reset active items
-
-	let targetObject = mainState.mapObjects[mainState.player.currentElevation][obj];
-
-	switch(getObjectType(targetObject.objectTypeID)) {
-		case "items":
-			contextMenuState.activeItems.push(contextMenuState.menu_get);
-			contextMenuState.activeItems.push(contextMenuState.menu_look);
-			contextMenuState.activeItems.push(contextMenuState.menu_inven);
-			contextMenuState.activeItems.push(contextMenuState.menu_skill);
-			break;
-		case "critters":
-			contextMenuState.activeItems.push(contextMenuState.menu_talk);
-			contextMenuState.activeItems.push(contextMenuState.menu_look);
-			contextMenuState.activeItems.push(contextMenuState.menu_inven);
-			contextMenuState.activeItems.push(contextMenuState.menu_skill);
-			break;
-		case "scenery":
-		case "walls":
-		case "tiles":
-		case "misc":
-			contextMenuState.activeItems.push(contextMenuState.menu_look);
-			break;
-		default:
-			break;
-	}
-
-	if(targetObject.hasOwnProperty('openState')) {	// if door
-		contextMenuState.activeItems.unshift(contextMenuState.menu_use);
-	}
-
-	contextMenuState.activeItems.push(contextMenuState.menu_cancel);
-
-	main_openActiveState(contextMenuState);
-
-};
-
-
-function main_gameStateFunction(f, ...extra) {
+function main_gameStateFunction(f, options) {
 	switch(f) {
+
+		case "main_initGameState":
+			mainState.loadSaveState(options.saveState);
+			activeGameStates.splice(activeGameStates.indexOf(loadState),1);
+			activeGameStates.push(mainState);
+			break;
+
+		case "main_loadGameState":
+			break;
+
 		case "mainMenu_newGame":
 			main_loadGame(newGame);
 			break;
 
 		case "openContextMenu":
-			main_openContextMenu(extra[0], extra[1], extra[2]);		//@TODO: FIX
+			main_openActiveState(contextMenuState);
 			break;
 		case "closeContextMenu":
 			main_closeActiveState(contextMenuState);
@@ -290,8 +253,7 @@ function main_payloadError(error) {
 };
 
 function main_loadJsonPayload(url) {
-	return new Promise(
-		function(resolve, reject) {
+	return new Promise((resolve, reject) => {
 			let payloadXHR = new XMLHttpRequest();
 
 			payloadXHR.onload = function() {

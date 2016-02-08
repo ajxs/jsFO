@@ -58,7 +58,7 @@ function browser_test() {
 		null);
 	testFeatures.push(Array.prototype.map);
 
-	testFeatures.forEach(function(element) {
+	testFeatures.forEach(element => {
 		if(!element) return false;
 	});
 

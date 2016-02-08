@@ -2,12 +2,16 @@
 
 function asset_createFRMFromJSON(obj) {
 	let frmItem = obj;
-	for(let d = 0; d < frmItem.frameInfo.length; d++) {
+	/* for(let d = 0; d < frmItem.frameInfo.length; d++) {
 		for(let f = 0; f < frmItem.nFrames; f++) {
 			frmItem.frameInfo[d][f].img = document.createElement('img');
 			frmItem.frameInfo[d][f].img.src = frmItem.frameInfo[d][f].imgdata;
 		}
-	}
+	} */
+
+	frmItem.img = document.createElement('img');
+	frmItem.img.src = frmItem.imgdata;
+
 	return frmItem;
 };
 

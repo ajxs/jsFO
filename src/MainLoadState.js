@@ -7,17 +7,13 @@ class MainLoadState extends GameState {
 		MainLoadState.prototype.loadPercentage = 0;
 		this.backgroundImage = document.getElementById("MainLoadState_bg");
 
-		let payloadSuccess = function(res) {
-			console.log("MainLoadState: download complete - parsing loadData");
-			asset_parseLoadData(res);
-			contextMenuState.init.call(contextMenuState);		// init contextMenu items
-			main_menu();
-		}.bind(this);
-
 		console.log("MainLoadState: loading remotely");
 		main_loadJsonPayload("jsfdata/main.jsf")
-			.then(payloadSuccess)
-			.catch(main_payloadError);
+			.then(res => {
+				console.log("MainLoadState: download complete - parsing loadData");
+				asset_parseLoadData(res);
+				main_menu();
+			}).catch(main_payloadError);
 	};
 
 	render() {

@@ -215,7 +215,7 @@ class MainState extends GameState {
 
 
 
-	init(_saveState) {		// use arguments here to pass saved state data.
+	loadSaveState(_saveState) {		// use arguments here to pass saved state data.
 		console.log("MainState: init: " + _saveState.map);
 
 		let loadMap = "maps/" + _saveState.map;
@@ -225,8 +225,8 @@ class MainState extends GameState {
 		this.map.elevationAt2 = _assets[loadMap].elevationAt2;
 		this.map.nElevations = _assets[loadMap].nElevations;
 
-		this.map.globallets = _assets[loadMap].globalvars;
-		this.map.locallets = _assets[loadMap].localvars;
+		this.map.globalvars = _assets[loadMap].globalvars;
+		this.map.localvars = _assets[loadMap].localvars;
 
 		this.map.playerStartDir = _assets[loadMap].playerStartDir;
 		this.map.playerStartPos = _assets[loadMap].playerStartPos;
@@ -241,14 +241,11 @@ class MainState extends GameState {
 
 		for(let n = 0; n < this.map.nElevations; n++) {
 
-			this.map.hexMap[n] = new Array(40000);
-			for(let h = 0; h < 40000; h++) {
-				this.map.hexMap[n][h] = {
+			this.map.hexMap[n] = new Array(40000).fill(0).map(hex => ({
 					blocked: false,
 					disabled: false,
-					scrollBlock: false,
-				};
-			}
+					scrollBlock: false
+				}));
 
 			let objectInfoLength = _assets[loadMap].objectInfo[n].length;
 			this.mapObjects[n] = new Array(objectInfoLength);
@@ -337,7 +334,7 @@ class MainState extends GameState {
 
 	exitMap(_map,_pos,_elev,_orientation) {
 		this.actor_endMoveState(this.player);	// reset movement lets so player doesn't get stuck in an unfinishable moveState when switching maps
-		main_loadGame(this.createSaveState(_map,_pos,_elev,_orientation))	//function(_map,_pos,_elev,_orientation)
+		main_loadGame(this.createSaveState(_map,_pos,_elev,_orientation));
 	};
 
 
@@ -364,10 +361,11 @@ class MainState extends GameState {
 						this.objectIndex = this.getObjectIndex();
 						if(this.objectIndex != -1) {		// if object under cursor
 							let objC = mapGeometry.h2s(this.mapObjects[this.player.currentElevation][this.objectIndex].hexPosition);
-							main_gameStateFunction('openContextMenu',
-								this.objectIndex,
+							// Context Menu
+							contextMenuState.setMenuItems(this.objectIndex,
 								objC.x - this.camera.x + 30,
 								objC.y - this.camera.y - 20);
+							main_gameStateFunction('openContextMenu');
 						}
 
 					}
@@ -466,10 +464,10 @@ class MainState extends GameState {
 						useFunction = function() {
 							//console.log("useFunction: " + targetItem.hexPosition + " / " + mainState.player.hexPosition);
 							this.player.orientation = mapGeometry.findOrientation(this.player.hexPosition, targetItem.hexPosition);
-							this.object_playAnim(this.player,"use",0,0,0,false,0,function() {
+							this.object_playAnim(this.player,"use",0,0,0,false,0, () => {
 								if(targetItem.openState == 0) this.object_openDoor(targetItem);
 								else this.object_closeDoor(targetItem);
-							}.bind(this));
+							});
 						};
 						break;
 				}
@@ -499,7 +497,6 @@ class MainState extends GameState {
 		// from this function you can accurately find the object under the cursor by blitting the objects 50px around the cursor onto the buffer, then reading the color underneath the centre of the image.
 		// from the formula r*1000 + b*100 + g we can find the index of the object.
 
-		this.objectBuffer.width = this.objectBufferRect.width;	// hack clear
 		this.objectBufferRect.x = MOUSE.x - this.objectBufferRect.width/2;
 		this.objectBufferRect.y = MOUSE.y - this.objectBufferRect.height/2;
 
@@ -534,8 +531,14 @@ class MainState extends GameState {
 			this.objectBufferContext2.globalCompositeOperation = "source-over";
 			this.objectBuffer2.width = this.objectBufferRect.width;	// hack clear
 
-			this.objectBufferContext2.drawImage(this.currentRenderImg.img,
-				0, 0);
+			//this.objectBufferContext2.drawImage(this.currentRenderImg.img,
+			//	0, 0);
+
+			blitFRM(this.currentRenderObject.anim.img,
+				this.objectBufferContext2,
+				0, 0,
+				this.currentRenderObject.orientation,
+				this.currentRenderObject.anim.frameNumber);
 
 			this.objectBufferContext2.globalCompositeOperation = "source-in";
 			this.objectBufferContext2.fillStyle = "rgb("+ Math.floor(i/1000) +","+ Math.floor((i%1000)/100) +","+ i%100 +")";
@@ -631,7 +634,7 @@ class MainState extends GameState {
 
 
 		let e = this.player.currentElevation;
-		this.mapObjects[e].sort(function(a, b) {	// z-sort
+		this.mapObjects[e].sort((a, b) => {	// z-sort
 			return ((a.hexPosition - b.hexPosition) || (a.anim.shiftY - b.anim.shiftY));
 		});
 
@@ -747,7 +750,8 @@ class MainState extends GameState {
 				SCREEN_WIDTH,
 				SCREEN_HEIGHT)) continue;
 
-			_context.drawImage(_assets['art/tiles/tiles.lst'][this.map.tileInfo[e].floorTiles[i]].ptr.frameInfo[0][0].img,		// use pointer in lst file
+			blitFRM(_assets['art/tiles/tiles.lst'][this.map.tileInfo[e].floorTiles[i]].ptr,
+				_context,
 				c.x - this.camera.x,
 				c.y - this.camera.y);
 
@@ -759,20 +763,26 @@ class MainState extends GameState {
 				this.eggBufferRect.height)) continue;
 
 			this.eggContext.globalCompositeOperation = "source-atop";	// EGG
-			this.eggContext.drawImage(_assets['art/tiles/tiles.lst'][this.map.tileInfo[e].floorTiles[i]].ptr.frameInfo[0][0].img,
+
+			blitFRM(_assets['art/tiles/tiles.lst'][this.map.tileInfo[e].floorTiles[i]].ptr,
+				this.eggContext,
 				c.x - this.camera.x - this.eggBufferRect.x,
 				c.y - this.camera.y - this.eggBufferRect.y);
+
 
 		}
 
 		if(this.inputState == "game" && this.inputState_sub == "move") {	// lower hex cursor
-			_context.drawImage(_assets["art/intrface/msef000.frm"].frameInfo[0][0].img,
+
+			blitFRM(_assets["art/intrface/msef000.frm"],
+				_context,
 				this.hsIndex.x - this.camera.x,
 				this.hsIndex.y - this.camera.y);
 
-			this.eggContext.drawImage(_assets["art/intrface/msef000.frm"].frameInfo[0][0].img,
-				this.hsIndex.x - this.camera.x - this.eggBufferRect.x,
-				this.hsIndex.y - this.camera.y - this.eggBufferRect.y);
+			blitFRM(_assets["art/intrface/msef000.frm"],
+				_context,
+				this.hsIndex.x - this.eggBufferRect.x,
+				this.hsIndex.y - this.eggBufferRect.y);
 		}
 
 		// render map objects.
@@ -782,7 +792,7 @@ class MainState extends GameState {
 			this.currentRenderObject = this.mapObjects[e][i];
 
 			let c = mapGeometry.h2s(this.currentRenderObject.hexPosition);
-			this.currentRenderImg = this.currentRenderObject.anim.img.frameInfo[this.currentRenderObject.orientation][this.currentRenderObject.anim.frameNumber];
+			this.currentRenderImg = this.currentRenderObject.anim.img.frameInfo[this.currentRenderObject.orientation][this.currentRenderObject.anim.frameNumber];		//@TODO: clean
 
 			let destX = (c.x + 16 - ((this.currentRenderImg.width/2)|0)) + this.currentRenderObject.anim.shiftX - this.camera.x;	// actual coords of of objects.
 			let destY = (c.y + 8 - this.currentRenderImg.height) + this.currentRenderObject.anim.shiftY - this.camera.y;
@@ -796,9 +806,12 @@ class MainState extends GameState {
 				SCREEN_WIDTH,
 				SCREEN_HEIGHT)) continue;		// testing in screen space with dest lets, slower but more accurate.
 
-			_context.drawImage(this.currentRenderImg.img,
+			blitFRM(this.currentRenderObject.anim.img,
+				_context,
 				destX,
-				destY);	// get dest coords in screen-space and blit.
+				destY,
+				this.currentRenderObject.orientation,
+				this.currentRenderObject.anim.frameNumber);	// get dest coords in screen-space and blit.
 
 			// render mapObjects on eggBufferRect.
 			if(intersectTest(destX,
@@ -820,9 +833,13 @@ class MainState extends GameState {
 					if(!(cRow < pRow || cCol < pCol  )) continue;
 				}
 				this.eggContext.globalCompositeOperation = "source-atop";
-				this.eggContext.drawImage(this.currentRenderImg.img,
+
+				blitFRM(this.currentRenderObject.anim.img,
+					this.eggContext,
 					destX - this.eggBufferRect.x,
-					destY - this.eggBufferRect.y);
+					destY - this.eggBufferRect.y,
+					this.currentRenderObject.orientation,
+					this.currentRenderObject.anim.frameNumber);	// get dest coords in screen-space and blit.
 
 				_context.globalCompositeOperation = 'source-over';
 			}
@@ -843,7 +860,8 @@ class MainState extends GameState {
 					SCREEN_WIDTH,
 					SCREEN_HEIGHT)) continue;
 
-				_context.drawImage(_assets['art/tiles/tiles.lst'][this.map.tileInfo[e].roofTiles[i]].ptr.frameInfo[0][0].img,
+				blitFRM(_assets['art/tiles/tiles.lst'][this.map.tileInfo[e].roofTiles[i]].ptr,
+					_context,
 					c.x - this.camera.x,
 					c.y - mapGeometry.m_roofHeight - this.camera.y);
 
@@ -880,15 +898,20 @@ class MainState extends GameState {
 		}
 
 		// interface
-		_context.drawImage(_assets["art/intrface/iface.frm"].frameInfo[0][0].img,
-			this.interfaceRect.x,
-			this.interfaceRect.y);	// interface
 
-		if(this.inputState == "interface" && this.interfaceRect.mouseState == 1) {
+		blitFRM(_assets["art/intrface/iface.frm"],
+			_context,
+			this.interfaceRect.x,
+			this.interfaceRect.y);
+
+
+		if(this.inputState == "interface" && this.interfaceRect.mouseState == 1) {		// interface
 			if(this.interfaceRect.activeItem > -1) {
-				_context.drawImage(_assets[ this.interfaceRect.elements[this.interfaceRect.activeItem].downSprite ].frameInfo[0][0].img,
+
+				blitFRM(_assets[ this.interfaceRect.elements[this.interfaceRect.activeItem].downSprite ],
+					_context,
 					this.interfaceRect.x + this.interfaceRect.elements[this.interfaceRect.activeItem].x,
-					this.interfaceRect.y + this.interfaceRect.elements[this.interfaceRect.activeItem].y);	// interface
+					this.interfaceRect.y + this.interfaceRect.elements[this.interfaceRect.activeItem].y);
 			}
 		}
 
@@ -918,12 +941,15 @@ class MainState extends GameState {
 			if(this.scrollStates.yPos && this.scrollStates.xPos)
 				this.scrollimg = (this.scrollStates.yPosBlocked || this.scrollStates.xNegBlocked) ? _assets["art/intrface/scrsex.frm"] : _assets["art/intrface/scrseast.frm"];
 
-			_context.drawImage(this.scrollimg.frameInfo[0][0].img,
+			blitFRM(this.scrollimg,
+				_context,
 				MOUSE.x,
 				MOUSE.y);
 
 		} else if(this.inputState == "interface") {		// if not scrolling
-			_context.drawImage(_assets["art/intrface/stdarrow.frm"].frameInfo[0][0].img,
+
+			blitFRM(_assets["art/intrface/stdarrow.frm"],
+				_context,
 				MOUSE.x,
 				MOUSE.y);
 
@@ -943,13 +969,16 @@ class MainState extends GameState {
 					}
 					break;
 				case "command":
-					_context.drawImage(_assets["art/intrface/actarrow.frm"].frameInfo[0][0].img,
+					blitFRM(_assets["art/intrface/actarrow.frm"],
+						_context,
 						MOUSE.x,
 						MOUSE.y);
+
 					if(this.cIndex_state) {
-						_context.drawImage(_assets["art/intrface/lookn.frm"].frameInfo[0][0].img,
+						blitFRM(_assets["art/intrface/lookn.frm"],
+							_context,
 							MOUSE.x + 40,
-							MOUSE.y);		// "hover look" icon
+							MOUSE.y);
 					}
 					break;
 			}	// end switch
@@ -1185,12 +1214,12 @@ class MainState extends GameState {
 	actor_beginMoveState(actor, dest, runState, pathCompleteCallback) {
 		if(actor.ai.moveState) {		// if already in anim
 
-			this.actor_addActionToFront(actor, function() {
+			this.actor_addActionToFront(actor, () => {
 				this.actor_moveStep(actor);
 				this.actor_endMoveState(actor);
 				this.actor_cancelAction(actor);
 				this.actor_beginMoveState(actor,dest,this.inputRunState);
-			}.bind(this), "onAnimEnd|onActionFrame");
+			}, "onAnimEnd|onActionFrame");
 
 			return;
 		}
@@ -1344,17 +1373,17 @@ class MainState extends GameState {
 
 
 	object_openDoor(obj) {
-		this.object_playAnim(obj,0,0,0,0,false,0,function() {
+		this.object_playAnim(obj,0,0,0,0,false,0, () => {
 			obj.openState = 1;
 			this.map.hexMap[this.player.currentElevation][obj.hexPosition].blocked = false;	// FIX FOR ELEVATION
-		}.bind(this));
+		});
 	};
 
 	object_closeDoor(obj) {
-		this.object_playAnim(obj,0,-1,0,1,false,0,function() {
+		this.object_playAnim(obj,0,-1,0,1,false,0, () => {
 			obj.openState = 0;
 			this.map.hexMap[this.player.currentElevation][obj.hexPosition].blocked = true;	// FIX FOR ELEVATION
-		}.bind(this));
+		});
 
 	};
 

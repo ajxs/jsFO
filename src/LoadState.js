@@ -13,39 +13,28 @@ class LoadState extends GameState {
 	init(_saveState) {		// use arguments here to pass saved state data.
 		console.log("LoadState: loading locally");
 
-		let payloadSuccess = function(res) {
-			console.log("MainLoadState: download complete - parsing loadData");
-			asset_parseLoadData(res);
-
-			var lstLength = _assets["art/tiles/tiles.lst"].length;		//@TODO: IMPROVE THIS
-			for(var i = 0; i < lstLength; i++) {
-				_assets["art/tiles/tiles.lst"][i].ptr = _assets["art/tiles/" + _assets["art/tiles/tiles.lst"][i].data];
-			}
-
-			lstLength = _assets["art/items/items.lst"].length;
-			for(var i = 0; i < lstLength; i++) {
-				_assets["art/items/items.lst"][i].ptr = _assets["art/items/" + _assets["art/items/items.lst"][i].data];
-			}
-
-			lstLength = _assets["art/scenery/scenery.lst"].length;
-			for(var i = 0; i < lstLength; i++) {
-				_assets["art/scenery/scenery.lst"][i].ptr = _assets["art/scenery/" + _assets["art/scenery/scenery.lst"][i].data];
-			}
-
-			lstLength = _assets["art/misc/misc.lst"].length;
-			for(var i = 0; i < lstLength; i++) {
-				_assets["art/misc/misc.lst"][i].ptr = _assets["art/misc/" + _assets["art/misc/misc.lst"][i].data];
-			}
-
-			console.log("LoadState: load complete");
-			this.gameInit(_saveState);
-
-		}.bind(this);
-
-		console.log("MainLoadState: loading remotely");
 		main_loadJsonPayload("jsfdata/" + _saveState.map.split(".")[0] + ".jsf")
-			.then(payloadSuccess)
-			.catch(main_payloadError);
+			.then(res => {
+				console.log("MainLoadState: download complete - parsing loadData");
+				asset_parseLoadData(res);
+
+				var createAssetPointers = function(type) {
+					_assets["art/" + type + "/" + type + ".lst"].forEach(item => {
+						item.ptr = _assets["art/" + type + "/" + item.data];
+					});
+				};
+
+				createAssetPointers("tiles");
+				createAssetPointers("items");
+				createAssetPointers("scenery");
+				createAssetPointers("misc");
+
+				console.log("LoadState: load complete");
+				main_gameStateFunction("main_initGameState", {
+					saveState: _saveState
+				});
+
+			}).catch(main_payloadError);
 
 	};
 
@@ -95,12 +84,6 @@ class LoadState extends GameState {
 		}
 
 		_context.globalAlpha = 1;
-	};
-
-	gameInit(_saveState) {
-		mainState.init(_saveState);
-		activeGameStates.splice(activeGameStates.indexOf(loadState),1);
-		activeGameStates.push(mainState);
 	};
 
 };
