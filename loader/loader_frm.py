@@ -1,6 +1,3 @@
-import sys
-sys.path.insert(0, '/home/protected/py/lib/python3.4/site-packages/')
-
 import struct
 from PIL import Image
 import numpy
@@ -35,7 +32,7 @@ def loadFRM(frmFile,pal):
 	for i in range(6):
 		fileOffset.append(struct.unpack('>I', frmFile.read(4))[0])
 
-	frmInfo['frameAreaSize'] = struct.unpack('>I', frmFile.read(4))[0]
+	frameAreaSize = struct.unpack('>I', frmFile.read(4))[0]
 
 	nDir = 1
 	for i in range(6):
@@ -90,11 +87,8 @@ def loadFRM(frmFile,pal):
 			currentX += frmInfo['frameInfo'][dir][f]['width']
 			frmInfo['frameInfo'][dir][f]['atlasY'] = 0
 
-	#masterImg.save('out.gif', "GIF", transparency=0)
-
 	output = io.BytesIO()
-	#masterImg.save(output, "GIF", transparency=0)
-	masterImg.save(output, "PNG", transparency=0)
+	masterImg.save(output, "PNG", transparency=0, bits=8)
 
 	datastring = str( base64.b64encode( output.getvalue()) )
 	datastring_length = len(datastring)
@@ -120,5 +114,3 @@ if __name__ == "__main__":
 
 	for i in range(6):
 		print("x: " + str(testfrm['shift'][i]['x']) + " y: " + str(testfrm['shift'][i]['y']))
-
-	print("frameAreaSize: " + str(testfrm['frameAreaSize']))

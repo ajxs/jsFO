@@ -1,4 +1,5 @@
 function blitFRM(frm, dest, dx, dy, dir = 0, frame = 0) {
+	if(!frm) return;
 	dest.drawImage(frm.img,
 		frm.frameInfo[dir][frame].atlasX,
 	 	frm.frameInfo[dir][frame].atlasY,

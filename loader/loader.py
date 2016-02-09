@@ -1,10 +1,8 @@
-#!/usr/local/bin/python
-
 import json
 import gzip
 import sys
 import getopt
-	
+
 import loader_dat
 import loader_frm
 import loader_pal
@@ -13,7 +11,7 @@ import loader_aaf
 import loader_txt
 import loader_msg
 import loader_map
-	
+
 urlprefix = "../data/"	# use this to point to the directory with the undat'd Fallout2 data
 
 master_dat = None
@@ -23,28 +21,28 @@ mapPreloadData = {}
 
 class AssetContainer:
 	'AssetContainer'
-	
+
 	def __init__(self, copy = None):
 		self.assets = {}
 		if(copy is not None):
 			self.assets = copy.assets.copy()
-				
-		
+
+
 	def printAssets(self):
 		for item in self.assets:
 			print(item)
-		
+
 	def serializeToJSON(self):
 		return json.JSONEncoder().encode(self.assets)
-		
+
 	def getFile(self, path):
 		return self.assets[path]
-		
-	def loadFile(self, datFile, path):		
-		
+
+	def loadFile(self, datFile, path):
+
 		extension = path.split('.')[1]		#crude switch
 		fileItem = datFile.getFile(path)
-		
+
 		if(fileItem is not None):		# if able to retrieve file from DAT
 			if extension == 'frm':
 				assetItem = loader_frm.loadFRM(fileItem, color)
@@ -67,13 +65,13 @@ class AssetContainer:
 				assetItem = {}
 				assetItem["type"] = "lst"
 				assetItem["data"] = []
-				
+
 				if path == "art/critters/critters.lst":
 					for line in fileItem:
 						line = line.decode("utf-8").strip().lower()
 
 						split = line.split(',')
-						
+
 						if(len(split) > 1):
 							critter = {}
 							critter['base'] = split[0]
@@ -82,25 +80,25 @@ class AssetContainer:
 								critter['ID2'] = split[2]
 						else:
 							critter = line
-						
+
 						assetItem["data"].append(critter)
 				elif path == "scripts/scripts.lst":
 					for line in fileItem:
 						if line[0] == ';':
 							continue
-							
+
 						split = line.split(';')
 						line = split[0]
-						
-						assetItem["data"].append(line.decode("utf-8").strip().lower())					
+
+						assetItem["data"].append(line.decode("utf-8").strip().lower())
 				else:
 					for line in fileItem:
 						assetItem["data"].append(line.decode("utf-8").strip().lower())
-				
-				
+
+
 			self.assets[path] = assetItem
-		
-		
+
+
 	def loadCritter(self, datFile, frmindex):
 		self.loadFile(datFile, "".join(["art/critters/",frmindex,"aa.frm"]))
 		self.loadFile(datFile, "".join(["art/critters/",frmindex,"ab.frm"]))
@@ -130,7 +128,7 @@ class AssetContainer:
 		#self.loadFile(datFile, "".join(["art/critters/",frmindex,"bd.fr2"]))
 		#self.loadFile(datFile, "".join(["art/critters/",frmindex,"bd.fr3"]))
 		#self.loadFile(datFile, "".join(["art/critters/",frmindex,"bd.fr4"]))
-		#self.loadFile(datFile, "".join(["art/critters/",frmindex,"bd.fr5"]))			
+		#self.loadFile(datFile, "".join(["art/critters/",frmindex,"bd.fr5"]))
 
 		#self.loadFile(datFile, "".join(["art/critters/",frmindex,"be.frm"]))
 		#self.loadFile(datFile, "".join(["art/critters/",frmindex,"bf.frm"]))
@@ -156,12 +154,12 @@ class AssetContainer:
 			#self.loadFile(datFile, "".join(["art/critters/",frmindex,chr(97 + 3 + r) + "e.frm"]))
 
 		#self.loadFile(datFile, "".join(["art/critters/",frmindex,"df.frm"]))
-		#self.loadFile(datFile, "".join(["art/critters/",frmindex,"ef.frm"]))		
-		#self.loadFile(datFile, "".join(["art/critters/",frmindex,"ff.frm"]))		
+		#self.loadFile(datFile, "".join(["art/critters/",frmindex,"ef.frm"]))
+		#self.loadFile(datFile, "".join(["art/critters/",frmindex,"ff.frm"]))
 		#self.loadFile(datFile, "".join(["art/critters/",frmindex,"gf.frm"]))
 
-		#self.loadFile(datFile, "".join(["art/critters/",frmindex,"dg.frm"]))	
-		#self.loadFile(datFile, "".join(["art/critters/",frmindex,"eg.frm"]))		
+		#self.loadFile(datFile, "".join(["art/critters/",frmindex,"dg.frm"]))
+		#self.loadFile(datFile, "".join(["art/critters/",frmindex,"eg.frm"]))
 		#self.loadFile(datFile, "".join(["art/critters/",frmindex,"fg.frm"]))
 
 		#for r in range(5):
@@ -169,15 +167,15 @@ class AssetContainer:
 			#self.loadFile(datFile, "".join(["art/critters/",frmindex,chr(97 + 7 + r) + "i.frm"]))
 			#self.loadFile(datFile, "".join(["art/critters/",frmindex,chr(97 + 7 + r) + "j.frm"]))
 			#self.loadFile(datFile, "".join(["art/critters/",frmindex,chr(97 + 7 + r) + "k.frm"]))
-			#self.loadFile(datFile, "".join(["art/critters/",frmindex,chr(97 + 7 + r) + "l.frm"]))	
+			#self.loadFile(datFile, "".join(["art/critters/",frmindex,chr(97 + 7 + r) + "l.frm"]))
 
 
 def loadMain():
 
 	loadData = AssetContainer()
-	
+
 	loadData.loadFile(master_dat, "data/maps.txt")
-	
+
 	loadData.loadFile(master_dat, "font0.aaf")		# fonts
 	loadData.loadFile(master_dat, "font1.aaf")
 	loadData.loadFile(master_dat, "font2.aaf")
@@ -189,7 +187,7 @@ def loadMain():
 	loadData.loadFile(master_dat, "font2.fon")
 	loadData.loadFile(master_dat, "font3.fon")
 	loadData.loadFile(master_dat, "font5.fon")
-	
+
 	# MSG files
 	loadData.loadFile(master_dat, "text/english/game/proto.msg")		# game lines
 	loadData.loadFile(master_dat, "text/english/game/skilldex.msg")
@@ -201,9 +199,9 @@ def loadMain():
 	loadData.loadFile(master_dat, "text/english/game/pro_misc.msg")
 	loadData.loadFile(master_dat, "text/english/game/pro_wall.msg")
 	loadData.loadFile(master_dat, "text/english/game/pro_tile.msg")
-	
+
 	loadData.loadCritter(critter_dat, "hmjmps")	#player
-	
+
 	loadData.loadFile(master_dat,"art/intrface/msef000.frm")		#hex cursors
 	loadData.loadFile(master_dat,"art/intrface/msef003.frm")
 
@@ -249,7 +247,7 @@ def loadMain():
 	loadData.loadFile(master_dat,"art/intrface/invenh.frm")
 	loadData.loadFile(master_dat,"art/intrface/canceln.frm")
 	loadData.loadFile(master_dat,"art/intrface/cancelh.frm")
-		
+
 	loadData.loadFile(master_dat,"art/intrface/opbase.frm")
 	loadData.loadFile(master_dat,"art/intrface/opbtnoff.frm")
 	loadData.loadFile(master_dat,"art/intrface/opbtnon.frm")
@@ -480,17 +478,17 @@ def loadMain():
 	loadData.loadFile(master_dat,"art/skilldex/stonwall.frm")
 	loadData.loadFile(master_dat,"art/skilldex/vcinnoc.frm")
 	loadData.loadFile(master_dat,"art/skilldex/wepnhand.frm")
-	loadData.loadFile(master_dat,"art/skilldex/divorced.frm")	
-	
-	
+	loadData.loadFile(master_dat,"art/skilldex/divorced.frm")
+
+
 	return loadData
-	
-	
+
+
 def loadMap(mapPath):
 
 	loadData = AssetContainer(mapPreloadData)
 	loadData.loadFile(master_dat, mapPath)
-		
+
 	def getFiletype(typeID):
 		if(typeID == 0):
 			return "items"
@@ -504,62 +502,62 @@ def loadMap(mapPath):
 			return "tiles"
 		elif(typeID == 5):
 			return "misc"
-	
-	
+
+
 	for e in range(loadData.getFile(mapPath)['nElevations']):		# load tile FRM
 		for i in range(10000):
 			index = loadData.getFile(mapPath)['tileInfo'][e]['floorTiles'][i]
 			filename = "".join(["art/tiles/", loadData.getFile('art/tiles/tiles.lst')["data"][index] ]).lower()
-		
+
 			loadData.loadFile(master_dat,filename)
 
 			index = loadData.getFile(mapPath)['tileInfo'][e]['roofTiles'][i]
 			filename = "".join(["art/tiles/", loadData.getFile('art/tiles/tiles.lst')["data"][index] ]).lower()
-		
+
 			loadData.loadFile(master_dat,filename)
-	
+
 
 		for i in range(len(loadData.getFile(mapPath)['objectInfo'][e])):
 			index = loadData.getFile(mapPath)['objectInfo'][e][i]['frmID']
 			filetype = getFiletype(loadData.getFile(mapPath)['objectInfo'][e][i]['frmTypeID'])
-			
+
 			if(filetype == "critters"):
 				loadData.loadCritter(critter_dat, loadData.getFile('art/critters/critters.lst')["data"][index]['base'])
-			else:	
+			else:
 				lstname = "".join(["art/",filetype,"/",filetype,".lst"])
 				filename = "".join(["art/",filetype,"/", loadData.getFile(lstname)["data"][index] ]).lower()
 				loadData.loadFile(master_dat,filename)
-			
+
 			for k in range(loadData.getFile(mapPath)['objectInfo'][e][i]['inventorySize']):
 				invfiletype = getFiletype(loadData.getFile(mapPath)['objectInfo'][e][i]['inventory'][k]['frmTypeID'])
 				invindex = loadData.getFile(mapPath)['objectInfo'][e][i]['inventory'][k]['frmID']
-				
+
 				if(invfiletype == "critters"):
 					loadData.loadCritter(critter_dat, loadData.getFile('art/critters/critters.lst')["data"][invindex]['base'])
 				else:
 					lstname = "".join(["art/",invfiletype,"/",invfiletype,".lst"])
 					filename = "".join(["art/",invfiletype,"/", loadData.getFile(lstname)["data"][invindex] ]).lower()
 					loadData.loadFile(master_dat,filename)
-	
-	
+
+
 	return loadData
-	
-	
+
+
 if __name__ == "__main__":
 	# Usage: --maps <mapfile [, ...]> [ --outputDir <output directory> ]
 
 	print("jsFO Asset Converter\nInitializing")
-	
+
 	loadVars = {}
 	loadVars["maps"] = None
 	loadVars["outputDir"] = ""
-	
+
 	print("Loading DAT assets")
 	master_dat = loader_dat.DATFile("".join([urlprefix,"master.dat"]))		#master_dat = loader_dat.loadDAT(master_dat_file)
 	critter_dat = loader_dat.DATFile("".join([urlprefix,"critter.dat"]))
 
-	color = loader_pal.loadPAL(master_dat.getFile("color.pal")) 
-	
+	color = loader_pal.loadPAL(master_dat.getFile("color.pal"))
+
 	print("Loading main assets")
 	loadData_main = loadMain()
 
@@ -568,19 +566,19 @@ if __name__ == "__main__":
 	except getopt.GetoptError as err:
 		print(err)
 		sys.exit(2)
-	for o, a in opts:	
+	for o, a in opts:
 		if o in "--maps":
 			split = a.split(',')
 			loadVars["maps"] = split
 		elif o in ("--outputDir"):
 			loadVars["outputDir"] = a
-	
+
 	print("".join(["Writing to ", loadVars["outputDir"], "main.jsf"]))
 	outfile = open("".join([loadVars["outputDir"], "main.jsf"]), 'w')
 	outfile.flush()
 	outfile.write(loadData_main.serializeToJSON())
-	
-	
+
+
 	if(loadVars["maps"]):
 		print("Loading shared map assets")
 		mapPreloadData = AssetContainer()
@@ -590,7 +588,7 @@ if __name__ == "__main__":
 		mapPreloadData.loadFile(master_dat, "proto/scenery/scenery.lst")
 		mapPreloadData.loadFile(master_dat, "proto/critters/critters.lst")
 		mapPreloadData.loadFile(master_dat, "proto/misc/misc.lst")
-		
+
 		mapPreloadData.loadFile(master_dat, "art/items/items.lst")
 		mapPreloadData.loadFile(master_dat, "art/walls/walls.lst")
 		mapPreloadData.loadFile(master_dat, "art/tiles/tiles.lst")
@@ -598,18 +596,18 @@ if __name__ == "__main__":
 		mapPreloadData.loadFile(master_dat, "art/misc/misc.lst")
 		mapPreloadData.loadFile(critter_dat, "art/critters/critters.lst")
 		mapPreloadData.loadFile(critter_dat, "scripts/scripts.lst")
-		
-		
+
+
 		for map in loadVars["maps"]:
 			print("".join(["Loading maps/", map]))
 			mapPath = "".join( ['maps/', map ] )
 			loadData_map = loadMap(mapPath)
-			
+
 			mapName = map.split('.')[0]
 			print("".join(["Writing to ", loadVars["outputDir"], mapName, ".jsf"]))
 			outfile = open("".join([loadVars["outputDir"], mapName, ".jsf"]), 'w')
 			outfile.flush()
-			outfile.write(loadData_map.serializeToJSON())			
-	
-	
+			outfile.write(loadData_map.serializeToJSON())
+
+
 	print("Operation Completed")

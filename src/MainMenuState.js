@@ -51,7 +51,6 @@ class MainMenuState extends GameState {
 		this.menu.elements.forEach((element, index) => {
 			_context.drawImage(this.buttonImage, this.menu.x + element.x, this.menu.y + element.y);
 
-
 			activeState = (this.menu.mouseState == 1 && this.menu.activeItem == index);
 			blitFRM(activeState ? _assets["art/intrface/menudown.frm"] : _assets["art/intrface/menuup.frm"],
 				_context,

@@ -4,8 +4,6 @@ class PipboyState extends GameState {
 	constructor() {
 		super();
 
-		this.activeItem = -1;
-		this.mouseState = 0;
 		this.x = 0;
 		this.y = 0;
 		this.activeScreen = "status";
@@ -13,25 +11,8 @@ class PipboyState extends GameState {
 		this.mapX = 280;
 		this.mapY = 80;
 
-		this.statusButton = {
-			x: 53, y: 340,
-			width: 15, height: 16,
-		};
+		this.interface = new Interface('jsfdata/interface/pipBoyInterface.json');
 
-		this.archiveButton = {
-			x: 53, y: 423,
-			width: 15, height: 16,
-		};
-
-		this.mapButton = {
-			x: 53, y: 394,
-			width: 15, height: 16,
-		};
-
-		this.closeButton = {
-			x: 53, y: 449,
-			width: 15, height: 16,
-		};
 	};
 
 	input(e) {
@@ -41,65 +22,54 @@ class PipboyState extends GameState {
 			case "keydown":
 				break;
 			case "mousedown":
-				this.mouseState = 1;
 				break;
 			case "mouseup":
-				this.mouseState = 0;
 				break;
-			case "click":
-				switch(this.activeItem) {
-					case "statusButton":
+			case "click":		//@TODO: figure out click/mouseup
+				this.interface.update();
+				switch(this.interface.clickHandler()) {
+					case "status":
 						this.activeScreen = "status";
-						this.activeItem = -1;	// reset this so that it mouse event doesn't propagate through on reopen
 						break;
-					case "archiveButton":
+					case "archive":
 						this.activeScreen = "archive";
-						this.activeItem = -1;	// reset this so that it mouse event doesn't propagate through on reopen
 						break;
-					case "mapButton":
+					case "map":
 						this.activeScreen = "map";
-						this.activeItem = -1;	// reset this so that it mouse event doesn't propagate through on reopen
 						break;
-					case "closeButton":
+					case "close":
+						console.log('huh');
 						main_gameStateFunction('closePipBoy');
-						this.activeItem = -1;	// reset this so that it mouse event doesn't propagate through on reopen
 						break;
 				}
+
 				break;
-			case 'contextmenu':	// switch input modes on mouse2
+			case 'contextmenu':
 				break;
 		};
 	};
 
 	update() {
-		this.activeItem = -1;
-		if(intersectTest(MOUSE.x,MOUSE.y,0,0,
-			this.x + this.statusButton.x, this.y + this.statusButton.y,
-			this.statusButton.width, this.statusButton.height)) {
-				this.activeItem = "statusButton";
-		} else if(intersectTest(MOUSE.x,MOUSE.y,0,0,
-			this.x + this.archiveButton.x, this.y + this.archiveButton.y,
-			this.archiveButton.width, this.archiveButton.height)) {
-				this.activeItem = "archiveButton";
-		} else if(intersectTest(MOUSE.x,MOUSE.y,0,0,
-			this.x + this.mapButton.x, this.y + this.mapButton.y,
-			this.mapButton.width, this.mapButton.height)) {
-				this.activeItem = "mapButton";
-		} else if(intersectTest(MOUSE.x,MOUSE.y,0,0,
-			this.x + this.closeButton.x, this.y + this.closeButton.y,
-			this.closeButton.width, this.closeButton.height)) {
-				this.activeItem = "closeButton";
-		}
+		if(MOUSE.c1) this.interface.mouseState = 1;
+		else this.interface.mouseState = 0;
+		this.interface.update();
 	};
 
 	render() {
 		_context.globalAlpha = 1;
-		_context.drawImage(_assets["art/intrface/pip.frm"].frameInfo[0][0].img, this.x, this.y);	// bg
+		blitFRM(_assets["art/intrface/pip.frm"],
+			_context,
+			this.x,
+			this.y);
 
-		if(this.activeItem == "statusButton" && this.mouseState == 1) _context.drawImage(_assets["art/intrface/lilreddn.frm"].frameInfo[0][0].img, this.x + this.statusButton.x, this.y + this.statusButton.y);
-		if(this.activeItem == "archiveButton" && this.mouseState == 1) _context.drawImage(_assets["art/intrface/lilreddn.frm"].frameInfo[0][0].img, this.x + this.archiveButton.x, this.y + this.archiveButton.y);
-		if(this.activeItem == "mapButton" && this.mouseState == 1) _context.drawImage(_assets["art/intrface/lilreddn.frm"].frameInfo[0][0].img, this.x + this.mapButton.x, this.y + this.mapButton.y);
-		if(this.activeItem == "closeButton" && this.mouseState == 1) _context.drawImage(_assets["art/intrface/lilreddn.frm"].frameInfo[0][0].img, this.x + this.closeButton.x, this.y + this.closeButton.y);
+		this.interface.elements.forEach((element, index) => {
+			if(this.interface.mouseState == 1 && this.interface.activeItem == index) {
+				blitFRM(_assets["art/intrface/lilreddn.frm"],
+					_context,
+					this.interface.x + element.x,
+					this.interface.y + element.y);
+			}
+		});
 
 		switch(this.activeScreen) {
 			case "map":
@@ -110,7 +80,11 @@ class PipboyState extends GameState {
 				break;
 		}
 
-		_context.drawImage(_assets["art/intrface/stdarrow.frm"].frameInfo[0][0].img, MOUSE.x, MOUSE.y);		// cursor
+		blitFRM(_assets["art/intrface/stdarrow.frm"],		// cursor
+			_context,
+			MOUSE.x,
+			MOUSE.y);
+
 	};
 
 };

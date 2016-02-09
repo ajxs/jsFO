@@ -12,63 +12,63 @@ import json
 
 def loadAAF(aafFile):
 	fontInfo = {}
-	
+
 	fontInfo['type'] = "aaf"
-	
+
 	pal = [];		# ten colour pallette
-	
+
 	pal.append(0)	#0 = transparent
 	pal.append(0)
 	pal.append(0)
 
 	pal.append(30)	#1
 	pal.append(30)
-	pal.append(30)	
-	
+	pal.append(30)
+
 	pal.append(66)	#2
 	pal.append(66)
-	pal.append(66)	
-	
+	pal.append(66)
+
 	pal.append(116)	#3
 	pal.append(116)
-	pal.append(116)	
-		
+	pal.append(116)
+
 	pal.append(116)	#4
 	pal.append(116)
-	pal.append(116)	
-		
+	pal.append(116)
+
 	pal.append(169) #5
 	pal.append(169)
 	pal.append(169)
-	
+
 	pal.append(219) #6
 	pal.append(219)
 	pal.append(219)
-	
+
 	pal.append(255) #7
 	pal.append(255)
 	pal.append(255)
-	
+
 	for i in range(247):
 		pal.append(0)
 		pal.append(0)
 		pal.append(0)
-		
-	
-	
+
+
+
 	temp = struct.unpack('>4c', aafFile.read(4))
-	
+
 	#fontInfo['signature'] = str(temp)
-	
+
 	temp = struct.unpack('>4H', aafFile.read(4*2))
-	
+
 	fontInfo['height'] = temp[0]
 	fontInfo['gapSize'] = temp[1]
 	fontInfo['spaceWidth'] = temp[2]
 	fontInfo['verticalGap'] = temp[3]
-	
+
 	fontInfo['symbolInfo'] = []
-	
+
 
 	for i in range(256):
 		glyphInfo = {}
@@ -81,7 +81,7 @@ def loadAAF(aafFile):
 	rowWidth = 0
 	maxRowWidth = 0
 	nRows = 0
-	
+
 	for i in range(256):
 		if( fontInfo['symbolInfo'][i]['height'] * fontInfo['symbolInfo'][i]['width'] != 0):
 			if(i%16 == 0):
@@ -92,14 +92,14 @@ def loadAAF(aafFile):
 
 			rowWidth += fontInfo['symbolInfo'][i]['width']
 
-		
+
 	mainimg = Image.new("P", (maxRowWidth,nRows*fontInfo['height']))
 	mainimg.putpalette(pal)
-	
+
 	currentX = 0
 	currentY = 0
-	currentRow = 0	
-		
+	currentRow = 0
+
 	for i in range(256):
 		if( fontInfo['symbolInfo'][i]['height'] * fontInfo['symbolInfo'][i]['width'] != 0):
 			imgData = numpy.empty([fontInfo['symbolInfo'][i]['height'],fontInfo['symbolInfo'][i]['width']],numpy.uint8)
@@ -113,22 +113,22 @@ def loadAAF(aafFile):
 			mainimg.paste(img, (currentX,currentY))
 			fontInfo['symbolInfo'][i]['x'] = currentX
 			fontInfo['symbolInfo'][i]['y'] = currentY
-			
+
 			if(i%16 == 0):
 				currentX = 0
 				currentRow += 1
 			else:
 				currentX += fontInfo['symbolInfo'][i]['width'];
-			
-			currentY = currentRow * fontInfo['height']
-	
-	output = io.BytesIO()
-	mainimg.save(output, "GIF", transparency=0)
-	
-	datastring = str( base64.b64encode( output.getvalue()) )
-	datastring_length = len(datastring)	
 
-	
+			currentY = currentRow * fontInfo['height']
+
+	output = io.BytesIO()
+	mainimg.save(output, "PNG", transparency=0, bits=8)
+
+	datastring = str( base64.b64encode( output.getvalue()) )
+	datastring_length = len(datastring)
+
+
 	fontInfo['imgdata'] = "".join(["data:image/gif;base64,", datastring[2: (datastring_length-1)] ])
-	
-	return fontInfo	
+
+	return fontInfo

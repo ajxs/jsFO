@@ -65,7 +65,7 @@ def loadMAP(mapFile, dat_file, loadData):
 
 		if nScripts == 0:
 			continue
-		
+
 		loop = nScripts
 		if nScripts%16 > 0:
 			loop += (16 - nScripts%16)
@@ -99,7 +99,7 @@ def loadMAP(mapFile, dat_file, loadData):
 
 	mapInfo['objectInfo'] = []
 
-	def loadMapObject():
+	def loadMapObject(objNum = 0):
 		object = {}
 
 		mapFile.seek(4,1)
@@ -152,8 +152,7 @@ def loadMAP(mapFile, dat_file, loadData):
 			filetype = "misc"
 		else:
 			sys.exit("".join(["unrecognized filetype: ",str(object['objectTypeID'])]))
-		
-		#loadDataPRO = loadData[ "".join(["proto/",filetype,"/",filetype,".lst"]) ]
+
 		loadDataPRO = loadData.getFile( "".join(["proto/",filetype,"/",filetype,".lst"]) )
 		filename = "".join(["proto/",filetype,"/",loadDataPRO['data'][object['objectID']-1].lower()])	# caching
 		if filename in proCache:
@@ -161,14 +160,14 @@ def loadMAP(mapFile, dat_file, loadData):
 		else:
 			proCache[filename] = loader_pro.loadPRO(dat_file.getFile(filename))		# @TODO: Fix tight coupling issue here
 			proto = proCache[filename]
-			
-			
+
+
 		if('subtypeID' in proto):
 			object['subtypeID'] = proto['subtypeID']
-						
-		
+
+
 		object['textID'] = proto['textID']
-		
+
 		if object['objectTypeID'] == 0:        #items
 			if proto['subtypeID'] == 0:
 				object['armorMaleFID'] = proto['armorMaleFID']
@@ -218,21 +217,16 @@ def loadMAP(mapFile, dat_file, loadData):
 				subobject = loadMapObject()
 				subobject['amount'] = subobject_amount
 				object['inventory'].append(subobject)
-				
+
 		return object
 
 
 	objects_total = struct.unpack('>i', mapFile.read(4))[0]
 
-
-	for e in range(mapInfo['nElevations']):
+	def readElevation(nElevation = 0):
 		objects_elevation = struct.unpack('>I', mapFile.read(4))[0]
+		return list(map(loadMapObject, range(objects_elevation)))
 
-		objectInfo_elevation = []
-		for j in range(objects_elevation):
-			objectInfo_elevation.append(loadMapObject())
-		
-		mapInfo['objectInfo'].append(objectInfo_elevation)
-
+	mapInfo['objectInfo'] = list(map(readElevation, range(mapInfo['nElevations'])))
 
 	return mapInfo
