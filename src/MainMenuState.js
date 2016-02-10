@@ -18,21 +18,16 @@ class MainMenuState extends GameState {
 
 	input(e) {
 		switch(e.type) {
-			case "mousemove":
-				break;
-			case "keydown":
-				break;
 			case "mousedown":
 				break;
 			case "mouseup":
 				this.menu.update();
 				main_gameStateFunction(this.menu.clickHandler());
-
 				break;
 			case "click":
 				break;
-			case 'contextmenu':	// switch input modes on mouse2
-				break;
+			default:
+				return;
 		};
 	};
 
@@ -57,11 +52,11 @@ class MainMenuState extends GameState {
 				this.menu.x + element.x + 14,
 				this.menu.y + element.y + 4);
 
-				bitmapFontRenderer.renderString(_assets["font4.aaf"],
-					element.text ,
-					this.menu.x + element.x + element.textX,
-					this.menu.y + element.y + element.textY,
-					activeState ? "#a99028": "#b89c28");
+			bitmapFontRenderer.renderString(_assets["font4.aaf"],
+				element.text ,
+				this.menu.x + element.x + element.textX,
+				this.menu.y + element.y + element.textY,
+				activeState ? "#a99028": "#b89c28");
 
 		});
 

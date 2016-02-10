@@ -12,61 +12,55 @@ class ContextMenuState extends GameState {
 		this.activeItems = [];
 		this.objectIndex = 0;
 
-
 		console.log("ContextMenuState: menuItems init");
-		this.menu_talk = {
+
+		this.menu = {
+			talk: {
 				img: "art/intrface/talkn.frm",
 				hoverImg: "art/intrface/talkh.frm",
-				action: "talk",
-			};
-
-		this.menu_look = {
+				action: "talk"
+			},
+			look: {
 				img: "art/intrface/lookn.frm",
 				hoverImg: "art/intrface/lookh.frm",
-				action: "look",
-			};
-
-		this.menu_use = {
+				action: "look"
+			},
+			use: {
 				img: "art/intrface/usegetn.frm",
 				hoverImg: "art/intrface/usegeth.frm",
-				action: "use",
-			};
-
-		this.menu_push = {
+				action: "use"
+			},
+			push: {
 				img: "art/intrface/pushn.frm",
 				hoverImg: "art/intrface/pushh.frm",
-				action: "push",
-			};
-
-		this.menu_rotate = {
+				action: "push"
+			},
+			rotate: {
 				img: "art/intrface/rotaten.frm",
 				hoverImg: "art/intrface/rotateh.frm",
-				action: "rotate",
-			};
-
-		this.menu_cancel = {
+				action: "rotate"
+			},
+			cancel: {
 				img: "art/intrface/canceln.frm",
 				hoverImg: "art/intrface/cancelh.frm",
-				action: "cancel",
-			};
-
-		this.menu_inven = {
+				action: "cancel"
+			},
+			inventory: {
 				img: "art/intrface/invenn.frm",
 				hoverImg: "art/intrface/invenh.frm",
-				action: "cancel",
-			};
-
-		this.menu_skill = {
+				action: "cancel"
+			},
+			skill: {
 				img: "art/intrface/skilln.frm",
 				hoverImg: "art/intrface/skillh.frm",
-				action: "skill",
-			};
-
-		this.menu_get = {
+				action: "skill"
+			},
+			get: {
 				img: "art/intrface/usegetn.frm",
 				hoverImg: "art/intrface/usegeth.frm",
-				action: "get",
-			};
+				action: "get"
+			}
+		};
 
 	};
 
@@ -83,56 +77,45 @@ class ContextMenuState extends GameState {
 
 		switch(getObjectType(targetObject.objectTypeID)) {
 			case "items":
-				this.activeItems.push(this.menu_get);
-				this.activeItems.push(this.menu_look);
-				this.activeItems.push(this.menu_inven);
-				this.activeItems.push(this.menu_skill);
+				this.activeItems.push(this.menu.get);
+				this.activeItems.push(this.menu.look);
+				this.activeItems.push(this.menu.inventory);
+				this.activeItems.push(this.menu.skill);
 				break;
 			case "critters":
-				this.activeItems.push(this.menu_talk);
-				this.activeItems.push(this.menu_look);
-				this.activeItems.push(this.menu_inven);
-				this.activeItems.push(this.menu_skill);
+				this.activeItems.push(this.menu.talk);
+				this.activeItems.push(this.menu.look);
+				this.activeItems.push(this.menu.inventory);
+				this.activeItems.push(this.menu.skill);
 				break;
 			case "scenery":
 			case "walls":
 			case "tiles":
 			case "misc":
-				this.activeItems.push(this.menu_look);
+				this.activeItems.push(this.menu.look);
 				break;
 			default:
 				break;
 		}
 
 		if(targetObject.hasOwnProperty('openState')) {	// if door
-			this.activeItems.unshift(this.menu_use);
+			this.activeItems.unshift(this.menu.use);
 		}
 
-		this.activeItems.push(this.menu_cancel);
+		this.activeItems.push(this.menu.cancel);
 
 	};
 
 	input(e) {
-
 		switch(e.type) {
-			case "mousemove":
-				break;
-			case "keydown":
-				break;
-			case "mousedown":
-				break;
 			case "mouseup":
 				mainState.contextMenuAction(this.activeItems[this.targetItem].action, this.objectIndex );	// context menu action
 				MOUSE.x = this.prevX;	// reset to previous stored mouse location
 				MOUSE.y = this.prevY;
 				main_gameStateFunction('closeContextMenu');
-
 				break;
-
-			case "click":
-				break;
-			case 'contextmenu':	// switch input modes on mouse2
-				break;
+			default:
+				return;
 		};
 
 	};
@@ -143,13 +126,16 @@ class ContextMenuState extends GameState {
 
 	render() {
 		for(var c = 0; c < this.activeItems.length; c++) {
-			_context.drawImage((c == this.targetItem) ? _assets[this.activeItems[c].hoverImg].frameInfo[0][0].img : _assets[this.activeItems[c].img].frameInfo[0][0].img,
+			blitFRM((c == this.targetItem) ? _assets[this.activeItems[c].hoverImg] : _assets[this.activeItems[c].img],
+				_context,
 				this.x,
 				this.y+(40*c));
 		}
 
-		_context.drawImage(_assets["art/intrface/actarrow.frm"].frameInfo[0][0].img, this.prevX, this.prevY);
-
+		blitFRM(_assets["art/intrface/actarrow.frm"],
+			_context,
+			this.prevX,
+			this.prevY);
 	};
 
 };

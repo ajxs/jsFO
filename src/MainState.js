@@ -564,9 +564,9 @@ class MainState extends GameState {
 
 		// STATE HANDLING
 		this.scrollStates.yNeg = (MOUSE.y < (SCREEN_HEIGHT * 0.025));
-		this.scrollStates.yPos = (MOUSE.y > (SCREEN_HEIGHT * 0.95));
+		this.scrollStates.yPos = (MOUSE.y > (SCREEN_HEIGHT * 0.975));
 		this.scrollStates.xNeg = (MOUSE.x < (SCREEN_WIDTH * 0.025));
-		this.scrollStates.xPos = (MOUSE.x > (SCREEN_WIDTH * 0.95));
+		this.scrollStates.xPos = (MOUSE.x > (SCREEN_WIDTH * 0.975));
 		this.scrollState = (this.scrollStates.yNeg || this.scrollStates.yPos || this.scrollStates.xNeg || this.scrollStates.xPos);
 
 		if(intersectTest(MOUSE.x,MOUSE.y,0,0, 0,0,SCREEN_WIDTH,SCREEN_HEIGHT) && this.scrollState) {

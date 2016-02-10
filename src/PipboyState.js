@@ -17,16 +17,10 @@ class PipboyState extends GameState {
 
 	input(e) {
 		switch(e.type) {
-			case "mousemove":
-				break;
-			case "keydown":
-				break;
 			case "mousedown":
+				this.interface.mouseState = 1;
 				break;
 			case "mouseup":
-				break;
-			case "click":		//@TODO: figure out click/mouseup
-				this.interface.update();
 				switch(this.interface.clickHandler()) {
 					case "status":
 						this.activeScreen = "status";
@@ -38,20 +32,20 @@ class PipboyState extends GameState {
 						this.activeScreen = "map";
 						break;
 					case "close":
-						console.log('huh');
 						main_gameStateFunction('closePipBoy');
 						break;
 				}
 
+				this.interface.mouseState = 0;
 				break;
-			case 'contextmenu':
+			case "click":		//@TODO: figure out click/mouseup
 				break;
+			default:
+				return;
 		};
 	};
 
 	update() {
-		if(MOUSE.c1) this.interface.mouseState = 1;
-		else this.interface.mouseState = 0;
 		this.interface.update();
 	};
 
@@ -62,14 +56,12 @@ class PipboyState extends GameState {
 			this.x,
 			this.y);
 
-		this.interface.elements.forEach((element, index) => {
-			if(this.interface.mouseState == 1 && this.interface.activeItem == index) {
-				blitFRM(_assets["art/intrface/lilreddn.frm"],
-					_context,
-					this.interface.x + element.x,
-					this.interface.y + element.y);
-			}
-		});
+		if(this.interface.mouseState == 1 && this.interface.activeItem != -1) {
+			blitFRM(_assets["art/intrface/lilreddn.frm"],
+				_context,
+				this.interface.x + this.interface.elements[this.interface.activeItem].x,
+				this.interface.y + this.interface.elements[this.interface.activeItem].y);
+		}
 
 		switch(this.activeScreen) {
 			case "map":

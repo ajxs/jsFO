@@ -11,6 +11,8 @@ class Interface {
 
 		this.activeItem = -1;
 		this.mouseState = 0;
+		this.x = 0;
+		this.y = 0;
 	};
 
 	update() {

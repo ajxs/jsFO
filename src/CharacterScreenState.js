@@ -16,227 +16,28 @@ class CharacterScreenState extends GameState {
 		this.x = 0;
 		this.y = 0;
 
-		this.slider = {
-			x: 592, y: 16,
-			width: 43, height: 29,
-		};
+		this.interface = new Interface("jsfdata/interface/charScreenInterface.json");
 
-		this.cancelButton = {
-			x: 553, y: 454,
-			width: 15, height: 16,
-		};
-
-		this.doneButton = {
-			x: 456, y: 454,
-			width: 15, height: 16,
-		};
-
-		this.printButton = {
-			x: 344, y: 454,
-			width: 15, height: 16,
-		};
-
-		this.perksTab = {
-			x: 11, y: 327,
-			width: 96, height: 25,
-		};
-
-		this.karmaTab = {
-			x: 107, y: 327,
-			width: 96, height: 25,
-		};
-
-		this.killsTab = {
-			x: 204, y: 327,
-			width: 96, height: 25,
-		};
-
-		this.smallGunsButton = {
-			x: 380, y: 27,
-			width: 100, height: 11,
-		};
-		this.bigGunsButton = {
-			x: 380, y: 38,
-			width: 100, height: 11,
-		};
-		this.energyWeaponsButton = {
-			x: 380, y: 49,
-			width: 100, height: 11,
-		};
-		this.unarmedButton = {
-			x: 380, y: 60,
-			width: 100, height: 11,
-		};
-		this.meleeWeaponsButton = {
-			x: 380, y: 71,
-			width: 100, height: 11,
-		};
-		this.throwingButton = {
-			x: 380, y: 82,
-			width: 100, height: 11,
-		};
-		this.firstAidButton = {
-			x: 380, y: 93,
-			width: 100, height: 11,
-		};
-		this.doctorButton = {
-			x: 380, y: 104,
-			width: 100, height: 11,
-		};
-		this.sneakButton = {
-			x: 380, y: 115,
-			width: 100, height: 11,
-		};
-		this.lockpickButton = {
-			x: 380, y: 126,
-			width: 100, height: 11,
-		};
-		this.stealButton = {
-			x: 380, y: 137,
-			width: 100, height: 11,
-		};
-		this.trapsButton = {
-			x: 380, y: 148,
-			width: 100, height: 11,
-		};
-		this.scienceButton = {
-			x: 380, y: 159,
-			width: 100, height: 11,
-		};
-		this.repairButton = {
-			x: 380, y: 170,
-			width: 100, height: 11,
-		};
-		this.speechButton = {
-			x: 380, y: 181,
-			width: 100, height: 11,
-		};
-		this.barterButton = {
-			x: 380, y: 192,
-			width: 100, height: 11,
-		};
-		this.gamblingButton = {
-			x: 380, y: 203,
-			width: 100, height: 11,
-		};
-		this.outdoorsmanButton = {
-			x: 380, y: 214,
-			width: 100, height: 11,
-		};
-
-		this.strengthButton = {
-			x: 100, y: 41,
-			width: 58, height: 17,
-		};
-		this.perceptionButton = {
-			x: 100, y: 74,
-			width: 58, height: 17,
-		};
-		this.enduranceButton = {
-			x: 100, y: 107,
-			width: 58, height: 17,
-		};
-		this.charismaButton = {
-			x: 100, y: 140,
-			width: 58, height: 17,
-		};
-		this.intelligenceButton = {
-			x: 100, y: 173,
-			width: 58, height: 17,
-		};
-		this.agilityButton = {
-			x: 100, y: 206,
-			width: 58, height: 17,
-		};
-		this.luckButton = {
-			x: 100, y: 239,
-			width: 58, height: 17,
-		};
-
-
-		this.armorClassButton = {
-			x: 194, y: 179,
-			width: 118, height: 11,
-		};
-		this.actionPointsButton = {
-			x: 194, y: 192,
-			width: 118, height: 11,
-		};
-		this.carryWeightButton = {
-			x: 194, y: 205,
-			width: 118, height: 11,
-		};
-		this.meleeDamageButton = {
-			x: 194, y: 218,
-			width: 118, height: 11,
-		};
-		this.damageResButton = {
-			x: 194, y: 231,
-			width: 118, height: 11,
-		};
-		this.poisonResButton = {
-			x: 194, y: 244,
-			width: 118, height: 11,
-		};
-		this.radiationResButton = {
-			x: 194, y: 257,
-			width: 118, height: 11,
-		};
-		this.sequenceButton = {
-			x: 194, y: 270,
-			width: 118, height: 11,
-		};
-		this.healingRateButton = {
-			x: 194, y: 283,
-			width: 118, height: 11,
-		};
-		this.criticalChanceButton = {
-			x: 194, y: 296,
-			width: 118, height: 11,
-		};
-
-
-		this.levelButton = {
-			x: 32, y: 280,
-			width: 118, height: 11,
-		};
-		this.expButton = {
-			x: 32, y: 291,
-			width: 118, height: 11,
-		};
-		this.nextLevelButton = {
-			x: 32, y: 302,
-			width: 118, height: 11,
-		};
-
-	};
+};
 
 
 
 	input(e) {
 		switch(e.type) {
-			case "mousemove":
-				break;
-			case "keydown":
-				break;
 			case "mousedown":
 				this.mouseState = 1;
 				break;
 			case "mouseup":
 				this.mouseState = 0;
-				break;
-			case "click":
-				switch(this.activeItem) {
+				switch(this.interface.clickHandler()) {
 					case "printButton":
-						this.activeItem = -1;	// reset this so that it mouse event doesn't propagate through on reopen
+						//this.activeItem = -1;	// reset this so that it mouse event doesn't propagate through on reopen
 						break;
 					case "doneButton":
 						main_gameStateFunction('closeCharacterScreen');
-						this.activeItem = -1;	// reset this so that it mouse event doesn't propagate through on reopen
 						break;
 					case "cancelButton":
 						main_gameStateFunction('closeCharacterScreen');
-						this.activeItem = -1;	// reset this so that it mouse event doesn't propagate through on reopen
 						break;
 					case "perksTab":
 						this.activeTab = "perks";
@@ -384,232 +185,67 @@ class CharacterScreenState extends GameState {
 					case "nextLevelButton":
 						this.selectedItem = "nextLevelButton";
 						break;
-
-
 				}
 				break;
-			case 'contextmenu':	// switch input modes on mouse2
+			default:
 				break;
 		};
 	};
 
 	update() {	//@TODO: FIX THIS MESS
-
-		this.activeItem = -1;
-		if(intersectTest(MOUSE.x,MOUSE.y,0,0,
-			this.x + this.printButton.x, this.y + this.printButton.y,
-			this.printButton.width, this.printButton.height)) {
-				this.activeItem = "printButton";
-		} else if(intersectTest(MOUSE.x,MOUSE.y,0,0,
-			this.x + this.cancelButton.x, this.y + this.cancelButton.y,
-			this.cancelButton.width, this.cancelButton.height)) {
-				this.activeItem = "cancelButton";
-		} else if(intersectTest(MOUSE.x,MOUSE.y,0,0,
-			this.x + this.doneButton.x, this.y + this.doneButton.y,
-			this.doneButton.width, this.doneButton.height)) {
-				this.activeItem = "doneButton";
-		}
-
-		if(intersectTest(MOUSE.x,MOUSE.y,0,0,
-			this.x + this.perksTab.x, this.y + this.perksTab.y,
-			this.perksTab.width, this.perksTab.height)) {
-				this.activeItem = "perksTab";
-		} else if(intersectTest(MOUSE.x,MOUSE.y,0,0,
-			this.x + this.karmaTab.x, this.y + this.karmaTab.y,
-			this.karmaTab.width, this.karmaTab.height)) {
-				this.activeItem = "karmaTab";
-		} else if(intersectTest(MOUSE.x,MOUSE.y,0,0,
-			this.x + this.killsTab.x, this.y + this.killsTab.y,
-			this.killsTab.width, this.killsTab.height)) {
-				this.activeItem = "killsTab";
-		}
-
-		if(intersectTest(MOUSE.x,MOUSE.y,0,0,		// check skills. ha
-			this.x + this.smallGunsButton.x, this.y + this.smallGunsButton.y,
-			this.smallGunsButton.width, this.smallGunsButton.height)) {
-				this.activeItem = "smallGunsButton";
-		} else if(intersectTest(MOUSE.x,MOUSE.y,0,0,
-			this.x + this.bigGunsButton.x, this.y + this.bigGunsButton.y,
-			this.bigGunsButton.width, this.bigGunsButton.height)) {
-				this.activeItem = "bigGunsButton";
-		} else if(intersectTest(MOUSE.x,MOUSE.y,0,0,
-			this.x + this.energyWeaponsButton.x, this.y + this.energyWeaponsButton.y,
-			this.energyWeaponsButton.width, this.energyWeaponsButton.height)) {
-				this.activeItem = "energyWeaponsButton";
-		} else if(intersectTest(MOUSE.x,MOUSE.y,0,0,
-			this.x + this.unarmedButton.x, this.y + this.unarmedButton.y,
-			this.unarmedButton.width, this.unarmedButton.height)) {
-				this.activeItem = "unarmedButton";
-		} else if(intersectTest(MOUSE.x,MOUSE.y,0,0,
-			this.x + this.meleeWeaponsButton.x, this.y + this.meleeWeaponsButton.y,
-			this.meleeWeaponsButton.width, this.meleeWeaponsButton.height)) {
-				this.activeItem = "meleeWeaponsButton";
-		} else if(intersectTest(MOUSE.x,MOUSE.y,0,0,
-			this.x + this.throwingButton.x, this.y + this.throwingButton.y,
-			this.throwingButton.width, this.throwingButton.height)) {
-				this.activeItem = "throwingButton";
-		} else if(intersectTest(MOUSE.x,MOUSE.y,0,0,
-			this.x + this.firstAidButton.x, this.y + this.firstAidButton.y,
-			this.firstAidButton.width, this.firstAidButton.height)) {
-				this.activeItem = "firstAidButton";
-		} else if(intersectTest(MOUSE.x,MOUSE.y,0,0,
-			this.x + this.doctorButton.x, this.y + this.doctorButton.y,
-			this.doctorButton.width, this.doctorButton.height)) {
-				this.activeItem = "doctorButton";
-		} else if(intersectTest(MOUSE.x,MOUSE.y,0,0,
-			this.x + this.sneakButton.x, this.y + this.sneakButton.y,
-			this.sneakButton.width, this.sneakButton.height)) {
-				this.activeItem = "sneakButton";
-		} else if(intersectTest(MOUSE.x,MOUSE.y,0,0,
-			this.x + this.lockpickButton.x, this.y + this.lockpickButton.y,
-			this.lockpickButton.width, this.lockpickButton.height)) {
-				this.activeItem = "lockpickButton";
-		} else if(intersectTest(MOUSE.x,MOUSE.y,0,0,
-			this.x + this.stealButton.x, this.y + this.stealButton.y,
-			this.stealButton.width, this.stealButton.height)) {
-				this.activeItem = "stealButton";
-		} else if(intersectTest(MOUSE.x,MOUSE.y,0,0,
-			this.x + this.trapsButton.x, this.y + this.trapsButton.y,
-			this.trapsButton.width, this.trapsButton.height)) {
-				this.activeItem = "trapsButton";
-		} else if(intersectTest(MOUSE.x,MOUSE.y,0,0,
-			this.x + this.scienceButton.x, this.y + this.scienceButton.y,
-			this.scienceButton.width, this.scienceButton.height)) {
-				this.activeItem = "scienceButton";
-		} else if(intersectTest(MOUSE.x,MOUSE.y,0,0,
-			this.x + this.repairButton.x, this.y + this.repairButton.y,
-			this.repairButton.width, this.repairButton.height)) {
-				this.activeItem = "repairButton";
-		} else if(intersectTest(MOUSE.x,MOUSE.y,0,0,
-			this.x + this.speechButton.x, this.y + this.speechButton.y,
-			this.speechButton.width, this.speechButton.height)) {
-				this.activeItem = "speechButton";
-		} else if(intersectTest(MOUSE.x,MOUSE.y,0,0,
-			this.x + this.barterButton.x, this.y + this.barterButton.y,
-			this.barterButton.width, this.barterButton.height)) {
-				this.activeItem = "barterButton";
-		} else if(intersectTest(MOUSE.x,MOUSE.y,0,0,
-			this.x + this.gamblingButton.x, this.y + this.gamblingButton.y,
-			this.gamblingButton.width, this.gamblingButton.height)) {
-				this.activeItem = "gamblingButton";
-		} else if(intersectTest(MOUSE.x,MOUSE.y,0,0,
-			this.x + this.outdoorsmanButton.x, this.y + this.outdoorsmanButton.y,
-			this.outdoorsmanButton.width, this.outdoorsmanButton.height)) {
-				this.activeItem = "outdoorsmanButton";
-		}
-
-
-		if(intersectTest(MOUSE.x,MOUSE.y,0,0,		// check skills. ha
-			this.x + this.strengthButton.x, this.y + this.strengthButton.y,
-			this.strengthButton.width, this.strengthButton.height)) {
-				this.activeItem = "strengthButton";
-		} else if(intersectTest(MOUSE.x,MOUSE.y,0,0,
-			this.x + this.perceptionButton.x, this.y + this.perceptionButton.y,
-			this.perceptionButton.width, this.perceptionButton.height)) {
-				this.activeItem = "perceptionButton";
-		} else if(intersectTest(MOUSE.x,MOUSE.y,0,0,
-			this.x + this.enduranceButton.x, this.y + this.enduranceButton.y,
-			this.enduranceButton.width, this.enduranceButton.height)) {
-				this.activeItem = "enduranceButton";
-		} else if(intersectTest(MOUSE.x,MOUSE.y,0,0,
-			this.x + this.charismaButton.x, this.y + this.charismaButton.y,
-			this.charismaButton.width, this.charismaButton.height)) {
-				this.activeItem = "charismaButton";
-		} else if(intersectTest(MOUSE.x,MOUSE.y,0,0,
-			this.x + this.intelligenceButton.x, this.y + this.intelligenceButton.y,
-			this.intelligenceButton.width, this.intelligenceButton.height)) {
-				this.activeItem = "intelligenceButton";
-		} else if(intersectTest(MOUSE.x,MOUSE.y,0,0,
-			this.x + this.agilityButton.x, this.y + this.agilityButton.y,
-			this.agilityButton.width, this.agilityButton.height)) {
-				this.activeItem = "agilityButton";
-		} else if(intersectTest(MOUSE.x,MOUSE.y,0,0,
-			this.x + this.luckButton.x, this.y + this.luckButton.y,
-			this.luckButton.width, this.luckButton.height)) {
-				this.activeItem = "luckButton";
-		}
-
-		if(intersectTest(MOUSE.x,MOUSE.y,0,0,		// check skills. ha
-			this.x + this.armorClassButton.x, this.y + this.armorClassButton.y,
-			this.armorClassButton.width, this.armorClassButton.height)) {
-				this.activeItem = "armorClassButton";
-		} else if(intersectTest(MOUSE.x,MOUSE.y,0,0,
-			this.x + this.actionPointsButton.x, this.y + this.actionPointsButton.y,
-			this.actionPointsButton.width, this.actionPointsButton.height)) {
-				this.activeItem = "actionPointsButton";
-		} else if(intersectTest(MOUSE.x,MOUSE.y,0,0,
-			this.x + this.carryWeightButton.x, this.y + this.carryWeightButton.y,
-			this.carryWeightButton.width, this.carryWeightButton.height)) {
-				this.activeItem = "carryWeightButton";
-		} else if(intersectTest(MOUSE.x,MOUSE.y,0,0,
-			this.x + this.meleeDamageButton.x, this.y + this.meleeDamageButton.y,
-			this.meleeDamageButton.width, this.meleeDamageButton.height)) {
-				this.activeItem = "meleeDamageButton";
-		} else if(intersectTest(MOUSE.x,MOUSE.y,0,0,
-			this.x + this.damageResButton.x, this.y + this.damageResButton.y,
-			this.damageResButton.width, this.damageResButton.height)) {
-				this.activeItem = "damageResButton";
-		} else if(intersectTest(MOUSE.x,MOUSE.y,0,0,
-			this.x + this.poisonResButton.x, this.y + this.poisonResButton.y,
-			this.poisonResButton.width, this.poisonResButton.height)) {
-				this.activeItem = "poisonResButton";
-		} else if(intersectTest(MOUSE.x,MOUSE.y,0,0,
-			this.x + this.radiationResButton.x, this.y + this.radiationResButton.y,
-			this.radiationResButton.width, this.radiationResButton.height)) {
-				this.activeItem = "radiationResButton";
-		} else if(intersectTest(MOUSE.x,MOUSE.y,0,0,
-			this.x + this.sequenceButton.x, this.y + this.sequenceButton.y,
-			this.sequenceButton.width, this.sequenceButton.height)) {
-				this.activeItem = "sequenceButton";
-		} else if(intersectTest(MOUSE.x,MOUSE.y,0,0,
-			this.x + this.healingRateButton.x, this.y + this.healingRateButton.y,
-			this.healingRateButton.width, this.healingRateButton.height)) {
-				this.activeItem = "healingRateButton";
-		} else if(intersectTest(MOUSE.x,MOUSE.y,0,0,
-			this.x + this.criticalChanceButton.x, this.y + this.criticalChanceButton.y,
-			this.criticalChanceButton.width, this.criticalChanceButton.height)) {
-				this.activeItem = "criticalChanceButton";
-		}
-
-
-		if(intersectTest(MOUSE.x,MOUSE.y,0,0,
-			this.x + this.levelButton.x, this.y + this.levelButton.y,
-			this.levelButton.width, this.levelButton.height)) {
-				this.activeItem = "levelButton";
-		} else if(intersectTest(MOUSE.x,MOUSE.y,0,0,
-			this.x + this.expButton.x, this.y + this.expButton.y,
-			this.expButton.width, this.expButton.height)) {
-				this.activeItem = "expButton";
-		} else if(intersectTest(MOUSE.x,MOUSE.y,0,0,
-			this.x + this.nextLevelButton.x, this.y + this.nextLevelButton.y,
-			this.nextLevelButton.width, this.nextLevelButton.height)) {
-				this.activeItem = "nextLevelButton";
-		}
-
+		this.interface.update();
 	};
 
 	render() {
 		_context.globalAlpha = 1;
-		_context.drawImage(_assets["art/intrface/edtredt.frm"].frameInfo[0][0].img, this.x + 0, this.y + 0);	// bg
+		blitFRM(_assets["art/intrface/edtredt.frm"],		// background
+			_context,
+			this.x,
+			this.y);
 
 		if(this.skillImage) {
-			_context.drawImage(_assets[this.skillImage].frameInfo[0][0].img, this.x + 484, this.y + 309);
+			blitFRM(_assets[this.skillImage],		// background
+				_context,
+				this.x + 484,
+				this.y + 309);
 		}
 
-		_context.drawImage(_assets["art/intrface/nameoff.frm"].frameInfo[0][0].img, this.x + 9, this.y + 0);
-		_context.drawImage(_assets["art/intrface/ageoff.frm"].frameInfo[0][0].img, this.x + 154, this.y + 0);
-		_context.drawImage(_assets["art/intrface/sexoff.frm"].frameInfo[0][0].img, this.x + 235, this.y + 0);
+		blitFRM(_assets["art/intrface/nameoff.frm"],
+			_context,
+			this.x + 9,
+			this.y);
+
+		blitFRM(_assets["art/intrface/ageoff.frm"],
+			_context,
+			this.x + 154,
+			this.y);
+
+		blitFRM(_assets["art/intrface/sexoff.frm"],
+			_context,
+			this.x + 235,
+			this.y);
+
 
 		switch(this.activeTab) {
 			case "perks":
-				_context.drawImage(_assets["art/intrface/perksfdr.frm"].frameInfo[0][0].img, this.x + 11, this.y + 327);
+				blitFRM(_assets["art/intrface/perksfdr.frm"],
+					_context,
+					this.x + 11,
+					this.y + 327);
+
 				bitmapFontRenderer.renderString(_assets["font1.aaf"], "" + "--------------- TRAITS ---------------", this.x + 34, this.y + 364, "#00FF00");
 				break;
 			case "karma":
-				_context.drawImage(_assets["art/intrface/karmafdr.frm"].frameInfo[0][0].img, this.x + 11, this.y + 327);
+				blitFRM(_assets["art/intrface/karmafdr.frm"],
+					_context,
+					this.x + 11,
+					this.y + 327);
 				break;
 			case "kills":
-				_context.drawImage(_assets["art/intrface/killsfdr.frm"].frameInfo[0][0].img, this.x + 11, this.y + 327);
+				blitFRM(_assets["art/intrface/killsfdr.frm"],
+					_context,
+					this.x + 11,
+					this.y + 327);
 				break;
 		}
 
@@ -712,18 +348,21 @@ class CharacterScreenState extends GameState {
 		bitmapFontRenderer.renderString(_assets["font1.aaf"], "Great", 103, 243, (this.selectedItem == "luckButton") ? "#fcfc7c" : "#00FF00");
 
 
-		_context.drawImage(_assets["art/intrface/slider.frm"].frameInfo[0][0].img, this.x + this.slider.x, this.y + this.slider.y);
+		/* _context.drawImage(_assets["art/intrface/slider.frm"].frameInfo[0][0].img, this.x + this.slider.x, this.y + this.slider.y);
 
 		_context.drawImage((this.activeItem == "doneButton" && this.mouseState == 1) ? _assets["art/intrface/lilreddn.frm"].frameInfo[0][0].img : _assets["art/intrface/lilredup.frm"].frameInfo[0][0].img,
 			this.doneButton.x, this.doneButton.y);	// bg
 		_context.drawImage((this.activeItem == "cancelButton" && this.mouseState == 1) ? _assets["art/intrface/lilreddn.frm"].frameInfo[0][0].img : _assets["art/intrface/lilredup.frm"].frameInfo[0][0].img,
 			this.cancelButton.x, this.cancelButton.y);	// bg
 		_context.drawImage((this.activeItem == "printButton" && this.mouseState == 1) ? _assets["art/intrface/lilreddn.frm"].frameInfo[0][0].img : _assets["art/intrface/lilredup.frm"].frameInfo[0][0].img,
-			this.printButton.x, this.printButton.y);	// bg
+			this.printButton.x, this.printButton.y);	// bg */
 
 
+		blitFRM(_assets["art/intrface/stdarrow.frm"],		// cursor
+			_context,
+			MOUSE.x,
+			MOUSE.y);
 
-		_context.drawImage(_assets["art/intrface/stdarrow.frm"].frameInfo[0][0].img, MOUSE.x, MOUSE.y);		// cursor
 	};
 
 };
