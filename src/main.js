@@ -57,14 +57,9 @@ function main_init() {
 	callFrame(main_loop);	// init loop
 	_canvas.focus();
 
-	main_loadMain();
-	mainState.console.print("Welcome to jsFO!");
-};
-
-
-function main_loadMain() {
 	activeGameStates.push(mainLoadState);
 	mainLoadState.init();
+	mainState.console.print("Welcome to jsFO!");
 };
 
 
@@ -254,19 +249,18 @@ function main_payloadError(error) {
 
 function main_loadJsonPayload(url) {
 	return new Promise((resolve, reject) => {
-			let payloadXHR = new XMLHttpRequest();
+		let payloadXHR = new XMLHttpRequest();
 
-			payloadXHR.onload = function() {
-				resolve(this.response);
-			};
+		payloadXHR.onload = function() {
+			resolve(this.response);
+		};
 
-			payloadXHR.onerror = function() {
-				reject(this.statusText);
-			};
+		payloadXHR.onerror = function() {
+			reject(this.statusText);
+		};
 
-			payloadXHR.open("GET", url, true);
-			payloadXHR.responseType = 'json';
-			payloadXHR.send();
-		}
-	);
+		payloadXHR.open("GET", url, true);
+		payloadXHR.responseType = 'json';
+		payloadXHR.send();
+	});
 };

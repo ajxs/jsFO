@@ -50,16 +50,11 @@ function browser_test() {
 
 	testFeatures.push(document.createElement('canvas').getContext('2d'));
 	testFeatures.push(new XMLHttpRequest());
-	testFeatures.push(window.requestAnimationFrame ||
-		window.webkitRequestAnimationFrame ||
-		window.mozRequestAnimationFrame    ||
-		window.oRequestAnimationFrame      ||
-		window.msRequestAnimationFrame     ||
-		null);
+	testFeatures.push(browser_getCallFrame());
 	testFeatures.push(Array.prototype.map);
 
 	testFeatures.forEach(element => {
-		if(!element) return false;
+		return element || false;
 	});
 
 	return true;

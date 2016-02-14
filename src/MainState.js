@@ -314,12 +314,8 @@ class MainState extends GameState {
 
 	};
 
-	createSaveState(_map,_pos,_elev,_orientation) {	// creates a gamestate for MainState to load to facilitate switching maps.
+	createSaveState(_map, _pos = 'default', _elev = 'default', _orientation = 'default') {	// creates a gamestate for MainState to load to facilitate switching maps.
 		let saveState = {}
-
-		if(!_pos) _pos == "default";		// fix this to track '0'
-		if(!_orientation) _orientation == "default";
-		if(!_elev) _elev == "default";
 
 		saveState.map = _assets["data/maps.txt"][_map].mapName + ".map";
 
@@ -1119,7 +1115,7 @@ class MainState extends GameState {
 
 
 	object_playAnim(obj = null, newAnim = "idle", frame = 0, actionFrame = 0, dir = 0, loop = false, actionCallback = null, endCallback = null) {
-		// playAnim differs from setAnim in that behaviors can be set here, this calls setAnim where the img let is generated, and offsets computed.
+		// playAnim differs from setAnim in that behaviors can be set here, this calls setAnim where the img var is generated, and offsets computed.
 
 		this.object_setAnim(obj, newAnim, frame, dir, loop, true);
 		obj.anim.actionFrame = actionFrame;
@@ -1188,8 +1184,7 @@ class MainState extends GameState {
 
 	};
 
-	object_setFrame(obj,frame) {
-		if(!frame) frame = 0;
+	object_setFrame(obj, frame = 0) {
 		if(frame == -1) {
 			frame = obj.anim.img.nFrames-1;	// last frame
 		}

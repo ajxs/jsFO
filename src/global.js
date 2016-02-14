@@ -66,9 +66,7 @@ function intersectTest(ax,ay,aw,ah, bx,by,bw,bh) {
 };
 
 
-function drawHex(_x,_y,_text,_col) {
-	if(!_col) _col = "#00FF00";
-
+function drawHex(_x,_y,_text,_col = "#00FF00") {
 	_context.beginPath();
 	_context.moveTo(_x+16,_y);
 	_context.lineTo(_x+32,_y+4);
@@ -90,9 +88,7 @@ function drawHex(_x,_y,_text,_col) {
 	}
 };
 
-function drawTile(_x,_y,_text,_col) {
-	if(!_col) _col = "#00FF00";
-
+function drawTile(_x,_y,_text,_col =  "#00FF00") {
 	_context.beginPath();
 	_context.moveTo(_x,_y+12);
 	_context.lineTo(_x+48,_y);
@@ -113,10 +109,5 @@ function drawTile(_x,_y,_text,_col) {
 };
 
 function getObjectType(_id) {		// returns type from typeID
-	if(_id < 0 || _id > 5) {
-		console.log("getObjectType: Can't read objectTypeID: " + _id);
-		return false;
-	} else {
-		return ["items","critters","scenery","walls","tiles","misc"][_id];
-	}
+	return ["items","critters","scenery","walls","tiles","misc"][_id] || false;
 };

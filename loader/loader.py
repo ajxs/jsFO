@@ -11,6 +11,8 @@ import loader_aaf
 import loader_txt
 import loader_msg
 import loader_map
+import loader_lst
+import loader_int
 
 urlprefix = "../data/"	# use this to point to the directory with the undat'd Fallout2 data
 
@@ -50,6 +52,8 @@ class AssetContainer:
 				assetItem = loader_fon.loadFON(fileItem)
 			elif extension == 'aaf':
 				assetItem = loader_aaf.loadAAF(fileItem)
+			elif extension == 'int':
+				assetItem = loader_int.loadINT(fileItem)
 			elif extension == 'msg':
 				assetItem = loader_msg.loadMSG(fileItem)
 			elif extension == 'txt':
@@ -62,41 +66,19 @@ class AssetContainer:
 			elif extension == 'map':
 				assetItem = loader_map.loadMAP(fileItem, master_dat, mapPreloadData)		# @TODO: Minor coupling issue
 			elif extension == 'lst':
-				assetItem = {}
-				assetItem["type"] = "lst"
-				assetItem["data"] = []
-
 				if path == "art/critters/critters.lst":
-					for line in fileItem:
-						line = line.decode("utf-8").strip().lower()
-
-						split = line.split(',')
-
-						if(len(split) > 1):
-							critter = {}
-							critter['base'] = split[0]
-							critter['ID1'] = split[1]
-							if(len(split) > 2):
-								critter['ID2'] = split[2]
-						else:
-							critter = line
-
-						assetItem["data"].append(critter)
+					assetItem = loader_lst.loadLST(fileItem, 'critters')
 				elif path == "scripts/scripts.lst":
-					for line in fileItem:
-						if line[0] == ';':
-							continue
-
-						split = line.split(';')
-						line = split[0]
-
-						assetItem["data"].append(line.decode("utf-8").strip().lower())
+					assetItem = loader_lst.loadLST(fileItem, 'scripts')
 				else:
-					for line in fileItem:
-						assetItem["data"].append(line.decode("utf-8").strip().lower())
-
+					assetItem = loader_lst.loadLST(fileItem)
 
 			self.assets[path] = assetItem
+
+		else:
+			print("file not found: " + path)
+			return False
+
 
 
 	def loadCritter(self, datFile, frmindex):
@@ -507,12 +489,12 @@ def loadMap(mapPath):
 	for e in range(loadData.getFile(mapPath)['nElevations']):		# load tile FRM
 		for i in range(10000):
 			index = loadData.getFile(mapPath)['tileInfo'][e]['floorTiles'][i]
-			filename = "".join(["art/tiles/", loadData.getFile('art/tiles/tiles.lst')["data"][index] ]).lower()
+			filename = "".join(["art/tiles/", loadData.getFile('art/tiles/tiles.lst')["data"][index] ])
 
 			loadData.loadFile(master_dat,filename)
 
 			index = loadData.getFile(mapPath)['tileInfo'][e]['roofTiles'][i]
-			filename = "".join(["art/tiles/", loadData.getFile('art/tiles/tiles.lst')["data"][index] ]).lower()
+			filename = "".join(["art/tiles/", loadData.getFile('art/tiles/tiles.lst')["data"][index] ])
 
 			loadData.loadFile(master_dat,filename)
 
@@ -525,7 +507,7 @@ def loadMap(mapPath):
 				loadData.loadCritter(critter_dat, loadData.getFile('art/critters/critters.lst')["data"][index]['base'])
 			else:
 				lstname = "".join(["art/",filetype,"/",filetype,".lst"])
-				filename = "".join(["art/",filetype,"/", loadData.getFile(lstname)["data"][index] ]).lower()
+				filename = "".join(["art/",filetype,"/", loadData.getFile(lstname)["data"][index] ])
 				loadData.loadFile(master_dat,filename)
 
 			for k in range(loadData.getFile(mapPath)['objectInfo'][e][i]['inventorySize']):
@@ -536,9 +518,13 @@ def loadMap(mapPath):
 					loadData.loadCritter(critter_dat, loadData.getFile('art/critters/critters.lst')["data"][invindex]['base'])
 				else:
 					lstname = "".join(["art/",invfiletype,"/",invfiletype,".lst"])
-					filename = "".join(["art/",invfiletype,"/", loadData.getFile(lstname)["data"][invindex] ]).lower()
+					filename = "".join(["art/",invfiletype,"/", loadData.getFile(lstname)["data"][invindex] ])
 					loadData.loadFile(master_dat,filename)
 
+	for scriptType in loadData.getFile(mapPath)['scriptInfo']:
+		for scriptID in loadData.getFile(mapPath)['scriptInfo'][scriptType]:
+			filename = "".join(["scripts/", loadData.getFile("scripts/scripts.lst")['data'][scriptID]])
+			loadData.loadFile(master_dat, filename)
 
 	return loadData
 
@@ -594,9 +580,8 @@ if __name__ == "__main__":
 		mapPreloadData.loadFile(master_dat, "art/tiles/tiles.lst")
 		mapPreloadData.loadFile(master_dat, "art/scenery/scenery.lst")
 		mapPreloadData.loadFile(master_dat, "art/misc/misc.lst")
+		mapPreloadData.loadFile(master_dat, "scripts/scripts.lst")
 		mapPreloadData.loadFile(critter_dat, "art/critters/critters.lst")
-		mapPreloadData.loadFile(critter_dat, "scripts/scripts.lst")
-
 
 		for map in loadVars["maps"]:
 			print("".join(["Loading maps/", map]))

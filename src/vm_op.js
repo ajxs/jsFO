@@ -1,6 +1,7 @@
 "use strict";
 
-var opMap = {
-	
-	
+function vm_op(op = null) {
+	return {
+		0: 'some shit here'
+	}[op] || null;
 };

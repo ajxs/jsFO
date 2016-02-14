@@ -2,6 +2,9 @@ import struct
 import loader_pro
 import loader_dat
 import sys
+import loader_util
+
+mapScriptTypes = ["system", "map", "time", "item", "critter"]
 
 def loadMAP(mapFile, dat_file, loadData):
 
@@ -10,23 +13,21 @@ def loadMAP(mapFile, dat_file, loadData):
 	mapInfo = {}
 
 	mapInfo['type'] = "map"
-	mapInfo['map_version'] = struct.unpack('>I', mapFile.read(4))[0]
+	mapInfo['map_version'] = loader_util.readUint32(mapFile, 1)
 	mapInfo['filename'] = str(mapFile.read(16))
 
-	temp = struct.unpack('>9i', mapFile.read(4*9))
-
-	mapInfo['playerStartPos'] =  temp[0]
-	mapInfo['defaultElevation'] =  temp[1]
-	mapInfo['playerStartDir'] =  temp[2]
-	mapInfo['nLocalVars'] =  temp[3]
-	mapInfo['scriptID'] =  temp[4]
-	mapInfo['elevationFlags'] =  temp[5]
-	mapInfo['unknown'] = temp[6]
-	mapInfo['nGlobalVars'] =  temp[7]
-	mapInfo['mapID'] =  temp[8]
+	mapInfo['playerStartPos'] = loader_util.readInt32(mapFile, 1)
+	mapInfo['defaultElevation'] = loader_util.readInt32(mapFile, 1)
+	mapInfo['playerStartDir'] = loader_util.readInt32(mapFile, 1)
+	mapInfo['nLocalVars'] = loader_util.readInt32(mapFile, 1)
+	mapInfo['scriptID'] = loader_util.readInt32(mapFile, 1)
+	mapInfo['elevationFlags'] = loader_util.readInt32(mapFile, 1)
+	mapInfo['unknown'] = loader_util.readInt32(mapFile, 1)
+	mapInfo['nGlobalVars'] = loader_util.readInt32(mapFile, 1)
+	mapInfo['mapID'] = loader_util.readInt32(mapFile, 1)
 
 
-	mapInfo['mapTime'] =  struct.unpack('>I', mapFile.read(4))[0]
+	mapInfo['mapTime'] = loader_util.readUint32(mapFile, 1)
 
 	mapFile.seek((4*44),1)
 
@@ -51,17 +52,18 @@ def loadMAP(mapFile, dat_file, loadData):
 		elevInfo = {'roofTiles': [], 'floorTiles': []}
 
 		for i in range(10000):
-			elevInfo['roofTiles'].append(struct.unpack('>H', mapFile.read(2))[0])
-			elevInfo['floorTiles'].append(struct.unpack('>H', mapFile.read(2))[0])
+			elevInfo['roofTiles'].append(loader_util.readUint16(mapFile, 1))
+			elevInfo['floorTiles'].append(loader_util.readUint16(mapFile, 1))
 
 		mapInfo['tileInfo'].append(elevInfo)
 
 
-	mapInfo['scriptInfo'] = []
+	mapInfo['scriptInfo'] = {}
 
 	for i in range(5):
-		nScripts = struct.unpack('>I', mapFile.read(4))[0]
-		scriptInfo = []
+		mapInfo['scriptInfo'][mapScriptTypes[i]] = {}
+
+		nScripts = loader_util.readUint32(mapFile, 1)
 
 		if nScripts == 0:
 			continue
@@ -75,27 +77,43 @@ def loadMAP(mapFile, dat_file, loadData):
 
 			script = {}
 
-			script['PID'] = struct.unpack('>i', mapFile.read(4))[0]
-			mapFile.seek(4,1)
+			script['PID'] = loader_util.readInt32(mapFile, 1)
+			script['PID_id'] = script['PID'] & 0xffff
+			script['PID_type'] = (script['PID'] & 0xFF000000) >> 24
 
-			if ((script['PID'] & 0xFF000000) >> 24) == 1:
-				mapFile.seek((4*2),1)
-			elif ((script['PID'] & 0xFF000000) >> 24) == 2:
-				mapFile.seek(4,1)
+			script['unknown1'] = loader_util.readInt32(mapFile, 1)
 
-			mapFile.seek(4,1)
-			script['scriptID'] = struct.unpack('>i', mapFile.read(4))[0]
+			if script['PID_type'] == 1:
+				script['unknown2'] = loader_util.readInt32(mapFile, 1)
+				script['unknown3'] = loader_util.readInt32(mapFile, 1)
+			elif script['PID_type'] == 2:
+				script['unknown2'] = loader_util.readInt32(mapFile, 1)
 
-			mapFile.seek((4*12),1)
-			scriptInfo.append(script)
+			script['unknown4'] = loader_util.readInt32(mapFile, 1)
+			script['scriptID'] = loader_util.readInt32(mapFile, 1)
+
+			script['unknown5'] = loader_util.readInt32(mapFile, 1)
+			script['unknown6'] = loader_util.readInt32(mapFile, 1)
+			script['unknown7'] = loader_util.readInt32(mapFile, 1)
+			script['unknown8'] = loader_util.readInt32(mapFile, 1)
+			script['unknown9'] = loader_util.readInt32(mapFile, 1)
+			script['unknown10'] = loader_util.readInt32(mapFile, 1)
+			script['unknown11'] = loader_util.readInt32(mapFile, 1)
+			script['unknown12'] = loader_util.readInt32(mapFile, 1)
+			script['unknown13'] = loader_util.readInt32(mapFile, 1)
+			script['unknown14'] = loader_util.readInt32(mapFile, 1)
+			script['unknown15'] = loader_util.readInt32(mapFile, 1)
+			script['unknown16'] = loader_util.readInt32(mapFile, 1)
+
+			if j < nScripts:
+				mapInfo['scriptInfo'][mapScriptTypes[i]][script['PID_id']] = script
 
 			if j%16 == 15:    # after every 16 scripts is the check block
-				check += struct.unpack('>I', mapFile.read(4))[0]
+				check += loader_util.readUint32(mapFile, 1)
 				mapFile.seek(4,1)
 
 		if check != nScripts:
 			print("fail")
-		mapInfo['scriptInfo'].append(scriptInfo)
 
 	mapInfo['objectInfo'] = []
 
@@ -103,55 +121,52 @@ def loadMAP(mapFile, dat_file, loadData):
 		object = {}
 
 		mapFile.seek(4,1)
-		object['hexPosition'] = struct.unpack('>i', mapFile.read(4))[0]
+		object['hexPosition'] = loader_util.readInt32(mapFile, 1)
 		mapFile.seek(4*4,1)
 
-		object['frameNumber'] = struct.unpack('>I', mapFile.read(4))[0]
-		object['orientation'] = struct.unpack('>I', mapFile.read(4))[0]
+		object['frameNumber'] = loader_util.readUint32(mapFile, 1)
+		object['orientation'] = loader_util.readUint32(mapFile, 1)
 
-		object['FID'] = struct.unpack('>I', mapFile.read(4))[0]
+		object['FID'] = loader_util.readUint32(mapFile, 1)
 		object['frmTypeID'] = object['FID'] >> 24
 		object['frmID'] = 0x00FFFFFF & object['FID']
 
-		object['itemFlags'] = struct.unpack('>I', mapFile.read(4))[0]
-		object['elevation'] = struct.unpack('>I', mapFile.read(4))[0]
+		object['itemFlags'] = loader_util.readUint32(mapFile, 1)
+		object['elevation'] = loader_util.readUint32(mapFile, 1)
 
-		object['PID'] = struct.unpack('>I', mapFile.read(4))[0]
+		object['PID'] = loader_util.readUint32(mapFile, 1)
 		object['objectTypeID'] = object['PID'] >> 24
 		object['objectID'] = 0x00FFFFFF & object['PID']
 		mapFile.seek(4*4,1)
 
-		mapScriptID = struct.unpack('>i', mapFile.read(4))[0]
+		mapScriptPID = loader_util.readInt32(mapFile, 1)
+		mapScriptPID_type = (mapScriptPID & 0xFF000000) >> 24
+		mapScriptPID_id = mapScriptPID & 0xffff
 
-		if mapScriptID != -1:
-			for l in range(len(mapInfo['scriptInfo'])):        # incase changed from hardcoded 5 types
-				for m in range(len(mapInfo['scriptInfo'][l])):
-					if mapScriptID == mapInfo['scriptInfo'][l][m]['scriptID']:
-						object['mapScriptID'] = mapScriptID
 
-		scriptID = struct.unpack('>i', mapFile.read(4))[0]
+		if mapScriptPID != -1:
+			if mapInfo['scriptInfo'][mapScriptTypes[mapScriptPID_type]][mapScriptPID_id]:
+				object['mapScriptID'] = mapScriptPID_id
+
+
+
+		scriptID = loader_util.readInt32(mapFile, 1)
 		if scriptID != -1:
 			object['scriptID'] = scriptID
 
-		object['inventorySize'] = struct.unpack('>i', mapFile.read(4))[0]
+		object['inventorySize'] = loader_util.readInt32(mapFile, 1)
 		mapFile.seek(4*3,1)
 
-		filetype = ""
-
-		if object['objectTypeID'] == 0:
-			filetype = "items"
-		elif object['objectTypeID'] == 1:
-			filetype = "critters"
-		elif object['objectTypeID'] == 2:
-			filetype = "scenery"
-		elif object['objectTypeID'] == 3:
-			filetype = "walls"
-		elif object['objectTypeID'] == 4:
-			filetype = "tiles"
-		elif object['objectTypeID'] == 5:
-			filetype = "misc"
-		else:
+		if(object['objectTypeID'] not in range(0, 6)):
 			sys.exit("".join(["unrecognized filetype: ",str(object['objectTypeID'])]))
+
+		filetype = ('items', 		# 0... etc
+			'critters',
+			'scenery',
+			'walls',
+			'tiles',
+			'misc')[object['objectTypeID']]
+
 
 		loadDataPRO = loadData.getFile( "".join(["proto/",filetype,"/",filetype,".lst"]) )
 		filename = "".join(["proto/",filetype,"/",loadDataPRO['data'][object['objectID']-1].lower()])	# caching
@@ -164,7 +179,6 @@ def loadMAP(mapFile, dat_file, loadData):
 
 		if('subtypeID' in proto):
 			object['subtypeID'] = proto['subtypeID']
-
 
 		object['textID'] = proto['textID']
 
@@ -202,18 +216,17 @@ def loadMAP(mapFile, dat_file, loadData):
 			if object['objectID'] == 12:
 				pass
 			elif( 16 <= object['objectID'] <= 23 ):    # 16-23
-				temp = struct.unpack('>4i', mapFile.read(4*4))
-				object['exitMap'] = temp[0]
-				object['exitPosition'] = temp[1]
-				object['exitElevation'] = temp[2]
-				object['exitOrientation'] = temp[3]
+				object['exitMap'] = loader_util.readInt32(mapFile, 1)
+				object['exitPosition'] = loader_util.readInt32(mapFile, 1)
+				object['exitElevation'] = loader_util.readInt32(mapFile, 1)
+				object['exitOrientation'] = loader_util.readInt32(mapFile, 1)
 			else:
 				mapFile.seek(4*4,1)
 
 		if object['inventorySize'] > 0:
 			object['inventory'] = []
 			for w in range(object['inventorySize']):
-				subobject_amount = struct.unpack('>i', mapFile.read(4))[0]
+				subobject_amount = loader_util.readInt32(mapFile, 1)
 				subobject = loadMapObject()
 				subobject['amount'] = subobject_amount
 				object['inventory'].append(subobject)
@@ -221,12 +234,13 @@ def loadMAP(mapFile, dat_file, loadData):
 		return object
 
 
-	objects_total = struct.unpack('>i', mapFile.read(4))[0]
+	objects_total = loader_util.readInt32(mapFile, 1)
 
 	def readElevation(nElevation = 0):
-		objects_elevation = struct.unpack('>I', mapFile.read(4))[0]
+		objects_elevation = loader_util.readUint32(mapFile, 1)
 		return list(map(loadMapObject, range(objects_elevation)))
 
 	mapInfo['objectInfo'] = list(map(readElevation, range(mapInfo['nElevations'])))
+
 
 	return mapInfo

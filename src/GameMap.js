@@ -6,8 +6,6 @@ class GameMap {
 	};
 
 	hexStatus(i,e) {
-		if(!this.hexMap[e][i]) return false;
-		if(this.hexMap[e][i].blocked) return false;
-		else return true;
+		return (this.hexMap[e][i] && !this.hexMap[e][i].blocked);
 	};
 };
