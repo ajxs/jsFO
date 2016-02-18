@@ -769,16 +769,15 @@ class MainState extends GameState {
 		}
 
 		if(this.inputState == "game" && this.inputState_sub == "move") {	// lower hex cursor
-
 			blitFRM(_assets["art/intrface/msef000.frm"],
 				_context,
 				this.hsIndex.x - this.camera.x,
 				this.hsIndex.y - this.camera.y);
 
 			blitFRM(_assets["art/intrface/msef000.frm"],
-				_context,
-				this.hsIndex.x - this.eggBufferRect.x,
-				this.hsIndex.y - this.eggBufferRect.y);
+				this.eggContext,
+				this.hsIndex.x - this.camera.x - this.eggBufferRect.x,
+				this.hsIndex.y - this.camera.y - this.eggBufferRect.y);
 		}
 
 		// render map objects.
@@ -877,6 +876,22 @@ class MainState extends GameState {
 		} */
 
 		_context.drawImage(this.eggBuffer,this.eggBufferRect.x,this.eggBufferRect.y);
+
+
+		this.currentRenderObject = this.player;
+		let c = mapGeometry.h2s(this.player.hexPosition);
+		this.currentRenderImg = this.player.anim.img.frameInfo[this.player.orientation][this.player.anim.frameNumber];		//@TODO: clean
+
+		let destX = (c.x + 16 - ((this.currentRenderImg.width/2)|0)) + this.currentRenderObject.anim.shiftX - this.camera.x;	// actual coords of of objects.
+		let destY = (c.y + 8 - this.currentRenderImg.height) + this.currentRenderObject.anim.shiftY - this.camera.y;
+
+		blitFRMOutline(this.player.anim.img,
+			_context,
+			destX-1,
+			destY-1,
+			this.player.orientation,
+			this.player.anim.frameNumber,
+			1);	// get dest coords in screen-space and blit.
 
 		// Render brightmap over the top of the main screen buffer.
 		if(this.mapLightLevel < 1) {

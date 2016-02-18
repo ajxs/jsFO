@@ -150,9 +150,7 @@ def loadMAP(mapFile, dat_file, loadData):
 
 
 
-		scriptID = loader_util.readInt32(mapFile, 1)
-		if scriptID != -1:
-			object['scriptID'] = scriptID
+		object['scriptID'] = loader_util.readInt32(mapFile, 1)
 
 		object['inventorySize'] = loader_util.readInt32(mapFile, 1)
 		mapFile.seek(4*3,1)

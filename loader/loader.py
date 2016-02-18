@@ -521,6 +521,11 @@ def loadMap(mapPath):
 					filename = "".join(["art/",invfiletype,"/", loadData.getFile(lstname)["data"][invindex] ])
 					loadData.loadFile(master_dat,filename)
 
+			if(loadData.getFile(mapPath)['objectInfo'][e][i]['scriptID'] != -1):
+				filename = "".join(["scripts/", loadData.getFile("scripts/scripts.lst")['data'][ loadData.getFile(mapPath)['objectInfo'][e][i]['scriptID'] ]])
+				loadData.loadFile(master_dat, filename)
+
+
 	for scriptType in loadData.getFile(mapPath)['scriptInfo']:
 		for scriptID in loadData.getFile(mapPath)['scriptInfo'][scriptType]:
 			filename = "".join(["scripts/", loadData.getFile("scripts/scripts.lst")['data'][scriptID]])

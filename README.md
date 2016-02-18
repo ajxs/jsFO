@@ -4,11 +4,14 @@ View the online demo at: [http://ajxs.github.io/jsFO](http://ajxs.github.io/jsFO
 
 jsFO is an open-source port of Interplay's Fallout2 for the browser, written in Javascript, with conversion of assets from the original Fallout2 handled in Python.
 jsFO uses the HTML5 canvas API for rendering, and should be compatible with all modern browsers.
-At present time of writing, jsFO is in a pre-alpha state and has limited playability. 
-The end goal of this project is not to create a complete, playable port of FO2 in the browser, but rather to create a technical demo to showcase HTML5's capabilities as a platform for serious game design, and to create a solid foundation of code from which other developers interested in Fallout mods or ports could learn from in their work on other projects. 
-All Source Code relating to the conversion of Fallout's original assets, as well as relevant documentation regarding the file formats and the specifics Fallout's engine will be recorded in this project's wiki. Feel free to contact the team with any specific questions regarding these formats, or specific functionality of the Fallout engine. 
+At present time of writing, jsFO is in a pre-alpha state and has limited playability.
+The end goal of this project is not to create a complete, playable port of FO2 in the browser, but rather to create a technical demo to showcase HTML5's capabilities as a platform for serious game design, and to create a solid foundation of code from which other developers interested in Fallout mods or ports could learn from in their work on other projects.
+All Source Code relating to the conversion of Fallout's original assets, as well as relevant documentation regarding the file formats and the specifics Fallout's engine will be recorded in this project's wiki. Feel free to contact the team with any specific questions regarding these formats, or specific functionality of the Fallout engine.
 
 All code for this project is released under the MIT license, meaning that you - the end user - are free to "use, copy, modify, merge, publish, distribute, sublicense, and/or sell copies of the Software"... but you probably won't get far selling it. You're free to deconstruct, reconstruct, repair, retouch, break and bend this software all you want. And I wish you the best of luck in doing so... you'll need it.
+
+##ES6-Compatibility
+"After minor deliberation I have decided to merge the experimental ES6 branch to main. jsFO on the whole can be considered an experiment in itself, and considering it's scope, browser compatibility cannot be considered a short-term priority for the project." - ajxs, lead dev.
 
 ##Running jsFO
 To run jsFO for yourself, simply download the source files to your computer and run index.html.
