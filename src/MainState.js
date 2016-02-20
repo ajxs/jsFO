@@ -4,7 +4,12 @@ class MainState extends GameState {
 	constructor() {
 		super();
 
-		this.map = new GameMap();
+		this.map = {
+			hexMap: 0,
+			hexStatus(i,e) {
+				return (this.hexMap[e][i] && !this.hexMap[e][i].blocked);
+			},
+		};
 
 		this.interfaceRect = new Interface('jsfdata/interface/mainStateInterface.json');
 		this.interfaceRect.x = ((SCREEN_WIDTH / 2)|0) - 320;
@@ -893,6 +898,8 @@ class MainState extends GameState {
 			this.player.anim.frameNumber,
 			1);	// get dest coords in screen-space and blit.
 
+
+
 		// Render brightmap over the top of the main screen buffer.
 		if(this.mapLightLevel < 1) {
 			// blit main light level to brightmap buffer.
@@ -928,7 +935,7 @@ class MainState extends GameState {
 
 		// console
 		for(let i = 0,  cl = (this.console.consoleData.length > 5) ? 5 : this.console.consoleData.length; i < cl; i++) {
-			bitmapFontRenderer.renderString(_assets["font1.aaf"],
+			blitFontString(_assets["font1.aaf"],
 				this.console.consoleData[i],
 				this.console.x,
 				this.console.y - (i*this.console.fontHeight),

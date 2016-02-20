@@ -52,7 +52,7 @@ class MainMenuState extends GameState {
 				this.menu.x + element.x + 14,
 				this.menu.y + element.y + 4);
 
-			bitmapFontRenderer.renderString(_assets["font4.aaf"],
+			blitFontString(_assets["font4.aaf"],
 				element.text ,
 				this.menu.x + element.x + element.textX,
 				this.menu.y + element.y + element.textY,

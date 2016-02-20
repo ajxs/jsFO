@@ -1,3 +1,5 @@
+"use strict";
+
 function blitFRM(frm, dest, dx, dy, dir = 0, frame = 0, alpha = 1) {
 	if(!frm) return;
 	if(alpha < 1) dest.globalAlpha = alpha;
@@ -14,11 +16,11 @@ function blitFRM(frm, dest, dx, dy, dir = 0, frame = 0, alpha = 1) {
 };
 
 
-function blitFRMOutline(frm, dest, dx, dy, dir = 0, frame = 0, alpha = 1) {
+function blitFRMOutline(frm, dest, dx, dy, dir = 0, frame = 0, alpha = 1, color = "#FF0000") {
 	if(!frm) return;
-	if(!frm.img_outline) createFRMOutline(frm);
+	if(!frm['img_outline_' + color]) createFRMOutline(frm, color);
 	if(alpha < 1) dest.globalAlpha = alpha;
-	dest.drawImage(frm.img_outline,
+	dest.drawImage(frm['img_outline_' + color],
 		frm.frameInfo_outline[dir][frame].atlasX,
 	 	frm.frameInfo_outline[dir][frame].atlasY,
 		frm.frameInfo_outline[dir][frame].width,
@@ -31,7 +33,8 @@ function blitFRMOutline(frm, dest, dx, dy, dir = 0, frame = 0, alpha = 1) {
 };
 
 const createFRMOutline_shadowColor = 12;
-function createFRMOutline(frm) {
+function createFRMOutline(frm, color = "#FF0000") {
+	console.log("creating " + color + " outline FRM img for: " + frm);
 	var outlines = new Array(frm.frameInfo.length);
 	var maxHeight = 0, maxWidth = 0;
 
@@ -66,7 +69,7 @@ function createFRMOutline(frm) {
 				frm.frameInfo[dir][f].height + 2);
 
 			let x, y;
-			outlineContext.fillStyle = "#FF0000";
+			outlineContext.fillStyle = color;
 			for(let i = 0, imgDataLength = trimmedData.data.length; i < imgDataLength; i+=4) {
 				if(trimmedData.data[i+3] > 0) {
 					x = (i/4) % (frm.frameInfo[dir][f].width + 2);
@@ -116,8 +119,87 @@ function createFRMOutline(frm) {
 			currentX += frm.frameInfo[dir][f].width + 2;
 		}
 	}
-
-	document.body.appendChild(total);
-	frm.img_outline = total;
+	frm['img_outline_' + color] = total;
 	frm.frameInfo_outline = outlineInfo;
+};
+
+
+let rF_stringlength = 0;
+let rF_symbolIndex = 0;
+let rF_totalWidth = 0;
+let rF_baseline = 0;
+let rF_img = 0;
+
+
+function createFontColorImg(_font, _color) {	// creates canvas element with coloured font
+	//@TODO - "create check so that you can't create duplicate rgb(r,g,b) and #rgb versions by accident. - Potentially force hex colors as argument.
+
+	console.log("Font: Creating color surface: " + _color);
+
+	_font["img_" + _color] = document.createElement("canvas");
+	_font["img_" + _color].width = _font.img.width;
+	_font["img_" + _color].height = _font.img.height;
+
+	var _fontContext = _font["img_" + _color].getContext("2d");
+
+	if(_font.type == "fon") {
+		_fontContext.globalCompositeOperation = "source-over";
+		_fontContext.fillStyle = _color;
+		_fontContext.fillRect(0,0,_font["img_" + _color].width,_font["img_" + _color].height);
+
+		_fontContext.globalCompositeOperation = "destination-in";
+		_fontContext.drawImage(_font.img,0,0);
+
+	} else {
+		_fontContext.globalCompositeOperation = "source-over";
+		_fontContext.drawImage(_font.img,0,0);
+
+		var imgData1 = _fontContext.getImageData(0,0,_font.img.width,_font.img.height);
+
+		_fontContext.globalCompositeOperation = "source-in";
+		_fontContext.fillStyle = _color;
+		_fontContext.fillRect(0,0,_font["img_" + _color].width,_font["img_" + _color].height);
+		var imgData2 = _fontContext.getImageData(0,0,_font.img.width,_font.img.height);
+
+		for(var i=0; i < imgData2.data.length; i+=4) {	// AAF 0-9 values act as alpha blend
+			imgData2.data[i+3] = imgData1.data[i];
+		}
+
+		_fontContext.putImageData(imgData2,0,0);
+	}
+
+};
+
+function blitFontString(_font, _string, _x, _y, _color) {
+
+	if(_font.img.width == 0 || _font.img.height == 0) return;		// hack fix for firefox race condition bug.
+
+	rF_stringlength = _string.length;
+	rF_totalWidth = 0;
+	rF_baseline = _y + _font.height;
+
+	if(_color) {
+		if(!_font.hasOwnProperty("img_" + _color)) {
+			console.log("Bitmap Font: call to font render for surface without color: ", _color);
+			createFontColorImg(_font, _color);	// if no colorized img, create one.
+		}
+		rF_img = _font["img_" + _color];
+	} else rF_img = _font.img;
+
+	for(var i = 0; i < rF_stringlength; i++) {
+		rF_symbolIndex = _string.charCodeAt(i);
+		if(rF_symbolIndex == 32) {	// space
+			rF_totalWidth += _font.symbolInfo[32].width;
+		} else {
+			if(!_font.symbolInfo[rF_symbolIndex].width) continue;
+
+			_context.drawImage(rF_img,
+				_font.symbolInfo[rF_symbolIndex].x, _font.symbolInfo[rF_symbolIndex].y,
+				_font.symbolInfo[rF_symbolIndex].width, _font.symbolInfo[rF_symbolIndex].height,
+				_x + rF_totalWidth, rF_baseline - _font.symbolInfo[rF_symbolIndex].height,
+				_font.symbolInfo[rF_symbolIndex].width, _font.symbolInfo[rF_symbolIndex].height);
+
+			rF_totalWidth += (_font.symbolInfo[rF_symbolIndex].width + _font.gapSize);
+		}
+	}
 };

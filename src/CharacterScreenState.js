@@ -233,7 +233,7 @@ class CharacterScreenState extends GameState {
 					this.x + 11,
 					this.y + 327);
 
-				bitmapFontRenderer.renderString(_assets["font1.aaf"], "" + "--------------- TRAITS ---------------", this.x + 34, this.y + 364, "#00FF00");
+				blitFontString(_assets["font1.aaf"], "" + "--------------- TRAITS ---------------", this.x + 34, this.y + 364, "#00FF00");
 				break;
 			case "karma":
 				blitFRM(_assets["art/intrface/karmafdr.frm"],
@@ -249,103 +249,103 @@ class CharacterScreenState extends GameState {
 				break;
 		}
 
-		bitmapFontRenderer.renderString(_assets["font3.aaf"], "PERKS", this.x + 46, this.y + (this.activeTab == "perks") ? 332 : 333, (this.activeTab == "perks") ? "#907824" : "#806814");
-		bitmapFontRenderer.renderString(_assets["font3.aaf"], "KARMA", this.x + 141, this.y + (this.activeTab == "karma") ? 332 : 333, (this.activeTab == "karma") ? "#907824" : "#806814");
-		bitmapFontRenderer.renderString(_assets["font3.aaf"], "KILLS", this.x + 246, this.y + (this.activeTab == "kills") ? 332 : 333, (this.activeTab == "kills") ? "#907824" : "#806814");
+		blitFontString(_assets["font3.aaf"], "PERKS", this.x + 46, this.y + (this.activeTab == "perks") ? 332 : 333, (this.activeTab == "perks") ? "#907824" : "#806814");
+		blitFontString(_assets["font3.aaf"], "KARMA", this.x + 141, this.y + (this.activeTab == "karma") ? 332 : 333, (this.activeTab == "karma") ? "#907824" : "#806814");
+		blitFontString(_assets["font3.aaf"], "KILLS", this.x + 246, this.y + (this.activeTab == "kills") ? 332 : 333, (this.activeTab == "kills") ? "#907824" : "#806814");
 
-		bitmapFontRenderer.renderString(_assets["font3.aaf"], mainState.player.name, this.x + 30, this.y + 6, "#907824");
-		bitmapFontRenderer.renderString(_assets["font3.aaf"], "AGE " + mainState.player.age, this.x + 167, this.y + 6, "#907824");
-		bitmapFontRenderer.renderString(_assets["font3.aaf"], mainState.player.sex, this.x + 254, this.y + 6, "#907824");
-
-
-		bitmapFontRenderer.renderString(_assets["font3.aaf"], "PRINT", 364, 454, "#907824");
-		bitmapFontRenderer.renderString(_assets["font3.aaf"], "DONE", 476, 454, "#907824");
-		bitmapFontRenderer.renderString(_assets["font3.aaf"], "CANCEL", 572, 454, "#907824");
-
-		bitmapFontRenderer.renderString(_assets["font3.aaf"], "SKILLS", 380, 5, "#907824");
-		bitmapFontRenderer.renderString(_assets["font3.aaf"], "SKILL POINTS", 400, 233, "#907824");
-
-		bitmapFontRenderer.renderString(_assets["font1.aaf"], "Level: 2", 32, 280, (this.selectedItem == "levelButton") ? "#fcfc7c" : "#00FF00");
-		bitmapFontRenderer.renderString(_assets["font1.aaf"], "Exp: 1,999", 32, 291, (this.selectedItem == "expButton") ? "#fcfc7c" : "#00FF00");
-		bitmapFontRenderer.renderString(_assets["font1.aaf"], "Next Level: 2000", 32, 302, (this.selectedItem == "nextLevelButton") ? "#fcfc7c" : "#00FF00");
-
-		bitmapFontRenderer.renderString(_assets["font1.aaf"], "Hit Points 29/34", this.x + 194, this.y + 46, (this.selectedItem == "hitPointsButton") ? "#fcfc7c" : "#00FF00");
-		bitmapFontRenderer.renderString(_assets["font1.aaf"], "Poisoned", this.x + 194, this.y + 59, "#183018");
-		bitmapFontRenderer.renderString(_assets["font1.aaf"], "Radiated", this.x + 194, this.y + 72, "#183018");
-		bitmapFontRenderer.renderString(_assets["font1.aaf"], "Eye Damage", this.x + 194, this.y + 85, "#183018");
-		bitmapFontRenderer.renderString(_assets["font1.aaf"], "Crippled Right Arm", this.x + 194, this.y + 98, "#183018");
-		bitmapFontRenderer.renderString(_assets["font1.aaf"], "Crippled Left Arm", this.x + 194, this.y + 111, "#183018");
-		bitmapFontRenderer.renderString(_assets["font1.aaf"], "Crippled Right Leg", this.x + 194, this.y + 124, "#183018");
-		bitmapFontRenderer.renderString(_assets["font1.aaf"], "Crippled Left Leg", this.x + 194, this.y + 137, "#183018");
+		blitFontString(_assets["font3.aaf"], mainState.player.name, this.x + 30, this.y + 6, "#907824");
+		blitFontString(_assets["font3.aaf"], "AGE " + mainState.player.age, this.x + 167, this.y + 6, "#907824");
+		blitFontString(_assets["font3.aaf"], mainState.player.sex, this.x + 254, this.y + 6, "#907824");
 
 
-		bitmapFontRenderer.renderString(_assets["font1.aaf"], "Armor Class", 194, 179, (this.selectedItem == "armorClassButton") ? "#fcfc7c" : "#00FF00");
-		bitmapFontRenderer.renderString(_assets["font1.aaf"], "Action Points", 194, 192, (this.selectedItem == "actionPointsButton") ? "#fcfc7c" : "#00FF00");
-		bitmapFontRenderer.renderString(_assets["font1.aaf"], "Carry Weight", 194, 205, (this.selectedItem == "carryWeightButton") ? "#fcfc7c" : "#00FF00");
-		bitmapFontRenderer.renderString(_assets["font1.aaf"], "Melee Damage", 194, 218, (this.selectedItem == "meleeDamageButton") ? "#fcfc7c" : "#00FF00");
-		bitmapFontRenderer.renderString(_assets["font1.aaf"], "Damage Res.", 194, 231, (this.selectedItem == "damageResButton") ? "#fcfc7c" : "#00FF00");
-		bitmapFontRenderer.renderString(_assets["font1.aaf"], "Poison Res.", 194, 244, (this.selectedItem == "poisonResButton") ? "#fcfc7c" : "#00FF00");
-		bitmapFontRenderer.renderString(_assets["font1.aaf"], "Radiation Res.", 194, 257, (this.selectedItem == "radiationResButton") ? "#fcfc7c" : "#00FF00");
-		bitmapFontRenderer.renderString(_assets["font1.aaf"], "Sequence", 194, 270, (this.selectedItem == "sequenceButton") ? "#fcfc7c" : "#00FF00");
-		bitmapFontRenderer.renderString(_assets["font1.aaf"], "Healing Rate", 194, 283, (this.selectedItem == "healingRateButton") ? "#fcfc7c" : "#00FF00");
-		bitmapFontRenderer.renderString(_assets["font1.aaf"], "Critical Chance", 194, 296, (this.selectedItem == "criticalChanceButton") ? "#fcfc7c" : "#00FF00");
+		blitFontString(_assets["font3.aaf"], "PRINT", 364, 454, "#907824");
+		blitFontString(_assets["font3.aaf"], "DONE", 476, 454, "#907824");
+		blitFontString(_assets["font3.aaf"], "CANCEL", 572, 454, "#907824");
 
-		bitmapFontRenderer.renderString(_assets["font1.aaf"], "" + mainState.player.stats["armorClass"].level, 288, 179, (this.selectedItem == "armorClassButton") ? "#fcfc7c" : "#00FF00");
-		bitmapFontRenderer.renderString(_assets["font1.aaf"], "" + mainState.player.stats["actionPoints"].level, 288, 192, (this.selectedItem == "actionPointsButton") ? "#fcfc7c" : "#00FF00");
-		bitmapFontRenderer.renderString(_assets["font1.aaf"], "" + mainState.player.stats["carryWeight"].level, 288, 205, (this.selectedItem == "carryWeightButton") ? "#fcfc7c" : "#00FF00");
-		bitmapFontRenderer.renderString(_assets["font1.aaf"], "" + mainState.player.stats["meleeDamage"].level, 288, 218, (this.selectedItem == "meleeDamageButton") ? "#fcfc7c" : "#00FF00");
-		bitmapFontRenderer.renderString(_assets["font1.aaf"], "" + mainState.player.stats["damageRes"].level, 288, 231, (this.selectedItem == "damageResButton") ? "#fcfc7c" : "#00FF00");
-		bitmapFontRenderer.renderString(_assets["font1.aaf"], "" + mainState.player.stats["poisonRes"].level, 288, 244, (this.selectedItem == "poisonResButton") ? "#fcfc7c" : "#00FF00");
-		bitmapFontRenderer.renderString(_assets["font1.aaf"], "" + mainState.player.stats["radiationRes"].level, 288, 257, (this.selectedItem == "radiationResButton") ? "#fcfc7c" : "#00FF00");
-		bitmapFontRenderer.renderString(_assets["font1.aaf"], "" + mainState.player.stats["sequence"].level, 288, 270, (this.selectedItem == "sequenceButton") ? "#fcfc7c" : "#00FF00");
-		bitmapFontRenderer.renderString(_assets["font1.aaf"], "" + mainState.player.stats["healingRate"].level, 288, 283, (this.selectedItem == "healingRateButton") ? "#fcfc7c" : "#00FF00");
-		bitmapFontRenderer.renderString(_assets["font1.aaf"], "" + mainState.player.stats["criticalChance"].level, 288, 296, (this.selectedItem == "criticalChanceButton") ? "#fcfc7c" : "#00FF00");
+		blitFontString(_assets["font3.aaf"], "SKILLS", 380, 5, "#907824");
+		blitFontString(_assets["font3.aaf"], "SKILL POINTS", 400, 233, "#907824");
 
-		bitmapFontRenderer.renderString(_assets["font1.aaf"], "Small Guns", 380, 27, (this.selectedItem == "smallGunsButton") ? "#fcfc7c" : "#00FF00");
-		bitmapFontRenderer.renderString(_assets["font1.aaf"], "Big Guns", 380, 38, (this.selectedItem == "bigGunsButton") ? "#fcfc7c" : "#00FF00");
-		bitmapFontRenderer.renderString(_assets["font1.aaf"], "Energy Weapons", 380, 49, (this.selectedItem == "energyWeaponsButton") ? "#fcfc7c" : "#00FF00");
-		bitmapFontRenderer.renderString(_assets["font1.aaf"], "Unarmed", 380, 60, (this.selectedItem == "unarmedButton") ? "#fcfc7c" : "#00FF00");
-		bitmapFontRenderer.renderString(_assets["font1.aaf"], "Melee Weapons", 380, 71, (this.selectedItem == "meleeWeaponsButton") ? "#fcfc7c" : "#00FF00");
-		bitmapFontRenderer.renderString(_assets["font1.aaf"], "Throwing", 380, 82, (this.selectedItem == "throwingButton") ? "#fcfc7c" : "#00FF00");
-		bitmapFontRenderer.renderString(_assets["font1.aaf"], "First Aid", 380, 93, (this.selectedItem == "firstAidButton") ? "#fcfc7c" : "#00FF00");
-		bitmapFontRenderer.renderString(_assets["font1.aaf"], "Doctor", 380, 104, (this.selectedItem == "doctorButton") ? "#fcfc7c" : "#00FF00");
-		bitmapFontRenderer.renderString(_assets["font1.aaf"], "Sneak", 380, 115, (this.selectedItem == "sneakButton") ? "#fcfc7c" : "#00FF00");
-		bitmapFontRenderer.renderString(_assets["font1.aaf"], "Lockpick", 380, 126, (this.selectedItem == "lockpickButton") ? "#fcfc7c" : "#00FF00");
-		bitmapFontRenderer.renderString(_assets["font1.aaf"], "Steal", 380, 137, (this.selectedItem == "stealButton") ? "#fcfc7c" : "#00FF00");
-		bitmapFontRenderer.renderString(_assets["font1.aaf"], "Traps", 380, 148, (this.selectedItem == "trapsButton") ? "#fcfc7c" : "#00FF00");
-		bitmapFontRenderer.renderString(_assets["font1.aaf"], "Science", 380, 159, (this.selectedItem == "scienceButton") ? "#fcfc7c" : "#00FF00");
-		bitmapFontRenderer.renderString(_assets["font1.aaf"], "Repair", 380, 170, (this.selectedItem == "repairButton") ? "#fcfc7c" : "#00FF00");
-		bitmapFontRenderer.renderString(_assets["font1.aaf"], "Speech", 380, 181, (this.selectedItem == "speechButton") ? "#fcfc7c" : "#00FF00");
-		bitmapFontRenderer.renderString(_assets["font1.aaf"], "Barter", 380, 192, (this.selectedItem == "barterButton") ? "#fcfc7c" : "#00FF00");
-		bitmapFontRenderer.renderString(_assets["font1.aaf"], "Gambling", 380, 203, (this.selectedItem == "gamblingButton") ? "#fcfc7c" : "#00FF00");
-		bitmapFontRenderer.renderString(_assets["font1.aaf"], "Outdoorsman", 380, 214, (this.selectedItem == "outdoorsmanButton") ? "#fcfc7c" : "#00FF00");
+		blitFontString(_assets["font1.aaf"], "Level: 2", 32, 280, (this.selectedItem == "levelButton") ? "#fcfc7c" : "#00FF00");
+		blitFontString(_assets["font1.aaf"], "Exp: 1,999", 32, 291, (this.selectedItem == "expButton") ? "#fcfc7c" : "#00FF00");
+		blitFontString(_assets["font1.aaf"], "Next Level: 2000", 32, 302, (this.selectedItem == "nextLevelButton") ? "#fcfc7c" : "#00FF00");
 
-		bitmapFontRenderer.renderString(_assets["font1.aaf"], mainState.player.skills["Small Guns"].level + "%", 573, 27, (this.selectedItem == "smallGunsButton") ? "#fcfc7c" : "#00FF00");
-		bitmapFontRenderer.renderString(_assets["font1.aaf"], mainState.player.skills["Big Guns"].level + "%", 573, 38, (this.selectedItem == "bigGunsButton") ? "#fcfc7c" : "#00FF00");
-		bitmapFontRenderer.renderString(_assets["font1.aaf"], mainState.player.skills["Energy Weapons"].level + "%", 573, 49, (this.selectedItem == "energyWeaponsButton") ? "#fcfc7c" : "#00FF00");
-		bitmapFontRenderer.renderString(_assets["font1.aaf"], mainState.player.skills["Unarmed"].level + "%", 573, 60, (this.selectedItem == "unarmedButton") ? "#fcfc7c" : "#00FF00");
-		bitmapFontRenderer.renderString(_assets["font1.aaf"], mainState.player.skills["Melee Weapons"].level + "%", 573, 71, (this.selectedItem == "meleeWeaponsButton") ? "#fcfc7c" : "#00FF00");
-		bitmapFontRenderer.renderString(_assets["font1.aaf"], mainState.player.skills["Throwing"].level + "%", 573, 82, (this.selectedItem == "throwingButton") ? "#fcfc7c" : "#00FF00");
-		bitmapFontRenderer.renderString(_assets["font1.aaf"], mainState.player.skills["First Aid"].level + "%", 573, 93, (this.selectedItem == "firstAidButton") ? "#fcfc7c" : "#00FF00");
-		bitmapFontRenderer.renderString(_assets["font1.aaf"], mainState.player.skills["Doctor"].level + "%", 573, 104, (this.selectedItem == "doctorButton") ? "#fcfc7c" : "#00FF00");
-		bitmapFontRenderer.renderString(_assets["font1.aaf"], mainState.player.skills["Sneak"].level + "%", 573, 115, (this.selectedItem == "sneakButton") ? "#fcfc7c" : "#00FF00");
-		bitmapFontRenderer.renderString(_assets["font1.aaf"], mainState.player.skills["Lockpick"].level + "%", 573, 126, (this.selectedItem == "lockpickButton") ? "#fcfc7c" : "#00FF00");
-		bitmapFontRenderer.renderString(_assets["font1.aaf"], mainState.player.skills["Steal"].level + "%", 573, 137, (this.selectedItem == "stealButton") ? "#fcfc7c" : "#00FF00");
-		bitmapFontRenderer.renderString(_assets["font1.aaf"], mainState.player.skills["Traps"].level + "%", 573, 148, (this.selectedItem == "trapsButton") ? "#fcfc7c" : "#00FF00");
-		bitmapFontRenderer.renderString(_assets["font1.aaf"], mainState.player.skills["Science"].level + "%", 573, 159, (this.selectedItem == "scienceButton") ? "#fcfc7c" : "#00FF00");
-		bitmapFontRenderer.renderString(_assets["font1.aaf"], mainState.player.skills["Repair"].level + "%", 573, 170, (this.selectedItem == "repairButton") ? "#fcfc7c" : "#00FF00");
-		bitmapFontRenderer.renderString(_assets["font1.aaf"], mainState.player.skills["Speech"].level + "%", 573, 181, (this.selectedItem == "speechButton") ? "#fcfc7c" : "#00FF00");
-		bitmapFontRenderer.renderString(_assets["font1.aaf"], mainState.player.skills["Barter"].level + "%", 573, 192, (this.selectedItem == "barterButton") ? "#fcfc7c" : "#00FF00");
-		bitmapFontRenderer.renderString(_assets["font1.aaf"], mainState.player.skills["Gambling"].level + "%", 573, 203, (this.selectedItem == "gamblingButton") ? "#fcfc7c" : "#00FF00");
-		bitmapFontRenderer.renderString(_assets["font1.aaf"], mainState.player.skills["Outdoorsman"].level + "%", 573, 214, (this.selectedItem == "outdoorsmanButton") ? "#fcfc7c" : "#00FF00");
+		blitFontString(_assets["font1.aaf"], "Hit Points 29/34", this.x + 194, this.y + 46, (this.selectedItem == "hitPointsButton") ? "#fcfc7c" : "#00FF00");
+		blitFontString(_assets["font1.aaf"], "Poisoned", this.x + 194, this.y + 59, "#183018");
+		blitFontString(_assets["font1.aaf"], "Radiated", this.x + 194, this.y + 72, "#183018");
+		blitFontString(_assets["font1.aaf"], "Eye Damage", this.x + 194, this.y + 85, "#183018");
+		blitFontString(_assets["font1.aaf"], "Crippled Right Arm", this.x + 194, this.y + 98, "#183018");
+		blitFontString(_assets["font1.aaf"], "Crippled Left Arm", this.x + 194, this.y + 111, "#183018");
+		blitFontString(_assets["font1.aaf"], "Crippled Right Leg", this.x + 194, this.y + 124, "#183018");
+		blitFontString(_assets["font1.aaf"], "Crippled Left Leg", this.x + 194, this.y + 137, "#183018");
 
-		bitmapFontRenderer.renderString(_assets["font1.aaf"], "Great", 103, 45, (this.selectedItem == "strengthButton") ? "#fcfc7c" : "#00FF00");
-		bitmapFontRenderer.renderString(_assets["font1.aaf"], "Great", 103, 78, (this.selectedItem == "perceptionButton") ? "#fcfc7c" : "#00FF00");
-		bitmapFontRenderer.renderString(_assets["font1.aaf"], "Great", 103, 111, (this.selectedItem == "enduranceButton") ? "#fcfc7c" : "#00FF00");
-		bitmapFontRenderer.renderString(_assets["font1.aaf"], "Great", 103, 144, (this.selectedItem == "charismaButton") ? "#fcfc7c" : "#00FF00");
-		bitmapFontRenderer.renderString(_assets["font1.aaf"], "Great", 103, 177, (this.selectedItem == "intelligenceButton") ? "#fcfc7c" : "#00FF00");
-		bitmapFontRenderer.renderString(_assets["font1.aaf"], "Great", 103, 210, (this.selectedItem == "agilityButton") ? "#fcfc7c" : "#00FF00");
-		bitmapFontRenderer.renderString(_assets["font1.aaf"], "Great", 103, 243, (this.selectedItem == "luckButton") ? "#fcfc7c" : "#00FF00");
+
+		blitFontString(_assets["font1.aaf"], "Armor Class", 194, 179, (this.selectedItem == "armorClassButton") ? "#fcfc7c" : "#00FF00");
+		blitFontString(_assets["font1.aaf"], "Action Points", 194, 192, (this.selectedItem == "actionPointsButton") ? "#fcfc7c" : "#00FF00");
+		blitFontString(_assets["font1.aaf"], "Carry Weight", 194, 205, (this.selectedItem == "carryWeightButton") ? "#fcfc7c" : "#00FF00");
+		blitFontString(_assets["font1.aaf"], "Melee Damage", 194, 218, (this.selectedItem == "meleeDamageButton") ? "#fcfc7c" : "#00FF00");
+		blitFontString(_assets["font1.aaf"], "Damage Res.", 194, 231, (this.selectedItem == "damageResButton") ? "#fcfc7c" : "#00FF00");
+		blitFontString(_assets["font1.aaf"], "Poison Res.", 194, 244, (this.selectedItem == "poisonResButton") ? "#fcfc7c" : "#00FF00");
+		blitFontString(_assets["font1.aaf"], "Radiation Res.", 194, 257, (this.selectedItem == "radiationResButton") ? "#fcfc7c" : "#00FF00");
+		blitFontString(_assets["font1.aaf"], "Sequence", 194, 270, (this.selectedItem == "sequenceButton") ? "#fcfc7c" : "#00FF00");
+		blitFontString(_assets["font1.aaf"], "Healing Rate", 194, 283, (this.selectedItem == "healingRateButton") ? "#fcfc7c" : "#00FF00");
+		blitFontString(_assets["font1.aaf"], "Critical Chance", 194, 296, (this.selectedItem == "criticalChanceButton") ? "#fcfc7c" : "#00FF00");
+
+		blitFontString(_assets["font1.aaf"], "" + mainState.player.stats["armorClass"].level, 288, 179, (this.selectedItem == "armorClassButton") ? "#fcfc7c" : "#00FF00");
+		blitFontString(_assets["font1.aaf"], "" + mainState.player.stats["actionPoints"].level, 288, 192, (this.selectedItem == "actionPointsButton") ? "#fcfc7c" : "#00FF00");
+		blitFontString(_assets["font1.aaf"], "" + mainState.player.stats["carryWeight"].level, 288, 205, (this.selectedItem == "carryWeightButton") ? "#fcfc7c" : "#00FF00");
+		blitFontString(_assets["font1.aaf"], "" + mainState.player.stats["meleeDamage"].level, 288, 218, (this.selectedItem == "meleeDamageButton") ? "#fcfc7c" : "#00FF00");
+		blitFontString(_assets["font1.aaf"], "" + mainState.player.stats["damageRes"].level, 288, 231, (this.selectedItem == "damageResButton") ? "#fcfc7c" : "#00FF00");
+		blitFontString(_assets["font1.aaf"], "" + mainState.player.stats["poisonRes"].level, 288, 244, (this.selectedItem == "poisonResButton") ? "#fcfc7c" : "#00FF00");
+		blitFontString(_assets["font1.aaf"], "" + mainState.player.stats["radiationRes"].level, 288, 257, (this.selectedItem == "radiationResButton") ? "#fcfc7c" : "#00FF00");
+		blitFontString(_assets["font1.aaf"], "" + mainState.player.stats["sequence"].level, 288, 270, (this.selectedItem == "sequenceButton") ? "#fcfc7c" : "#00FF00");
+		blitFontString(_assets["font1.aaf"], "" + mainState.player.stats["healingRate"].level, 288, 283, (this.selectedItem == "healingRateButton") ? "#fcfc7c" : "#00FF00");
+		blitFontString(_assets["font1.aaf"], "" + mainState.player.stats["criticalChance"].level, 288, 296, (this.selectedItem == "criticalChanceButton") ? "#fcfc7c" : "#00FF00");
+
+		blitFontString(_assets["font1.aaf"], "Small Guns", 380, 27, (this.selectedItem == "smallGunsButton") ? "#fcfc7c" : "#00FF00");
+		blitFontString(_assets["font1.aaf"], "Big Guns", 380, 38, (this.selectedItem == "bigGunsButton") ? "#fcfc7c" : "#00FF00");
+		blitFontString(_assets["font1.aaf"], "Energy Weapons", 380, 49, (this.selectedItem == "energyWeaponsButton") ? "#fcfc7c" : "#00FF00");
+		blitFontString(_assets["font1.aaf"], "Unarmed", 380, 60, (this.selectedItem == "unarmedButton") ? "#fcfc7c" : "#00FF00");
+		blitFontString(_assets["font1.aaf"], "Melee Weapons", 380, 71, (this.selectedItem == "meleeWeaponsButton") ? "#fcfc7c" : "#00FF00");
+		blitFontString(_assets["font1.aaf"], "Throwing", 380, 82, (this.selectedItem == "throwingButton") ? "#fcfc7c" : "#00FF00");
+		blitFontString(_assets["font1.aaf"], "First Aid", 380, 93, (this.selectedItem == "firstAidButton") ? "#fcfc7c" : "#00FF00");
+		blitFontString(_assets["font1.aaf"], "Doctor", 380, 104, (this.selectedItem == "doctorButton") ? "#fcfc7c" : "#00FF00");
+		blitFontString(_assets["font1.aaf"], "Sneak", 380, 115, (this.selectedItem == "sneakButton") ? "#fcfc7c" : "#00FF00");
+		blitFontString(_assets["font1.aaf"], "Lockpick", 380, 126, (this.selectedItem == "lockpickButton") ? "#fcfc7c" : "#00FF00");
+		blitFontString(_assets["font1.aaf"], "Steal", 380, 137, (this.selectedItem == "stealButton") ? "#fcfc7c" : "#00FF00");
+		blitFontString(_assets["font1.aaf"], "Traps", 380, 148, (this.selectedItem == "trapsButton") ? "#fcfc7c" : "#00FF00");
+		blitFontString(_assets["font1.aaf"], "Science", 380, 159, (this.selectedItem == "scienceButton") ? "#fcfc7c" : "#00FF00");
+		blitFontString(_assets["font1.aaf"], "Repair", 380, 170, (this.selectedItem == "repairButton") ? "#fcfc7c" : "#00FF00");
+		blitFontString(_assets["font1.aaf"], "Speech", 380, 181, (this.selectedItem == "speechButton") ? "#fcfc7c" : "#00FF00");
+		blitFontString(_assets["font1.aaf"], "Barter", 380, 192, (this.selectedItem == "barterButton") ? "#fcfc7c" : "#00FF00");
+		blitFontString(_assets["font1.aaf"], "Gambling", 380, 203, (this.selectedItem == "gamblingButton") ? "#fcfc7c" : "#00FF00");
+		blitFontString(_assets["font1.aaf"], "Outdoorsman", 380, 214, (this.selectedItem == "outdoorsmanButton") ? "#fcfc7c" : "#00FF00");
+
+		blitFontString(_assets["font1.aaf"], mainState.player.skills["Small Guns"].level + "%", 573, 27, (this.selectedItem == "smallGunsButton") ? "#fcfc7c" : "#00FF00");
+		blitFontString(_assets["font1.aaf"], mainState.player.skills["Big Guns"].level + "%", 573, 38, (this.selectedItem == "bigGunsButton") ? "#fcfc7c" : "#00FF00");
+		blitFontString(_assets["font1.aaf"], mainState.player.skills["Energy Weapons"].level + "%", 573, 49, (this.selectedItem == "energyWeaponsButton") ? "#fcfc7c" : "#00FF00");
+		blitFontString(_assets["font1.aaf"], mainState.player.skills["Unarmed"].level + "%", 573, 60, (this.selectedItem == "unarmedButton") ? "#fcfc7c" : "#00FF00");
+		blitFontString(_assets["font1.aaf"], mainState.player.skills["Melee Weapons"].level + "%", 573, 71, (this.selectedItem == "meleeWeaponsButton") ? "#fcfc7c" : "#00FF00");
+		blitFontString(_assets["font1.aaf"], mainState.player.skills["Throwing"].level + "%", 573, 82, (this.selectedItem == "throwingButton") ? "#fcfc7c" : "#00FF00");
+		blitFontString(_assets["font1.aaf"], mainState.player.skills["First Aid"].level + "%", 573, 93, (this.selectedItem == "firstAidButton") ? "#fcfc7c" : "#00FF00");
+		blitFontString(_assets["font1.aaf"], mainState.player.skills["Doctor"].level + "%", 573, 104, (this.selectedItem == "doctorButton") ? "#fcfc7c" : "#00FF00");
+		blitFontString(_assets["font1.aaf"], mainState.player.skills["Sneak"].level + "%", 573, 115, (this.selectedItem == "sneakButton") ? "#fcfc7c" : "#00FF00");
+		blitFontString(_assets["font1.aaf"], mainState.player.skills["Lockpick"].level + "%", 573, 126, (this.selectedItem == "lockpickButton") ? "#fcfc7c" : "#00FF00");
+		blitFontString(_assets["font1.aaf"], mainState.player.skills["Steal"].level + "%", 573, 137, (this.selectedItem == "stealButton") ? "#fcfc7c" : "#00FF00");
+		blitFontString(_assets["font1.aaf"], mainState.player.skills["Traps"].level + "%", 573, 148, (this.selectedItem == "trapsButton") ? "#fcfc7c" : "#00FF00");
+		blitFontString(_assets["font1.aaf"], mainState.player.skills["Science"].level + "%", 573, 159, (this.selectedItem == "scienceButton") ? "#fcfc7c" : "#00FF00");
+		blitFontString(_assets["font1.aaf"], mainState.player.skills["Repair"].level + "%", 573, 170, (this.selectedItem == "repairButton") ? "#fcfc7c" : "#00FF00");
+		blitFontString(_assets["font1.aaf"], mainState.player.skills["Speech"].level + "%", 573, 181, (this.selectedItem == "speechButton") ? "#fcfc7c" : "#00FF00");
+		blitFontString(_assets["font1.aaf"], mainState.player.skills["Barter"].level + "%", 573, 192, (this.selectedItem == "barterButton") ? "#fcfc7c" : "#00FF00");
+		blitFontString(_assets["font1.aaf"], mainState.player.skills["Gambling"].level + "%", 573, 203, (this.selectedItem == "gamblingButton") ? "#fcfc7c" : "#00FF00");
+		blitFontString(_assets["font1.aaf"], mainState.player.skills["Outdoorsman"].level + "%", 573, 214, (this.selectedItem == "outdoorsmanButton") ? "#fcfc7c" : "#00FF00");
+
+		blitFontString(_assets["font1.aaf"], "Great", 103, 45, (this.selectedItem == "strengthButton") ? "#fcfc7c" : "#00FF00");
+		blitFontString(_assets["font1.aaf"], "Great", 103, 78, (this.selectedItem == "perceptionButton") ? "#fcfc7c" : "#00FF00");
+		blitFontString(_assets["font1.aaf"], "Great", 103, 111, (this.selectedItem == "enduranceButton") ? "#fcfc7c" : "#00FF00");
+		blitFontString(_assets["font1.aaf"], "Great", 103, 144, (this.selectedItem == "charismaButton") ? "#fcfc7c" : "#00FF00");
+		blitFontString(_assets["font1.aaf"], "Great", 103, 177, (this.selectedItem == "intelligenceButton") ? "#fcfc7c" : "#00FF00");
+		blitFontString(_assets["font1.aaf"], "Great", 103, 210, (this.selectedItem == "agilityButton") ? "#fcfc7c" : "#00FF00");
+		blitFontString(_assets["font1.aaf"], "Great", 103, 243, (this.selectedItem == "luckButton") ? "#fcfc7c" : "#00FF00");
 
 
 		/* _context.drawImage(_assets["art/intrface/slider.frm"].frameInfo[0][0].img, this.x + this.slider.x, this.y + this.slider.y);

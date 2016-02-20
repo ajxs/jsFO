@@ -145,12 +145,12 @@ class SkilldexState extends GameState {
 	render() {
 		_context.drawImage(_assets["art/intrface/skldxbox.frm"].frameInfo[0][0].img, this.x, this.y);	// interface
 
-		bitmapFontRenderer.renderString(_assets["font3.aaf"], "SKILLDEX" ,
+		blitFontString(_assets["font3.aaf"], "SKILLDEX" ,
 			this.x + 55,
 			this.y + 14,
 			"#907824");
 
-		bitmapFontRenderer.renderString(_assets["font3.aaf"], "CANCEL" ,
+		blitFontString(_assets["font3.aaf"], "CANCEL" ,
 			this.x + 72,
 			this.y + 337,
 			(this.mouseState == 1 && this.activeItem == "closeButton") ? "#806814" : "#907824");
@@ -165,7 +165,7 @@ class SkilldexState extends GameState {
 				this.x + this.menuItems[i].x,
 				this.y + this.menuItems[i].y);
 
-			bitmapFontRenderer.renderString(_assets["font3.aaf"], this.menuItems[i].text ,
+			blitFontString(_assets["font3.aaf"], this.menuItems[i].text ,
 				this.x + this.menuItems[i].x + this.menuItems[i].textX,
 				this.y + this.menuItems[i].y + this.menuItems[i].textY,
 				(this.mouseState == 1 && this.activeItem == i) ? "#806814" : "#907824");
