@@ -80,9 +80,7 @@ class MainState extends GameState {
 		this.brightmap.width = SCREEN_WIDTH;
 		this.brightmap.height = SCREEN_HEIGHT;
 		this.brightmapContext = this.brightmap.getContext("2d");
-
-		this.mse_overlay_blocked = document.getElementById("mse_overlay_blocked");
-
+		
 		this.vm = new ScriptVM();
 
 
@@ -917,6 +915,7 @@ class MainState extends GameState {
 		// console
 		for(let i = 0,  cl = (this.console.consoleData.length > 5) ? 5 : this.console.consoleData.length; i < cl; i++) {
 			blitFontString(_assets["font1.aaf"],
+				_context,
 				this.console.consoleData[i],
 				this.console.x,
 				this.console.y - (i*this.console.fontHeight),
@@ -963,10 +962,15 @@ class MainState extends GameState {
 						0, 0, 0.5, "#900000");
 
 					if(this.cIndex_path == 0) {		// render "X" if no path to location
-						_context.drawImage(mse_overlay_blocked,
+						blitFontStringOutline(_assets["font1.aaf"],
+							_context,
+							"X",
 							this.hsIndex.x - this.camera.x + 11,
-							this.hsIndex.y - this.camera.y + 3);		// top hex overlay img
+							this.hsIndex.y - this.camera.y + 5,
+							"#FF0000",
+							"#000000");
 					}
+
 					break;
 				case "command":
 					blitFRM(_assets["art/intrface/actarrow.frm"],

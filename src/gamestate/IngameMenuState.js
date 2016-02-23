@@ -108,7 +108,9 @@ class IngameMenuState extends GameState {
 			_context.drawImage( (this.menu.elements[i].mouseState == 0) ? _assets["art/intrface/opbtnoff.frm"].frameInfo[0][0].img : _assets["art/intrface/opbtnon.frm"].frameInfo[0][0].img,
 				this.menu.x + this.menu.elements[i].x, this.menu.y + this.menu.elements[i].y);
 
-			blitFontString(_assets["font3.aaf"], this.menu.elements[i].text ,
+			blitFontString(_assets["font3.aaf"],
+				_context,
+			 	this.menu.elements[i].text ,
 				this.menu.x + this.menu.elements[i].x + this.menu.elements[i].textX,
 				this.menu.y + this.menu.elements[i].y + this.menu.elements[i].textY,
 				(this.menu.elements[i].mouseState == 0) ? "#907824" : "#806814");

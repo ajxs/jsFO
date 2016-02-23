@@ -131,10 +131,123 @@ let rF_baseline = 0;
 let rF_img = 0;
 
 
+function createFontOutlineImg(_font, _color, _outlineColor) {
+
+	let maxHeight = 0, maxWidth = 0, currentX = 0;
+	let symbolInfo_outline = _font.symbolInfo.map(function(symbol) {
+		if(symbol.width == 0 || symbol.height == 0) {
+			return {
+				width: 0,
+				height: 0
+			};
+		}
+
+		if((symbol.height+2) > maxHeight) maxHeight = (symbol.height+2);
+		currentX = maxWidth;
+		maxWidth += symbol.width + 2;
+		return {
+			x: currentX,
+			y: 0,
+			width: symbol.width + 2,
+			height: symbol.height + 2,
+		};
+	});
+
+	let outlineCanvas = document.createElement('canvas');
+	outlineCanvas.width = maxWidth;
+	outlineCanvas.height = maxHeight;
+	let outlineContext = outlineCanvas.getContext('2d');
+
+	for(let i = 0; i < symbolInfo_outline.length; i++) {
+		outlineContext.drawImage(_font.img,
+		_font.symbolInfo[i].x,
+		_font.symbolInfo[i].y,
+		_font.symbolInfo[i].width,
+		_font.symbolInfo[i].height,
+		symbolInfo_outline[i].x + 1,
+		symbolInfo_outline[i].y + 1,
+		_font.symbolInfo[i].width,
+		_font.symbolInfo[i].height);
+	}
+
+
+	let imgData = outlineContext.getImageData(0,0,
+		outlineCanvas.width,
+		outlineCanvas.height);
+
+	outlineContext.fillStyle = _outlineColor;
+	let x,y;
+	for(let i = 0, imgDataLength = imgData.data.length; i < imgDataLength; i+=4) {
+		if(imgData.data[i+3] > 0) {
+			x = (i/4) % outlineCanvas.width;
+			y = ((i/4) / outlineCanvas.width)|0;
+			outlineContext.fillRect(x-1, y-1, 3, 3);
+		}
+	}
+
+	createFontColorImg(_font, _color);
+	for(let i = 0; i < symbolInfo_outline.length; i++) {
+		outlineContext.drawImage(_font["img_" + _color],
+		_font.symbolInfo[i].x,
+		_font.symbolInfo[i].y,
+		_font.symbolInfo[i].width,
+		_font.symbolInfo[i].height,
+		symbolInfo_outline[i].x + 1,
+		symbolInfo_outline[i].y + 1,
+		_font.symbolInfo[i].width,
+		_font.symbolInfo[i].height);
+	}
+
+	_font.symbolInfo_outline = symbolInfo_outline;
+	_font["img_" + _color + "_" + _outlineColor] = outlineCanvas;
+
+};
+
+
+function blitFontStringOutline(_font, _dest, _string, _x, _y, _color, _outlineColor) {
+
+	if(_font.img.width == 0 || _font.img.height == 0) return;		// hack fix for firefox race condition bug.
+
+	rF_stringlength = _string.length;
+	rF_totalWidth = 0;
+	rF_baseline = _y + _font.height;
+
+	if(_color || _outlineColor) {
+		if(!_font.hasOwnProperty("img_" + _color)) {
+			console.log("Bitmap Font: call to font outline render for surface without color(s): ", _color, _outlineColor);
+			createFontOutlineImg(_font, _color, _outlineColor);	// if no colorized img, create one.
+		}
+		rF_img = _font["img_" + _color + "_" + _outlineColor];
+	} else rF_img = _font.img;
+
+	for(var i = 0; i < rF_stringlength; i++) {
+		rF_symbolIndex = _string.charCodeAt(i);
+		if(rF_symbolIndex == 32) {	// space
+			rF_totalWidth += _font.symbolInfo[32].width;
+		} else {
+			if(!_font.symbolInfo[rF_symbolIndex].width) continue;
+
+			_dest.drawImage(rF_img,
+				_font.symbolInfo_outline[rF_symbolIndex].x,
+				_font.symbolInfo_outline[rF_symbolIndex].y,
+				_font.symbolInfo_outline[rF_symbolIndex].width,
+				_font.symbolInfo_outline[rF_symbolIndex].height,
+				_x + rF_totalWidth, rF_baseline - _font.symbolInfo_outline[rF_symbolIndex].height,
+				_font.symbolInfo_outline[rF_symbolIndex].width,
+				_font.symbolInfo_outline[rF_symbolIndex].height);
+
+			rF_totalWidth += (_font.symbolInfo_outline[rF_symbolIndex].width + _font.gapSize);
+		}
+	}
+};
+
+
 function createFontColorImg(_font, _color) {	// creates canvas element with coloured font
 	//@TODO - "create check so that you can't create duplicate rgb(r,g,b) and #rgb versions by accident. - Potentially force hex colors as argument.
 
 	console.log("Font: Creating color surface: " + _color);
+
+	if(_font["img_" + _color]) return;
 
 	_font["img_" + _color] = document.createElement("canvas");
 	_font["img_" + _color].width = _font.img.width;
@@ -170,7 +283,8 @@ function createFontColorImg(_font, _color) {	// creates canvas element with colo
 
 };
 
-function blitFontString(_font, _string, _x, _y, _color) {
+
+function blitFontString(_font, _dest, _string, _x, _y, _color) {
 
 	if(_font.img.width == 0 || _font.img.height == 0) return;		// hack fix for firefox race condition bug.
 
@@ -193,7 +307,7 @@ function blitFontString(_font, _string, _x, _y, _color) {
 		} else {
 			if(!_font.symbolInfo[rF_symbolIndex].width) continue;
 
-			_context.drawImage(rF_img,
+			_dest.drawImage(rF_img,
 				_font.symbolInfo[rF_symbolIndex].x, _font.symbolInfo[rF_symbolIndex].y,
 				_font.symbolInfo[rF_symbolIndex].width, _font.symbolInfo[rF_symbolIndex].height,
 				_x + rF_totalWidth, rF_baseline - _font.symbolInfo[rF_symbolIndex].height,
