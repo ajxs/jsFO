@@ -81,7 +81,6 @@ class MainState extends GameState {
 		this.brightmap.height = SCREEN_HEIGHT;
 		this.brightmapContext = this.brightmap.getContext("2d");
 
-		this.mse_overlay = document.getElementById("mse_overlay");		// WHY FALLOUT WHY
 		this.mse_overlay_blocked = document.getElementById("mse_overlay_blocked");
 
 		this.vm = new ScriptVM();
@@ -868,37 +867,19 @@ class MainState extends GameState {
 			}
 		}
 
-		/* if(DEBUG_FLAGS.drawSpecialHexes) {		// Hex debug
+		if(DEBUG_FLAGS.drawSpecialHexes) {		// Hex debug
 			let centreHex = mapGeometry.h2s(mapGeometry.s2h( 320 + this.camera.x, 190 + this.camera.y));	// hex debug stuff
-			drawHex(centreHex.x - this.camera.x,centreHex.y - this.camera.y,"","#00FFFF");
+			drawHex(centreHex.x - this.camera.x, centreHex.y - this.camera.y, "", "#00FFFF");
 
 			for(let h = 0; h < 40000; h++) {
 				let cx = mapGeometry.h2s(h);
-				if(this.map.hexMap[e][h].exitGrid) drawHex(cx.x - this.camera.x,cx.y - this.camera.y, "","#00FF00");
-				if(this.map.hexMap[e][h].blocked) drawHex(cx.x - this.camera.x,cx.y - this.camera.y, "","#FF0000");
-				if(this.map.hexMap[e][h].scrollBlock) drawHex(cx.x - this.camera.x,cx.y - this.camera.y, "","#FFFF00");
+				if(this.map.hexMap[e][h].exitGrid) drawHex(cx.x - this.camera.x, cx.y - this.camera.y, "", "#00FF00");
+				if(this.map.hexMap[e][h].blocked) drawHex(cx.x - this.camera.x, cx.y - this.camera.y, "", "#FF0000");
+				if(this.map.hexMap[e][h].scrollBlock) drawHex(cx.x - this.camera.x, cx.y - this.camera.y, "", "#FFFF00");
 			}
-		} */
+		}
 
 		_context.drawImage(this.eggBuffer,this.eggBufferRect.x,this.eggBufferRect.y);
-
-
-		this.currentRenderObject = this.player;
-		let c = mapGeometry.h2s(this.player.hexPosition);
-		this.currentRenderImg = this.player.anim.img.frameInfo[this.player.orientation][this.player.anim.frameNumber];		//@TODO: clean
-
-		let destX = (c.x + 16 - ((this.currentRenderImg.width/2)|0)) + this.currentRenderObject.anim.shiftX - this.camera.x;	// actual coords of of objects.
-		let destY = (c.y + 8 - this.currentRenderImg.height) + this.currentRenderObject.anim.shiftY - this.camera.y;
-
-		blitFRMOutline(this.player.anim.img,
-			_context,
-			destX-1,
-			destY-1,
-			this.player.orientation,
-			this.player.anim.frameNumber,
-			1);	// get dest coords in screen-space and blit.
-
-
 
 		// Render brightmap over the top of the main screen buffer.
 		if(this.mapLightLevel < 1) {
@@ -974,11 +955,12 @@ class MainState extends GameState {
 		} else if(this.inputState == "game") {	// if not in HUD - on map
 			switch(this.inputState_sub) {
 				case "move":
-					_context.globalAlpha = 0.5;
-					_context.drawImage(mse_overlay,
+
+					blitFRMOutline(_assets["art/intrface/msef000.frm"],		// mouse overlay
+						_context,
 						this.hsIndex.x - this.camera.x - 1,
-						this.hsIndex.y - this.camera.y - 1);	// top hex overlay img
-					_context.globalAlpha = 1;
+						this.hsIndex.y - this.camera.y - 1,
+						0, 0, 0.5, "#900000");
 
 					if(this.cIndex_path == 0) {		// render "X" if no path to location
 						_context.drawImage(mse_overlay_blocked,

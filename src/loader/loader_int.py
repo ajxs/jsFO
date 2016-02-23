@@ -6,18 +6,15 @@ def loadINT(intFile):
 	intInfo = {}
 	intInfo['type'] = "int"
 
+	intInfo['header'] = {}
 	headerdata = struct.unpack('>2HI2HI13H', intFile.read(42))
 
-	intInfo['header'] = {}
-
-	intFile.seek(0x2A)	# force start of proc table
-
-	intInfo['nProcedures'] = loader_util.readUint32(intFile, 1)
+	nProcedures = loader_util.readUint32(intFile, 1)
 	intInfo['procedures'] = {}
 
 	procedures = []
 
-	for i in range(intInfo['nProcedures']):
+	for i in range(nProcedures):
 		procedure = {}
 
 		procedure['nameIndex'] = loader_util.readUint32(intFile, 1)
@@ -71,7 +68,7 @@ def loadINT(intFile):
 if __name__ == "__main__":
 	import loader_dat
 
-	master_dat = loader_dat.DATFile("../data/master.dat")
+	master_dat = loader_dat.DATFile("../../data/master.dat")
 	#int = loadINT(master_dat.getFile("scripts/ahhakun.int"))
 	int = loadINT(master_dat.getFile("scripts/gcfestus.int"))
 

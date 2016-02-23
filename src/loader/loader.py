@@ -14,7 +14,7 @@ import loader_map
 import loader_lst
 import loader_int
 
-urlprefix = "../data/"	# use this to point to the directory with the undat'd Fallout2 data
+urlprefix = "../../data/"	# use this to point to the directory with the undat'd Fallout2 data
 
 master_dat = None
 critter_dat = None
