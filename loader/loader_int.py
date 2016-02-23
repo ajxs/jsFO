@@ -1,5 +1,6 @@
 import struct
 import binascii
+import loader_util
 
 def loadINT(intFile):
 	intInfo = {}
@@ -9,49 +10,49 @@ def loadINT(intFile):
 
 	intInfo['header'] = {}
 
-	intInfo['nProcedures'] = struct.unpack('>I', intFile.read(4))[0]
-	intInfo['procedures'] = []
+	intFile.seek(0x2A)	# force start of proc table
+
+	intInfo['nProcedures'] = loader_util.readUint32(intFile, 1)
+	intInfo['procedures'] = {}
+
+	procedures = []
 
 	for i in range(intInfo['nProcedures']):
 		procedure = {}
 
-		temp = struct.unpack('>6I', intFile.read(24))
+		procedure['nameIndex'] = loader_util.readUint32(intFile, 1)
+		procedure['flags'] = loader_util.readUint32(intFile, 1)
+		procedure['delay'] = loader_util.readUint32(intFile, 1)
+		procedure['conditionalOffset'] = loader_util.readUint32(intFile, 1)
+		procedure['functionOffset'] = loader_util.readUint32(intFile, 1)
+		procedure['nArguments'] = loader_util.readUint32(intFile, 1)
 
-		procedure['nameIndex'] = temp[0]
-		procedure['flags'] = temp[1]
-		procedure['delay'] = temp[2]
-		procedure['conditionalOffset'] = temp[3]
-		procedure['functionOffset'] = temp[4]
-		procedure['nArguments'] = temp[5]
+		procedures.append(procedure)
 
-		intInfo['procedures'].append(procedure)
+	identifiers = {}
+	identifiers_blockOffset = intFile.tell()
+	identifiers_blockSize = loader_util.readUint32(intFile, 1)
 
-	intInfo['names'] = {}
-	tableSize = struct.unpack('>I', intFile.read(4))[0]
-	j = 0
-	while(j < tableSize):
-		nameOffset = j+4
-		nameSize = struct.unpack('>H', intFile.read(2))[0]
-		name = struct.unpack("".join([str(nameSize),'s']), intFile.read(nameSize))[0].decode('UTF-8','ignore').strip()
+	while((intFile.tell() - identifiers_blockOffset) < identifiers_blockSize):
+		nameSize = loader_util.readUint16(intFile, 1)
+		nameOffset = intFile.tell() - identifiers_blockOffset
+		identifiers[nameOffset] = struct.unpack("".join([str(nameSize),'s']), intFile.read(nameSize))[0].decode('UTF-8','ignore').strip()
 
-		j+=(nameSize + 2)
-		intInfo['names'][nameOffset] = name
+	assert loader_util.readUint32(intFile, 1) == 0xFFFFFFFF, "did not get 0xFF check byte at end of block"
 
-	struct.unpack('>I', intFile.read(4))[0]	#0xFFFFFFFF
+	for proc in procedures:
+		name = identifiers[proc['nameIndex']]
+		intInfo["procedures"][name] = proc
 
 	intInfo['strings'] = {}
-	tableSize = struct.unpack('>I', intFile.read(4))[0]
-	if(tableSize != 0xFFFFFFFF):		#if strings table not empty
-		j = 0
-		while(j < tableSize):
-			stringOffset = j+4
-			stringSize = struct.unpack('>H', intFile.read(2))[0]
-			string = struct.unpack("".join([str(stringSize),'s']), intFile.read(stringSize))[0].decode('UTF-8','ignore').strip()
+	strings_blockOffset = intFile.tell()
+	strings_blockSize = loader_util.readUint32(intFile, 1)
+	if(strings_blockSize != 0xFFFFFFFF):		#if strings table not empty
+		while((intFile.tell() - strings_blockOffset) < strings_blockSize):
+			stringSize = loader_util.readUint16(intFile, 1)
+			stringOffset = intFile.tell() - strings_blockOffset
+			intInfo['strings'][stringOffset] = struct.unpack("".join([str(stringSize),'s']), intFile.read(stringSize))[0].decode('UTF-8','ignore').strip()
 
-			j+=(stringSize + 2)
-			intInfo['strings'][stringOffset] = string
-
-		struct.unpack('>I', intFile.read(4))[0]	#0xFFFFFFFF
 
 	intInfo['body'] = {}
 	opcode = 0
@@ -59,36 +60,26 @@ def loadINT(intFile):
 	while True:
 		try:
 			address = intFile.tell()
-			opcode = struct.unpack('>H', intFile.read(2))[0]
+			opcode = loader_util.readUint16(intFile, 1)
 			intInfo['body'][address] = opcode
 		except:
 			break
 
-
 	return intInfo
+
 
 if __name__ == "__main__":
 	import loader_dat
 
-
 	master_dat = loader_dat.DATFile("../data/master.dat")
-	int = loadINT(master_dat.getFile("scripts/ahhakun.int"))
+	#int = loadINT(master_dat.getFile("scripts/ahhakun.int"))
+	int = loadINT(master_dat.getFile("scripts/gcfestus.int"))
 
+	print("\n\nPROCEDURES\n")
+	for key in int['procedures']:
+		print(str(key))
 
-	print("\n\nPROCEDURES\n\n")
-	for i in range(int['nProcedures']):
-		print(int['procedures'][i])
-
-	print("\n\nNAMES\n\n")
-	for key in int['names']:
-		print(str(key) + " " + int['names'][key])
-
-	print("\n\nSTRINGS\n\n")
+	print("\n\nSTRINGS\n")
 
 	for key in int['strings']:
-		print(str(key) + " " + int['strings'][key])
-
-	print("\n\nBODY\n\n")
-
-	for key in int['body']:
-		print(str(key) + " " + str(hex(int['body'][key])))
+		print(int['strings'][key])
