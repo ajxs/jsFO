@@ -1,16 +1,12 @@
-function GameState() {
+'use strict';
 
-}
+class GameState {
+	constructor() {
+		this.statePause = false;
+	};
 
-GameState.prototype = {
-	constructor: GameState,
-	
-	statePause: false,
-	
-	init:function() {},
-	input:function() {},
-	update:function() {},
-	render:function() {}
-	
-
-}
+	init() {};
+	input() {};
+	update() {};
+	render() {};
+};

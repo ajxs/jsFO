@@ -8,33 +8,33 @@
 
 	<script src="src/assets.js"></script>
 	<script src="src/browser.js"></script>
-	<script src="src/bitmapFont.js"></script>
 	<script src="src/mapObjects.js"></script>
 	<script src="src/global.js"></script>
+	<script src="src/geometry.js"></script>
 	<script src="src/GameState.js"></script>
-	<script src="src/GameMap.js"></script>
-	<script src="src/MainState.js"></script>
+	<script src="src/interface.js"></script>
+	<script src="src/gamestate/MainState.js"></script>
 	<script src="src/newGame.js"></script>
-	<script src="src/MainState_obj.js"></script>
-	<script src="src/LoadState.js"></script>
-	<script src="src/MainLoadState.js"></script>
-	<script src="src/SkilldexState.js"></script>
-	<script src="src/ContextMenuState.js"></script>
-	<script src="src/MainMenuState.js"></script>
-	<script src="src/IngameMenuState.js"></script>
-	<script src="src/InventoryState.js"></script>
-	<script src="src/CharacterScreenState.js"></script>
-	<script src="src/PipboyState.js"></script>
-	<script src="src/MapscreenState.js"></script>
+	<script src="src/gamestate/LoadState.js"></script>
+	<script src="src/gamestate/MainLoadState.js"></script>
+	<script src="src/gamestate/SkilldexState.js"></script>
+	<script src="src/gamestate/ContextMenuState.js"></script>
+	<script src="src/gamestate/MainMenuState.js"></script>
+	<script src="src/gamestate/IngameMenuState.js"></script>
+	<script src="src/gamestate/InventoryState.js"></script>
+	<script src="src/gamestate/CharacterScreenState.js"></script>
+	<script src="src/gamestate/PipboyState.js"></script>
+	<script src="src/gamestate/MapscreenState.js"></script>
 	<script src="src/vm.js"></script>
 	<script src="src/vm_op.js"></script>
-	
+	<script src="src/renderer.js"></script>
+
 	<script src="src/main.js"></script>
 
 	<script>
-	
+
 		var mainState_prevState;	// track previous state of mainState.statePause
-	
+
 		// Page functions
 		function openInfo() {
 			mainState_prevState = mainState.statePause;
@@ -42,28 +42,28 @@
 			document.getElementById('lightbox').style.display = 'block';
 			document.getElementById('info').style.display = 'block';
 		};
-		
+
 		function openHelp() {
 			mainState_prevState = mainState.statePause;
 			mainState.statePause = true;
 			document.getElementById('lightbox').style.display = 'block';
 			document.getElementById('help').style.display = 'block';
 		};
-		
+
 		function closeWindows() {
 			mainState.statePause = mainState_prevState;
 			document.getElementById('lightbox').style.display = 'none';
 			document.getElementById('info').style.display = 'none';
 			document.getElementById('help').style.display = 'none';
 		};
-		
+
 		function browserTestFail() {
 			document.getElementById("mainCanvas").style.display = 'none';
 			document.getElementById("main_failed").style.display = 'block';
 		};
-	
+
 	</script>
-	
+
 </head>
 
 <!--Entry point defined as window.addEventListener("load", main_init); in main.js -->
@@ -82,10 +82,8 @@
 			<img src="inc/main_failed.png"/>
 		</div>
 	</div>
-	
+
 	<div id="mainStorage">
-		<img id="mse_overlay" src="inc/mse_overlay.gif"/>
-		<img id="mse_overlay_blocked" src="inc/mse_overlay_blocked.gif"/>
 		<img id="trans_egg" src="inc/egg.png"/>
 		<img id="loadState_overlay" src="inc/loadState_overlay.png"/>
 		<img id="MainMenuState_bg" src="inc/MainMenuState_bg.png"/>

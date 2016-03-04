@@ -1,0 +1,39 @@
+{
+	"x": 0,
+	"y": 0,
+	"width": 640,
+	"height": 480,
+	"elements": [{
+		"handle": "status",
+		"x": 53,
+		"y": 340,
+		"width": 15,
+		"height": 16,
+		"upSprite": 0,
+		"downSprite": 0
+	},{
+		"handle": "archive",
+		"x": 53,
+		"y": 423,
+		"width": 15,
+		"height": 16,
+		"upSprite": 0,
+		"downSprite": 0
+	},{
+		"handle": "map",
+		"x": 53,
+		"y": 394,
+		"width": 15,
+		"height": 16,
+		"upSprite": 0,
+		"downSprite": 0
+	},{
+		"handle": "close",
+		"x": 53,
+		"y": 449,
+		"width": 15,
+		"height": 16,
+		"upSprite": 0,
+		"downSprite": 0
+	}]
+}

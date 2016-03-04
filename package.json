@@ -1,0 +1,19 @@
+{
+	"name": "jsFO",
+	"version": "0.0.1",
+	"description": "Browser based javascript port of Fallout 2",
+	"author": "ajxs <ajxscc@gmail.com>",
+	"contributors": [{
+		"name": "ajxs",
+		"email": "ajxscc@gmail.com"
+	}],
+	"repository": {
+		"type": "git",
+		"url": "https://github.com/ajxs/jsFO"
+	},
+	"bugs": {
+		"url": "https://github.com/ajxs/jsFO/issues"
+	},
+	"private": true,
+	"license": "Apache-2.0"
+}

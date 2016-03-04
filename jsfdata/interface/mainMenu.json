@@ -1,0 +1,48 @@
+{
+	"x": 32,
+	"y": 90,
+	"width": 640,
+	"height": 480,
+	"elements": [{
+		"handle": "mainMenu_newGame",
+		"x": 0,
+		"y": 0,
+		"width": 191,
+		"height": 35,
+		"mouseState": 0,
+		"text": "NEW GAME",
+		"textX": 50,
+		"textY": 5
+	}, {
+		"handle": "mainMenu_sample",
+		"x": 0,
+		"y": 40,
+		"width": 191,
+		"height": 35,
+		"mouseState": 0,
+		"text": "MORE",
+		"textX": 50,
+		"textY": 5
+	}, {
+		"handle": "mainMenu_sample",
+		"x": 0,
+		"y": 80,
+		"width": 191,
+		"height": 35,
+		"mouseState": 0,
+		"text": "COMING",
+		"textX": 50,
+		"textY": 5
+	}, {
+		"handle": "mainMenu_sample",
+		"x": 0,
+		"y": 120,
+		"width": 191,
+		"height": 35,
+		"mouseState": 0,
+		"text": "SOON",
+		"textX": 50,
+		"textY": 5
+	}]
+
+}
