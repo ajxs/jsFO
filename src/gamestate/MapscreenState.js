@@ -62,11 +62,11 @@ class MapScreenState extends GameState {
 
 	update() {
 		this.activeItem = -1;
-		if(intersectTest(MOUSE.x,MOUSE.y,0,0,
+		if(intersectTest(_mouse.x,_mouse.y,0,0,
 			this.x + this.closeButton.x, this.y + this.closeButton.y,
 			this.closeButton.width, this.closeButton.height)) {
 				this.activeItem = "closeButton";
-		} else if(intersectTest(MOUSE.x,MOUSE.y,0,0,
+		} else if(intersectTest(_mouse.x,_mouse.y,0,0,
 			this.x + this.hiSwitch.x, this.y + this.hiSwitch.y,
 			this.hiSwitch.width, this.hiSwitch.height)) {
 				this.activeItem = "hiSwitch";
@@ -109,7 +109,7 @@ class MapScreenState extends GameState {
 
 		}
 
-		_context.drawImage(_assets["art/intrface/stdarrow.frm"].frameInfo[0][0].img, MOUSE.x, MOUSE.y);		// cursor
+		_context.drawImage(_assets["art/intrface/stdarrow.frm"].frameInfo[0][0].img, _mouse.x, _mouse.y);		// cursor
 	};
 
 };

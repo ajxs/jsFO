@@ -7,12 +7,9 @@ class MainMenuState extends GameState {
 		super();
 
 		this.backgroundImage = document.getElementById('MainMenuState_bg');
-		this.buttonImage = document.getElementById('MainMenuState_btn');
+		this.buttonImage = document.getElementById('MainMenuState_btn');		//@TODO: FIX
 
 		this.menu = new Interface('jsfdata/interface/mainMenu.json');
-
-		this.menu.x = (SCREEN_WIDTH*0.05)|0;
-		this.menu.y = (SCREEN_WIDTH*0.185)|0;		// set in main_setResolution()
 
 	};
 
@@ -33,21 +30,15 @@ class MainMenuState extends GameState {
 
 	update() {
 		this.menu.update();
-		if(MOUSE.c1) this.menu.mouseState = 1;
-		else this.menu.mouseState = 0;
 	};
 
 	render() {
-		_context.globalAlpha = 1;
-
 		_context.drawImage(this.backgroundImage, 0, 0, 1024, 768, 0,0,SCREEN_WIDTH, SCREEN_HEIGHT);	// bg
 
-		let activeState;
 		this.menu.elements.forEach((element, index) => {
 			_context.drawImage(this.buttonImage, this.menu.x + element.x, this.menu.y + element.y);
 
-			activeState = (this.menu.mouseState == 1 && this.menu.activeItem == index);
-			blitFRM(activeState ? _assets["art/intrface/menudown.frm"] : _assets["art/intrface/menuup.frm"],
+			blitFRM((this.menu.mouseState == 1 && this.menu.activeItem == index) ? _assets["art/intrface/menudown.frm"] : _assets["art/intrface/menuup.frm"],
 				_context,
 				this.menu.x + element.x + 14,
 				this.menu.y + element.y + 4);
@@ -57,14 +48,14 @@ class MainMenuState extends GameState {
 				element.text ,
 				this.menu.x + element.x + element.textX,
 				this.menu.y + element.y + element.textY,
-				activeState ? "#a99028": "#b89c28");
+				(this.menu.mouseState == 1 && this.menu.activeItem == index) ? "#a99028": "#b89c28");
 
 		});
 
 		blitFRM(_assets["art/intrface/stdarrow.frm"],		// cursor
 			_context,
-			MOUSE.x,
-			MOUSE.y);
+			_mouse.x,
+			_mouse.y);
 	};
 
 };

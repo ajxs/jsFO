@@ -360,8 +360,8 @@ class CharacterScreenState extends GameState {
 
 		blitFRM(_assets["art/intrface/stdarrow.frm"],		// cursor
 			_context,
-			MOUSE.x,
-			MOUSE.y);
+			_mouse.x,
+			_mouse.y);
 
 	};
 

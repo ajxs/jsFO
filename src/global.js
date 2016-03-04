@@ -1,47 +1,41 @@
 'use strict';
 
-var _canvas;		// global vars
-var _context;
+let _canvas;		// global vars
+let _context;
 
-var callFrame = browser_getCallFrame();
-
+const CALLFRAME = browser_getCallFrame();
 const SCREEN_WIDTH = 640, SCREEN_HEIGHT = 480;
-
 const DEBUG_FLAGS = {
 	drawSpecialHexes: false,
 };
 
-
-var MOUSE = {		// struct for mouse info
+let clientBoundingRect;
+let _mouse = {		// struct for mouse info
 	x: 0,
 	y: 0,
-	c1: false,
-	c2: false
 };
 
-var clientBoundingRect;
-
-var _keyboardStates = [];	// array to hold keycode states
+let _keyboard = {};	// array to hold keycode states
 
 
-var _assets = {};		// main asset hashtable
+let _assets = {};		// main asset hashtable
 
 
-var fps_currentTime;
+let fps_currentTime;
 
-var activeGameStates = [];		// state stack
+let activeGameStates = [];		// state stack
 
-var loadState;
-var mainState;
-var mainLoadState;
-var contextMenuState;
-var inventoryState;
-var skilldexState;
-var ingameMenuState;
-var mainMenuState;
-var characterScreenState;
-var pipboyState;
-var mapScreenState;
+let loadState;
+let mainState;
+let mainLoadState;
+let contextMenuState;
+let inventoryState;
+let skilldexState;
+let ingameMenuState;
+let mainMenuState;
+let characterScreenState;
+let pipboyState;
+let mapScreenState;
 
 
 function getTicks() {
@@ -54,7 +48,7 @@ function isObject(_o) {
 };
 
 function isFunction(functionToCheck) {
-	var getType = {};
+	let getType = {};
 	return functionToCheck && getType.toString.call(functionToCheck) === '[object Function]';
 };
 

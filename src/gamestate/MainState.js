@@ -7,18 +7,16 @@ class MainState extends GameState {
 		this.map = {
 			hexMap: 0,
 			hexStatus(i,e) {
-				return (this.hexMap[e][i] && !this.hexMap[e][i].blocked);
+				return !this.hexMap[e][i].blocked;
 			},
 		};
 
 		this.interfaceRect = new Interface('jsfdata/interface/mainStateInterface.json');
-		this.interfaceRect.x = ((SCREEN_WIDTH / 2)|0) - 320;
-		this.interfaceRect.y = SCREEN_HEIGHT - 99;
 
 		this.console = {
 			consoleData: [],
-			x: (((SCREEN_WIDTH / 2)|0) - 320) + 30,
-			y: SCREEN_HEIGHT - 26,
+			x: 30,
+			y: 454,
 
 			fontHeight: 10,
 			fontColor: "#00FF00",
@@ -80,7 +78,7 @@ class MainState extends GameState {
 		this.brightmap.width = SCREEN_WIDTH;
 		this.brightmap.height = SCREEN_HEIGHT;
 		this.brightmapContext = this.brightmap.getContext("2d");
-		
+
 		this.vm = new ScriptVM();
 
 
@@ -341,7 +339,7 @@ class MainState extends GameState {
 			case "mousemove":
 				break;
 			case "keydown":
-				if(_keyboardStates[27]) {
+				if(_keyboard['Escape']) {
 					main_gameStateFunction('openIngameMenu');
 					return;
 				}
@@ -355,7 +353,7 @@ class MainState extends GameState {
 					return;
 				} else if(this.inputState == "game") {
 					if(this.inputState_sub == "command") {
-						if(MOUSE.c2) return;		// stop mouse2 from triggering commands when in command mode
+						if(_mouse.c2) return;		// stop mouse2 from triggering commands when in command mode
 						this.objectIndex = this.getObjectIndex();
 						if(this.objectIndex != -1) {		// if object under cursor
 							let objC = mapGeometry.h2s(this.mapObjects[this.player.currentElevation][this.objectIndex].hexPosition);
@@ -495,8 +493,8 @@ class MainState extends GameState {
 		// from this function you can accurately find the object under the cursor by blitting the objects 50px around the cursor onto the buffer, then reading the color underneath the centre of the image.
 		// from the formula r*1000 + b*100 + g we can find the index of the object.
 
-		this.objectBufferRect.x = MOUSE.x - this.objectBufferRect.width/2;
-		this.objectBufferRect.y = MOUSE.y - this.objectBufferRect.height/2;
+		this.objectBufferRect.x = _mouse.x - this.objectBufferRect.width/2;
+		this.objectBufferRect.y = _mouse.y - this.objectBufferRect.height/2;
 
 		for(let i = 0, mapObjectsLength = this.mapObjects[this.player.currentElevation].length; i < mapObjectsLength; i++) {
 			this.currentRenderObject = this.mapObjects[this.player.currentElevation][i];
@@ -561,13 +559,13 @@ class MainState extends GameState {
 	update() {
 
 		// STATE HANDLING
-		this.scrollStates.yNeg = (MOUSE.y < (SCREEN_HEIGHT * 0.025));
-		this.scrollStates.yPos = (MOUSE.y > (SCREEN_HEIGHT * 0.975));
-		this.scrollStates.xNeg = (MOUSE.x < (SCREEN_WIDTH * 0.025));
-		this.scrollStates.xPos = (MOUSE.x > (SCREEN_WIDTH * 0.975));
+		this.scrollStates.yNeg = (_mouse.y < (SCREEN_HEIGHT * 0.025));
+		this.scrollStates.yPos = (_mouse.y > (SCREEN_HEIGHT * 0.975));
+		this.scrollStates.xNeg = (_mouse.x < (SCREEN_WIDTH * 0.025));
+		this.scrollStates.xPos = (_mouse.x > (SCREEN_WIDTH * 0.975));
 		this.scrollState = (this.scrollStates.yNeg || this.scrollStates.yPos || this.scrollStates.xNeg || this.scrollStates.xPos);
 
-		if(intersectTest(MOUSE.x,MOUSE.y,0,0, 0,0,SCREEN_WIDTH,SCREEN_HEIGHT) && this.scrollState) {
+		if(intersectTest(_mouse.x,_mouse.y,0,0, 0,0,SCREEN_WIDTH,SCREEN_HEIGHT) && this.scrollState) {
 			this.inputState = "scroll";
 
 			this.scrollCheckAdj = mapGeometry.findAdj(mapGeometry.s2h( 320 + this.camera.x, 190 + this.camera.y));
@@ -583,7 +581,7 @@ class MainState extends GameState {
 			if(this.scrollStates.xNeg && !this.scrollStates.xNegBlocked) this.camera.x -= this.scrollDelta;
 			if(this.scrollStates.xPos && !this.scrollStates.xPosBlocked) this.camera.x += this.scrollDelta;
 
-		} else if(intersectTest(MOUSE.x,MOUSE.y,0,0, this.interfaceRect.x,this.interfaceRect.y,this.interfaceRect.width,this.interfaceRect.height)) {	// if mouse over interface rect
+		} else if(intersectTest(_mouse.x,_mouse.y,0,0, this.interfaceRect.x,this.interfaceRect.y,this.interfaceRect.width,this.interfaceRect.height)) {	// if mouse over interface rect
 			this.inputState = "interface";
 			this.interfaceRect.update();		//@TODO: bug here
 
@@ -591,7 +589,7 @@ class MainState extends GameState {
 			this.inputState = "game";
 
 			if(this.inputState_sub == "move") {
-				this.hIndex = mapGeometry.s2h(MOUSE.x + this.camera.x, MOUSE.y + this.camera.y);		// hex index calculated here
+				this.hIndex = mapGeometry.s2h(_mouse.x + this.camera.x, _mouse.y + this.camera.y);		// hex index calculated here
 				this.hsIndex = mapGeometry.h2s(this.hIndex);
 
 				if(this.cIndex_test != this.hIndex) {		// check if mouse has moved for hover functionality
@@ -602,9 +600,9 @@ class MainState extends GameState {
 				}
 
 			} else if(this.inputState_sub == "command") {
-				if(this.cIndex_x != MOUSE.x || this.cIndex_y != MOUSE.y) {	// check if mouse has moved for hover functionality
-					this.cIndex_x = MOUSE.x;
-					this.cIndex_y = MOUSE.y;
+				if(this.cIndex_x != _mouse.x || this.cIndex_y != _mouse.y) {	// check if mouse has moved for hover functionality
+					this.cIndex_x = _mouse.x;
+					this.cIndex_y = _mouse.y;
 					this.cIndex_time = getTicks();
 					this.cIndex_state = false;
 				}
@@ -626,7 +624,7 @@ class MainState extends GameState {
 		}
 
 
-		if(_keyboardStates[16]) {	// SHIFT control input for running
+		if(_keyboard['ShiftRight'] || _keyboard['ShiftLeft']) {	// SHIFT control input for running
 			this.inputRunState = true;
 		} else this.inputRunState = false;
 
@@ -941,15 +939,15 @@ class MainState extends GameState {
 
 			blitFRM(this.scrollimg,
 				_context,
-				MOUSE.x,
-				MOUSE.y);
+				_mouse.x,
+				_mouse.y);
 
 		} else if(this.inputState == "interface") {		// if not scrolling
 
 			blitFRM(_assets["art/intrface/stdarrow.frm"],
 				_context,
-				MOUSE.x,
-				MOUSE.y);
+				_mouse.x,
+				_mouse.y);
 
 		} else if(this.inputState == "game") {	// if not in HUD - on map
 			switch(this.inputState_sub) {
@@ -975,14 +973,14 @@ class MainState extends GameState {
 				case "command":
 					blitFRM(_assets["art/intrface/actarrow.frm"],
 						_context,
-						MOUSE.x,
-						MOUSE.y);
+						_mouse.x,
+						_mouse.y);
 
 					if(this.cIndex_state) {
 						blitFRM(_assets["art/intrface/lookn.frm"],
 							_context,
-							MOUSE.x + 40,
-							MOUSE.y);
+							_mouse.x + 40,
+							_mouse.y);
 					}
 					break;
 			}	// end switch

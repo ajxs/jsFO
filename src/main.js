@@ -34,10 +34,10 @@ function main_init() {
 	var main_loop = function() {
 		main_update();
 		main_render();
-		callFrame(main_loop);
+		CALLFRAME(main_loop);
 	};
 
-	if(!callFrame) {
+	if(!CALLFRAME) {
 		console.log("main: frame handler error: No frame handler!");
 		return;
 	}
@@ -54,7 +54,7 @@ function main_init() {
 	pipboyState = new PipboyState();
 	mapScreenState = new MapScreenState();
 
-	callFrame(main_loop);	// init loop
+	CALLFRAME(main_loop);	// init loop
 	_canvas.focus();
 
 	activeGameStates.push(mainLoadState);
@@ -91,23 +91,20 @@ function main_input(e) {
 	switch(e.type) {
 		case "mousemove":
 			clientBoundingRect = _canvas.getBoundingClientRect();
-			MOUSE.x = (e.clientX - clientBoundingRect.left)|0;
-			MOUSE.y = (e.clientY - clientBoundingRect.top)|0;
+			_mouse.x = (e.clientX - clientBoundingRect.left)|0;
+			_mouse.y = (e.clientY - clientBoundingRect.top)|0;
 			break;
 		case "mousedown":
-			if(e.which == 1) {
-				MOUSE.c1 = true;
-			} else if(e.which == 3) MOUSE.c2 = true;
+			_mouse[e.button] = true;
 			break;
 		case "mouseup":
-			if(e.which == 1) MOUSE.c1 = false;
-			else if(e.which == 3) MOUSE.c2 = false;
+			_mouse[e.button] = false;
 			break;
 		case "keydown":
-			_keyboardStates[e.which] = true;
+			_keyboard[e.code] = true;
 			break;
 		case "keyup":
-			_keyboardStates[e.which] = false;
+			_keyboard[e.code] = false;
 			break;
 		case "click":
 			break;
@@ -167,7 +164,7 @@ function main_loadGame(_saveState) {
 function main_openActiveState(state) {
 	mainState.statePause = true;
 	activeGameStates.push(state);
-	_keyboardStates[27] = false;	// LOL - sets ESC key state to false to prevent the next iteration of the gamestate stack from capturing the input.
+	_keyboard['Escape'] = false;	// LOL - sets ESC key state to false to prevent the next iteration of the gamestate stack from capturing the input.
 };
 
 function main_closeActiveState(state) {
