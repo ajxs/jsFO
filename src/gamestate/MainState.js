@@ -953,14 +953,14 @@ class MainState extends GameState {
 			switch(this.inputState_sub) {
 				case "move":
 
-					blitFRMOutline(_assets["art/intrface/msef000.frm"],		// mouse overlay
+					blitFRM(_assets["art/intrface/msef000.frm"],		// mouse overlay
 						_context,
 						this.hsIndex.x - this.camera.x - 1,
 						this.hsIndex.y - this.camera.y - 1,
 						0, 0, 0.5, "#900000");
 
 					if(this.cIndex_path == 0) {		// render "X" if no path to location
-						blitFontStringOutline(_assets["font1.aaf"],
+						blitFontString(_assets["font1.aaf"],
 							_context,
 							"X",
 							this.hsIndex.x - this.camera.x + 11,

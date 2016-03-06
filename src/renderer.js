@@ -1,34 +1,32 @@
 "use strict";
 
-function blitFRM(frm, dest, dx, dy, dir = 0, frame = 0, alpha = 1) {
+let blitFRM_image = null;
+function blitFRM(frm, dest, dx, dy, dir = 0, frame = 0, alpha = 1, outlineColor = null) {
 	if(!frm) return;
 	if(alpha < 1) dest.globalAlpha = alpha;
-	dest.drawImage(frm.img,
-		frm.frameInfo[dir][frame].atlasX,
-	 	frm.frameInfo[dir][frame].atlasY,
-		frm.frameInfo[dir][frame].width,
-		frm.frameInfo[dir][frame].height,
-		dx,
-		dy,
-		frm.frameInfo[dir][frame].width,
-		frm.frameInfo[dir][frame].height);
-	if(alpha < 1) dest.globalAlpha = 1;
-};
+	if(!outlineColor) {
+		dest.drawImage(frm.img,
+			frm.frameInfo[dir][frame].atlasX,
+		 	frm.frameInfo[dir][frame].atlasY,
+			frm.frameInfo[dir][frame].width,
+			frm.frameInfo[dir][frame].height,
+			dx,
+			dy,
+			frm.frameInfo[dir][frame].width,
+			frm.frameInfo[dir][frame].height);
+	} else {
+		if(!frm['img_outline_' + outlineColor]) createFRMOutline(frm, outlineColor);
+		dest.drawImage(frm['img_outline_' + outlineColor],
+			frm.frameInfo_outline[dir][frame].atlasX,
+		 	frm.frameInfo_outline[dir][frame].atlasY,
+			frm.frameInfo_outline[dir][frame].width,
+			frm.frameInfo_outline[dir][frame].height,
+			dx,
+			dy,
+			frm.frameInfo_outline[dir][frame].width,
+			frm.frameInfo_outline[dir][frame].height);
+	}
 
-
-function blitFRMOutline(frm, dest, dx, dy, dir = 0, frame = 0, alpha = 1, color = "#FF0000") {
-	if(!frm) return;
-	if(!frm['img_outline_' + color]) createFRMOutline(frm, color);
-	if(alpha < 1) dest.globalAlpha = alpha;
-	dest.drawImage(frm['img_outline_' + color],
-		frm.frameInfo_outline[dir][frame].atlasX,
-	 	frm.frameInfo_outline[dir][frame].atlasY,
-		frm.frameInfo_outline[dir][frame].width,
-		frm.frameInfo_outline[dir][frame].height,
-		dx,
-		dy,
-		frm.frameInfo_outline[dir][frame].width,
-		frm.frameInfo_outline[dir][frame].height);
 	if(alpha < 1) dest.globalAlpha = 1;
 };
 
@@ -131,7 +129,7 @@ let rF_baseline = 0;
 let rF_img = 0;
 
 
-function createFontOutlineImg(_font, _color, _outlineColor) {
+function createFontOutlineImg(_font, _outlineColor) {
 
 	let maxHeight = 0, maxWidth = 0, currentX = 0;
 	let symbolInfo_outline = _font.symbolInfo.map(function(symbol) {
@@ -185,7 +183,7 @@ function createFontOutlineImg(_font, _color, _outlineColor) {
 		}
 	}
 
-	createFontColorImg(_font, _color);
+	/* createFontColorImg(_font, _color);
 	for(let i = 0; i < symbolInfo_outline.length; i++) {
 		outlineContext.drawImage(_font["img_" + _color],
 		_font.symbolInfo[i].x,
@@ -196,15 +194,14 @@ function createFontOutlineImg(_font, _color, _outlineColor) {
 		symbolInfo_outline[i].y + 1,
 		_font.symbolInfo[i].width,
 		_font.symbolInfo[i].height);
-	}
+	} */
 
 	_font.symbolInfo_outline = symbolInfo_outline;
-	_font["img_" + _color + "_" + _outlineColor] = outlineCanvas;
+	_font["img_outline_" + _outlineColor] = outlineCanvas;
 
 };
 
-
-function blitFontStringOutline(_font, _dest, _string, _x, _y, _color, _outlineColor) {
+function blitFontString(_font, _dest, _string, _x, _y, _color = null, _outlineColor = null) {
 
 	if(_font.img.width == 0 || _font.img.height == 0) return;		// hack fix for firefox race condition bug.
 
@@ -212,13 +209,17 @@ function blitFontStringOutline(_font, _dest, _string, _x, _y, _color, _outlineCo
 	rF_totalWidth = 0;
 	rF_baseline = _y + _font.height;
 
-	if(_color || _outlineColor) {
+	if(_color) {
 		if(!_font.hasOwnProperty("img_" + _color)) {
-			console.log("Bitmap Font: call to font outline render for surface without color(s): ", _color, _outlineColor);
-			createFontOutlineImg(_font, _color, _outlineColor);	// if no colorized img, create one.
+			console.log("Bitmap Font: call to font render for surface without color: ", _color);
+			createFontColorImg(_font, _color);	// if no colorized img, create one.
 		}
-		rF_img = _font["img_" + _color + "_" + _outlineColor];
+		rF_img = _font["img_" + _color];
 	} else rF_img = _font.img;
+
+	if(_outlineColor) {
+		if(!_font.hasOwnProperty("img_outline_" + _color)) createFontOutlineImg(_font, _outlineColor);	// if no colorized img, create one.
+	}
 
 	for(var i = 0; i < rF_stringlength; i++) {
 		rF_symbolIndex = _string.charCodeAt(i);
@@ -227,16 +228,22 @@ function blitFontStringOutline(_font, _dest, _string, _x, _y, _color, _outlineCo
 		} else {
 			if(!_font.symbolInfo[rF_symbolIndex].width) continue;
 
-			_dest.drawImage(rF_img,
-				_font.symbolInfo_outline[rF_symbolIndex].x,
-				_font.symbolInfo_outline[rF_symbolIndex].y,
-				_font.symbolInfo_outline[rF_symbolIndex].width,
-				_font.symbolInfo_outline[rF_symbolIndex].height,
-				_x + rF_totalWidth, rF_baseline - _font.symbolInfo_outline[rF_symbolIndex].height,
-				_font.symbolInfo_outline[rF_symbolIndex].width,
-				_font.symbolInfo_outline[rF_symbolIndex].height);
+			if(_outlineColor) {
+				_dest.drawImage(_font["img_outline_" + _outlineColor],
+					_font.symbolInfo_outline[rF_symbolIndex].x, _font.symbolInfo_outline[rF_symbolIndex].y,
+					_font.symbolInfo_outline[rF_symbolIndex].width, _font.symbolInfo_outline[rF_symbolIndex].height,
+					_x + rF_totalWidth - 1,
+					rF_baseline - _font.symbolInfo_outline[rF_symbolIndex].height + 1,
+					_font.symbolInfo_outline[rF_symbolIndex].width, _font.symbolInfo_outline[rF_symbolIndex].height);
+			}
 
-			rF_totalWidth += (_font.symbolInfo_outline[rF_symbolIndex].width + _font.gapSize);
+			_dest.drawImage(rF_img,
+				_font.symbolInfo[rF_symbolIndex].x, _font.symbolInfo[rF_symbolIndex].y,
+				_font.symbolInfo[rF_symbolIndex].width, _font.symbolInfo[rF_symbolIndex].height,
+				_x + rF_totalWidth, rF_baseline - _font.symbolInfo[rF_symbolIndex].height,
+				_font.symbolInfo[rF_symbolIndex].width, _font.symbolInfo[rF_symbolIndex].height);
+
+			rF_totalWidth += (_font.symbolInfo[rF_symbolIndex].width + _font.gapSize);
 		}
 	}
 };
@@ -281,39 +288,4 @@ function createFontColorImg(_font, _color) {	// creates canvas element with colo
 		_fontContext.putImageData(imgData2,0,0);
 	}
 
-};
-
-
-function blitFontString(_font, _dest, _string, _x, _y, _color) {
-
-	if(_font.img.width == 0 || _font.img.height == 0) return;		// hack fix for firefox race condition bug.
-
-	rF_stringlength = _string.length;
-	rF_totalWidth = 0;
-	rF_baseline = _y + _font.height;
-
-	if(_color) {
-		if(!_font.hasOwnProperty("img_" + _color)) {
-			console.log("Bitmap Font: call to font render for surface without color: ", _color);
-			createFontColorImg(_font, _color);	// if no colorized img, create one.
-		}
-		rF_img = _font["img_" + _color];
-	} else rF_img = _font.img;
-
-	for(var i = 0; i < rF_stringlength; i++) {
-		rF_symbolIndex = _string.charCodeAt(i);
-		if(rF_symbolIndex == 32) {	// space
-			rF_totalWidth += _font.symbolInfo[32].width;
-		} else {
-			if(!_font.symbolInfo[rF_symbolIndex].width) continue;
-
-			_dest.drawImage(rF_img,
-				_font.symbolInfo[rF_symbolIndex].x, _font.symbolInfo[rF_symbolIndex].y,
-				_font.symbolInfo[rF_symbolIndex].width, _font.symbolInfo[rF_symbolIndex].height,
-				_x + rF_totalWidth, rF_baseline - _font.symbolInfo[rF_symbolIndex].height,
-				_font.symbolInfo[rF_symbolIndex].width, _font.symbolInfo[rF_symbolIndex].height);
-
-			rF_totalWidth += (_font.symbolInfo[rF_symbolIndex].width + _font.gapSize);
-		}
-	}
 };
