@@ -335,63 +335,49 @@ class MainState extends GameState {
 
 
 	input(e) {
-		switch(e.type) {
-			case "mousemove":
-				break;
-			case "keydown":
-				if(_keyboard['Escape']) {
-					main_gameStateFunction('openIngameMenu');
-					return;
-				}
+		if(e.type == "keydown" && _keyboard['Escape']) {
+			main_gameStateFunction('openIngameMenu');
+			return;
+		}
 
-				break;
-			case "keyup":
-				break;
-			case "mousedown":
-				if(this.inputState == "interface") {
-					this.interfaceRect.mouseState = 1;
-					return;
-				} else if(this.inputState == "game") {
+		if(this.inputState == "game") {
+			switch(e.type) {
+				case "click":
+					if(this.inputState_sub == "move") this.actor_beginMoveState(this.player,this.hIndex,this.inputRunState);		//this.actor_cancelAction(this.player);
+					break;
+				case 'contextmenu':	// switch input modes on mouse2
+					(this.inputState_sub == "move") ? this.inputState_sub = "command" : this.inputState_sub = "move";
+					break;
+				case "mousedown":
 					if(this.inputState_sub == "command") {
-						if(_mouse.c2) return;		// stop mouse2 from triggering commands when in command mode
+						if(_mouse[2]) return;		// stop mouse2 from triggering commands when in command mode
 						this.objectIndex = this.getObjectIndex();
 						if(this.objectIndex != -1) {		// if object under cursor
 							let objC = mapGeometry.h2s(this.mapObjects[this.player.currentElevation][this.objectIndex].hexPosition);
-							// Context Menu
-							contextMenuState.setMenuItems(this.objectIndex,
-								objC.x - this.camera.x + 30,
-								objC.y - this.camera.y - 20);
-							main_gameStateFunction('openContextMenu');
+							main_gameStateFunction('openContextMenu', {		// Context Menu
+								obj: this.objectIndex,
+								x: objC.x - this.camera.x + 30,
+								y: objC.y - this.camera.y - 20
+							});
 						}
-
 					}
-				}
-				break;
-			case "mouseup":
-				if(this.inputState == "interface") {
-					this.interfaceRect.mouseState = 0;
-				}
-				break;
-			case "click":
-				if(this.inputState == "interface") {
-					let clickIndex = this.interfaceRect.clickHandler();
-					if(clickIndex) main_gameStateFunction(clickIndex);
+					break;
+			}
+		} else if(this.inputState == "interface") {
+			switch(e.type) {
+				case "click":
+					main_gameStateFunction(this.interfaceRect.clickHandler());
 					this.interfaceRect.activeItem = -1;
+					break;
+				case "mousedown":
+					this.interfaceRect.mouseState = 1;
+					break;
+				case "mouseup":
+					this.interfaceRect.mouseState = 0;
+					break;
+			}
+		}
 
-				} else if(this.inputState == "game") {
-					if(this.inputState_sub == "move") {
-						//this.actor_cancelAction(this.player);
-						this.actor_beginMoveState(this.player,this.hIndex,this.inputRunState);
-					}
-				}
-				break;
-			case 'contextmenu':	// switch input modes on mouse2
-				if(this.inputState == "game") {
-					if(this.inputState_sub == "move") this.inputState_sub = "command";
-					else if(this.inputState_sub == "command") this.inputState_sub = "move";
-				}
-				break;
-		};
 
 	};
 
@@ -892,6 +878,24 @@ class MainState extends GameState {
 			_context.globalCompositeOperation = "source-over";	// reset
 		}
 
+
+
+		this.currentRenderObject = this.player;
+		let c = mapGeometry.h2s(this.currentRenderObject.hexPosition);
+		this.currentRenderImg = this.currentRenderObject.anim.img.frameInfo[this.currentRenderObject.orientation][this.currentRenderObject.anim.frameNumber];		//@TODO: clean
+
+		let destX = (c.x + 16 - ((this.currentRenderImg.width/2)|0)) + this.currentRenderObject.anim.shiftX - this.camera.x;	// actual coords of of objects.
+		let destY = (c.y + 8 - this.currentRenderImg.height) + this.currentRenderObject.anim.shiftY - this.camera.y;
+
+		blitFRM(this.currentRenderObject.anim.img,
+			_context,
+			destX,
+			destY,
+			this.currentRenderObject.orientation,
+			this.currentRenderObject.anim.frameNumber,
+			1,
+			"#00FFFF");	// get dest coords in screen-space and blit.
+
 		// interface
 
 		blitFRM(_assets["art/intrface/iface.frm"],
@@ -955,9 +959,9 @@ class MainState extends GameState {
 
 					blitFRM(_assets["art/intrface/msef000.frm"],		// mouse overlay
 						_context,
-						this.hsIndex.x - this.camera.x - 1,
-						this.hsIndex.y - this.camera.y - 1,
-						0, 0, 0.5, "#900000");
+						this.hsIndex.x - this.camera.x,
+						this.hsIndex.y - this.camera.y,
+						0, 0, 0, "#900000", 0.5);
 
 					if(this.cIndex_path == 0) {		// render "X" if no path to location
 						blitFontString(_assets["font1.aaf"],

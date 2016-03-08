@@ -1,33 +1,36 @@
 "use strict";
 
 let blitFRM_image = null;
-function blitFRM(frm, dest, dx, dy, dir = 0, frame = 0, alpha = 1, outlineColor = null) {
+function blitFRM(frm, dest, dx, dy, dir = 0, frame = 0, alpha = 1, outlineColor = null, outlineAlpha = 1) {
 	if(!frm) return;
 	if(alpha < 1) dest.globalAlpha = alpha;
-	if(!outlineColor) {
-		dest.drawImage(frm.img,
-			frm.frameInfo[dir][frame].atlasX,
-		 	frm.frameInfo[dir][frame].atlasY,
-			frm.frameInfo[dir][frame].width,
-			frm.frameInfo[dir][frame].height,
-			dx,
-			dy,
-			frm.frameInfo[dir][frame].width,
-			frm.frameInfo[dir][frame].height);
-	} else {
+	dest.drawImage(frm.img,
+		frm.frameInfo[dir][frame].atlasX,
+	 	frm.frameInfo[dir][frame].atlasY,
+		frm.frameInfo[dir][frame].width,
+		frm.frameInfo[dir][frame].height,
+		dx,
+		dy,
+		frm.frameInfo[dir][frame].width,
+		frm.frameInfo[dir][frame].height);
+	if(alpha < 1) dest.globalAlpha = 1;
+
+	if(outlineColor) {
+		if(outlineAlpha < 1) dest.globalAlpha = outlineAlpha;
 		if(!frm['img_outline_' + outlineColor]) createFRMOutline(frm, outlineColor);
 		dest.drawImage(frm['img_outline_' + outlineColor],
 			frm.frameInfo_outline[dir][frame].atlasX,
 		 	frm.frameInfo_outline[dir][frame].atlasY,
 			frm.frameInfo_outline[dir][frame].width,
 			frm.frameInfo_outline[dir][frame].height,
-			dx,
-			dy,
+			dx - 1,		// offset for outline
+			dy - 1,
 			frm.frameInfo_outline[dir][frame].width,
 			frm.frameInfo_outline[dir][frame].height);
+		if(outlineAlpha < 1) dest.globalAlpha = 1;
 	}
 
-	if(alpha < 1) dest.globalAlpha = 1;
+
 };
 
 const createFRMOutline_shadowColor = 12;
@@ -183,19 +186,6 @@ function createFontOutlineImg(_font, _outlineColor) {
 		}
 	}
 
-	/* createFontColorImg(_font, _color);
-	for(let i = 0; i < symbolInfo_outline.length; i++) {
-		outlineContext.drawImage(_font["img_" + _color],
-		_font.symbolInfo[i].x,
-		_font.symbolInfo[i].y,
-		_font.symbolInfo[i].width,
-		_font.symbolInfo[i].height,
-		symbolInfo_outline[i].x + 1,
-		symbolInfo_outline[i].y + 1,
-		_font.symbolInfo[i].width,
-		_font.symbolInfo[i].height);
-	} */
-
 	_font.symbolInfo_outline = symbolInfo_outline;
 	_font["img_outline_" + _outlineColor] = outlineCanvas;
 
@@ -218,7 +208,10 @@ function blitFontString(_font, _dest, _string, _x, _y, _color = null, _outlineCo
 	} else rF_img = _font.img;
 
 	if(_outlineColor) {
-		if(!_font.hasOwnProperty("img_outline_" + _color)) createFontOutlineImg(_font, _outlineColor);	// if no colorized img, create one.
+		if(!_font.hasOwnProperty("img_outline_" + _outlineColor)) {
+			console.log("Bitmap Font: call to font render for surface without outline color: ", _outlineColor);
+			createFontOutlineImg(_font, _outlineColor);	// if no colorized img, create one.
+		}
 	}
 
 	for(var i = 0; i < rF_stringlength; i++) {

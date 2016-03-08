@@ -195,6 +195,9 @@ function main_gameStateFunction(f, options) {
 			break;
 
 		case "openContextMenu":
+			contextMenuState.setMenuItems(options.obj,
+				options.x,
+				options.y);
 			main_openActiveState(contextMenuState);
 			break;
 		case "closeContextMenu":
