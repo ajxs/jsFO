@@ -1,6 +1,5 @@
 "use strict";
 
-let blitFRM_image = null;
 function blitFRM(frm, dest, dx, dy, dir = 0, frame = 0, alpha = 1, outlineColor = null, outlineAlpha = 1) {
 	if(!frm) return;
 	if(alpha < 1) dest.globalAlpha = alpha;
@@ -32,6 +31,24 @@ function blitFRM(frm, dest, dx, dy, dir = 0, frame = 0, alpha = 1, outlineColor 
 
 
 };
+
+
+function blitFRMOutline(frm, dest, dx, dy, dir = 0, frame = 0, outlineColor = null, outlineAlpha = 1) {
+	if(!frm) return;
+	if(outlineAlpha < 1) dest.globalAlpha = outlineAlpha;
+	if(!frm['img_outline_' + outlineColor]) createFRMOutline(frm, outlineColor);
+	dest.drawImage(frm['img_outline_' + outlineColor],
+		frm.frameInfo_outline[dir][frame].atlasX,
+		frm.frameInfo_outline[dir][frame].atlasY,
+		frm.frameInfo_outline[dir][frame].width,
+		frm.frameInfo_outline[dir][frame].height,
+		dx - 1,		// offset for outline
+		dy - 1,
+		frm.frameInfo_outline[dir][frame].width,
+		frm.frameInfo_outline[dir][frame].height);
+	if(outlineAlpha < 1) dest.globalAlpha = 1;
+};
+
 
 const createFRMOutline_shadowColor = 12;
 function createFRMOutline(frm, color = "#FF0000") {

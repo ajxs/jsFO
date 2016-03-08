@@ -40,6 +40,8 @@ class MainState extends GameState {
 		object buffer canvas size CAN be modified with few ill effects.
 		*/
 
+		this.outlineTargets = true;
+
 		this.objectBufferRect = {
 			x: 0, y: 0,
 			width: 100, height: 100
@@ -878,23 +880,41 @@ class MainState extends GameState {
 			_context.globalCompositeOperation = "source-over";	// reset
 		}
 
+		if(this.outlineTargets) {
+			for(let i = 0, mapObjectsLength = this.mapObjects[e].length; i < mapObjectsLength; i++) {
 
+				if(!(this.mapObjects[e][i] instanceof Actor)) {
+					continue;
+				}
 
-		this.currentRenderObject = this.player;
-		let c = mapGeometry.h2s(this.currentRenderObject.hexPosition);
-		this.currentRenderImg = this.currentRenderObject.anim.img.frameInfo[this.currentRenderObject.orientation][this.currentRenderObject.anim.frameNumber];		//@TODO: clean
+				this.currentRenderObject = this.mapObjects[e][i];
 
-		let destX = (c.x + 16 - ((this.currentRenderImg.width/2)|0)) + this.currentRenderObject.anim.shiftX - this.camera.x;	// actual coords of of objects.
-		let destY = (c.y + 8 - this.currentRenderImg.height) + this.currentRenderObject.anim.shiftY - this.camera.y;
+				let c = mapGeometry.h2s(this.currentRenderObject.hexPosition);
+				this.currentRenderImg = this.currentRenderObject.anim.img.frameInfo[this.currentRenderObject.orientation][this.currentRenderObject.anim.frameNumber];		//@TODO: clean
 
-		blitFRM(this.currentRenderObject.anim.img,
-			_context,
-			destX,
-			destY,
-			this.currentRenderObject.orientation,
-			this.currentRenderObject.anim.frameNumber,
-			1,
-			"#00FFFF");	// get dest coords in screen-space and blit.
+				let destX = (c.x + 16 - ((this.currentRenderImg.width/2)|0)) + this.currentRenderObject.anim.shiftX - this.camera.x;	// actual coords of of objects.
+				let destY = (c.y + 8 - this.currentRenderImg.height) + this.currentRenderObject.anim.shiftY - this.camera.y;
+
+				if(!intersectTest(destX,		// test if object is on screen. If not - skip.
+					destY,
+					this.currentRenderImg.width,
+					this.currentRenderImg.height,
+					0,
+					0,
+					SCREEN_WIDTH,
+					SCREEN_HEIGHT)) continue;		// testing in screen space with dest vars, slower but more accurate.
+
+				blitFRMOutline(this.currentRenderObject.anim.img,
+					_context,
+					destX,
+					destY,
+					this.currentRenderObject.orientation,
+					this.currentRenderObject.anim.frameNumber,
+					"#00FFFF");	// get dest coords in screen-space and blit
+
+			}	// end mapObject loop
+		}
+
 
 		// interface
 
