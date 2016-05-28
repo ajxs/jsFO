@@ -81,9 +81,6 @@ class MainState extends GameState {
 		this.brightmap.height = SCREEN_HEIGHT;
 		this.brightmapContext = this.brightmap.getContext("2d");
 
-		this.vm = new ScriptVM();
-
-
 		this.currentRenderObject = 0;
 		this.currentRenderImg = 0;
 
