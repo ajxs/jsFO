@@ -40,7 +40,7 @@ class MainState extends GameState {
 		object buffer canvas size CAN be modified with few ill effects.
 		*/
 
-		this.outlineTargets = true;
+		this.outlineTargets = false;
 
 		this.objectBufferRect = {
 			x: 0, y: 0,

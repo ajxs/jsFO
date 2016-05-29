@@ -1,7 +1,7 @@
 "use strict";
 
 
-vm = {
+let vm = {
 	paused: false,
 	procAddress: 0,
 	script: 0,
