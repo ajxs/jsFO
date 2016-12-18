@@ -15,21 +15,8 @@ function blitFRM(frm, dest, dx, dy, dir = 0, frame = 0, alpha = 1, outlineColor 
 	if(alpha < 1) dest.globalAlpha = 1;
 
 	if(outlineColor) {
-		if(outlineAlpha < 1) dest.globalAlpha = outlineAlpha;
-		if(!frm['img_outline_' + outlineColor]) createFRMOutline(frm, outlineColor);
-		dest.drawImage(frm['img_outline_' + outlineColor],
-			frm.frameInfo_outline[dir][frame].atlasX,
-		 	frm.frameInfo_outline[dir][frame].atlasY,
-			frm.frameInfo_outline[dir][frame].width,
-			frm.frameInfo_outline[dir][frame].height,
-			dx - 1,		// offset for outline
-			dy - 1,
-			frm.frameInfo_outline[dir][frame].width,
-			frm.frameInfo_outline[dir][frame].height);
-		if(outlineAlpha < 1) dest.globalAlpha = 1;
+		blitFRMOutline(frm, dest, dx, dy, dir, frame, alpha, outlineColor, outlineAlpha);
 	}
-
-
 };
 
 

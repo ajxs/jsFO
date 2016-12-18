@@ -850,13 +850,13 @@ class MainState extends GameState {
 
 		if(DEBUG_FLAGS.drawSpecialHexes) {		// Hex debug
 			let centreHex = mapGeometry.h2s(mapGeometry.s2h( 320 + this.camera.x, 190 + this.camera.y));	// hex debug stuff
-			drawHex(centreHex.x - this.camera.x, centreHex.y - this.camera.y, "", "#00FFFF");
+			drawHex(centreHex.x - this.camera.x, centreHex.y - this.camera.y, "#00FFFF");
 
 			for(let h = 0; h < 40000; h++) {
 				let cx = mapGeometry.h2s(h);
-				if(this.map.hexMap[e][h].exitGrid) drawHex(cx.x - this.camera.x, cx.y - this.camera.y, "", "#00FF00");
-				if(this.map.hexMap[e][h].blocked) drawHex(cx.x - this.camera.x, cx.y - this.camera.y, "", "#FF0000");
-				if(this.map.hexMap[e][h].scrollBlock) drawHex(cx.x - this.camera.x, cx.y - this.camera.y, "", "#FFFF00");
+				if(this.map.hexMap[e][h].exitGrid) drawHex(cx.x - this.camera.x, cx.y - this.camera.y, "#00FF00");
+				if(this.map.hexMap[e][h].blocked) drawHex(cx.x - this.camera.x, cx.y - this.camera.y, "#FF0000");
+				if(this.map.hexMap[e][h].scrollBlock) drawHex(cx.x - this.camera.x, cx.y - this.camera.y, "#FFFF00");
 			}
 		}
 

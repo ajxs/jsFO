@@ -53,14 +53,14 @@ function isFunction(functionToCheck) {
 };
 
 function intersectTest(ax,ay,aw,ah, bx,by,bw,bh) {
-    return !(bx > (ax+aw)
-        || (bx+bw) < ax
-        || by > (ay+ah)
-        || (by+bh) < ay);
+	return !(bx > (ax+aw)
+		|| (bx+bw) < ax
+		|| by > (ay+ah)
+		|| (by+bh) < ay);
 };
 
 
-function drawHex(_x,_y,_text,_col = "#00FF00") {
+function drawHex(_x,_y,_col = "#00FF00", _text) {
 	_context.beginPath();
 	_context.moveTo(_x+16,_y);
 	_context.lineTo(_x+32,_y+4);
