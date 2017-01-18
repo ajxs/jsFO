@@ -119,7 +119,7 @@ function main_input(e) {
 
 
 function main_update() {
-	fps_currentTime = Date.now();
+	currentTime = Date.now();
 
 	for(let i = 0; i < activeGameStates.length; i++) {
 		if(!activeGameStates[i].statePause) activeGameStates[i].update.call(activeGameStates[i]);

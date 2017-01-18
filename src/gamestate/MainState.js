@@ -579,7 +579,7 @@ class MainState extends GameState {
 
 				if(this.cIndex_test != this.hIndex) {		// check if mouse has moved for hover functionality
 					this.cIndex_test = this.hIndex;
-					this.cIndex_time = getTicks();
+					this.cIndex_time = currentTime;
 					this.cIndex_state = false;
 					this.cIndex_path = -1;
 				}
@@ -588,12 +588,12 @@ class MainState extends GameState {
 				if(this.cIndex_x != _mouse.x || this.cIndex_y != _mouse.y) {	// check if mouse has moved for hover functionality
 					this.cIndex_x = _mouse.x;
 					this.cIndex_y = _mouse.y;
-					this.cIndex_time = getTicks();
+					this.cIndex_time = currentTime;
 					this.cIndex_state = false;
 				}
 			}
 
-			if(!this.cIndex_state && (Math.abs(getTicks() - this.cIndex_time) >= 1000)) {	// 'hover' functionality timer
+			if(!this.cIndex_state && (Math.abs(currentTime - this.cIndex_time) >= 1000)) {	// 'hover' functionality timer
 
 				if(this.inputState_sub == "move") {
 					this.cIndex_path = this.findPath(this.player.hexPosition, this.hIndex);
@@ -627,7 +627,7 @@ class MainState extends GameState {
 			this.currentRenderImg = this.currentRenderObject.anim.img;
 
 			if(this.currentRenderObject.anim.animActive) {	// framestep and animation functions
-				this.currentRenderObject.anim.animDelta = (getTicks() - this.currentRenderObject.anim.lastFrameTime);
+				this.currentRenderObject.anim.animDelta = (currentTime - this.currentRenderObject.anim.lastFrameTime);
 				if(this.currentRenderObject.anim.animDelta >= (1000/this.currentRenderImg.fps)) {	// if time to update frame.
 
 					let cond = (this.currentRenderObject.anim.animDirection == 0) ? this.currentRenderObject.anim.frameNumber < this.currentRenderImg.nFrames-1 : this.currentRenderObject.anim.frameNumber > 0;
@@ -660,15 +660,15 @@ class MainState extends GameState {
 						this.actor_nextAction(this.currentRenderObject,"onAnimEnd");
 
 					}
-					this.currentRenderObject.anim.lastFrameTime = getTicks();
+					this.currentRenderObject.anim.lastFrameTime = currentTime;
 				}
 			} else {	// anim inactive
 				if(this.currentRenderObject.hasOwnProperty('ai')) {		// idle twitch
-					if(getTicks() - this.currentRenderObject.ai.idleStartTime > 2000) {
+					if(currentTime - this.currentRenderObject.ai.idleStartTime > 2000) {
 						if(Math.random() > 0.95) this.object_playAnim(this.currentRenderObject,"idle",0,0,0,false,0,function() {		//(obj, newAnim, frame, actionFrame, dir, loop, actionCallback, endCallback) {
 							this.object_setAnim(this.currentRenderObject,"idle");		// reset to frame zero.
 						});
-						this.currentRenderObject.ai.idleStartTime = getTicks();
+						this.currentRenderObject.ai.idleStartTime = currentTime;
 					}
 				}
 			}
@@ -1206,7 +1206,7 @@ class MainState extends GameState {
 		this.object_setFrame(obj,frame);	// reset frame and offset
 
 		if(obj.hasOwnProperty('ai') && newAnim == "idle") {		// idle
-			obj.ai.idleStartTime = getTicks();
+			obj.ai.idleStartTime = currentTime;
 		}
 
 	};
@@ -1336,7 +1336,7 @@ class MainState extends GameState {
 			actor.actionQ.push({
 				trigger: trigger,
 				action: action,
-				timeStart: getTicks(),
+				timeStart: currentTime,
 				delay: delay,
 			});
 		}
@@ -1347,7 +1347,7 @@ class MainState extends GameState {
 			actor.actionQ.unshift({
 				trigger: trigger,
 				action: action,
-				timeStart: getTicks(),
+				timeStart: currentTime,
 				delay: delay,
 			});
 		}
@@ -1360,7 +1360,7 @@ class MainState extends GameState {
 		for(let i = 0; i < actionTriggers.length; i++) {
 			if(actionTriggers[i] == "timed") {
 
-				let currentTime = getTicks();
+				let currentTime = currentTime;
 				let endTime = actor.actionQ[0].timeStart + (actor.actionQ[0].delay*1000);
 
 				if(currentTime > endTime) {

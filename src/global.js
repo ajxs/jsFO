@@ -15,13 +15,12 @@ let _mouse = {		// struct for mouse info
 	y: 0,
 };
 
-let _keyboard = {};	// array to hold keycode states
+let _keyboard = [];	// array to hold keycode states
+
+let _assets = {};		// main asset map
 
 
-let _assets = {};		// main asset hashtable
-
-
-let fps_currentTime;
+let currentTime;
 
 let activeGameStates = [];		// state stack
 
@@ -36,11 +35,6 @@ let mainMenuState;
 let characterScreenState;
 let pipboyState;
 let mapScreenState;
-
-
-function getTicks() {
-	return fps_currentTime;
-};
 
 function isObject(_o) {
 	if(_o !== null && typeof _o === 'object') return true;
@@ -60,7 +54,7 @@ function intersectTest(ax,ay,aw,ah, bx,by,bw,bh) {
 };
 
 
-function drawHex(_x,_y,_col = "#00FF00", _text) {
+function drawHex(_x,_y,_col = "#00FF00", _text = null) {
 	_context.beginPath();
 	_context.moveTo(_x+16,_y);
 	_context.lineTo(_x+32,_y+4);
@@ -82,7 +76,7 @@ function drawHex(_x,_y,_col = "#00FF00", _text) {
 	}
 };
 
-function drawTile(_x,_y,_text,_col =  "#00FF00") {
+function drawTile(_x,_y,_col = "#00FF00", _text = null) {
 	_context.beginPath();
 	_context.moveTo(_x,_y+12);
 	_context.lineTo(_x+48,_y);
@@ -103,5 +97,5 @@ function drawTile(_x,_y,_text,_col =  "#00FF00") {
 };
 
 function getObjectType(_id) {		// returns type from typeID
-	return ["items","critters","scenery","walls","tiles","misc"][_id] || false;
+	return ["items","critters","scenery","walls","tiles","misc"][_id] || null;
 };

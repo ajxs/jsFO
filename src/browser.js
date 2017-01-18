@@ -9,16 +9,6 @@ function browser_getCallFrame() {
 		null;
 };
 
-var browser_getError = function(msg) {
-	if(window.console) {
-		if(window.console.error) {
-			window.console.error(msg);
-		} else if(window.console.log) {
-			window.console.log(msg);
-		}
-	}
-};
-
 function browser_getInfo() {		// returns user-agent info
 	let ua = navigator.userAgent, tem;
 	let M = ua.match(/(opera|chrome|safari|firefox|msie|trident(?=\/))\/?\s*(\d+)/i) || [];
@@ -53,9 +43,8 @@ function browser_test() {
 	testFeatures.push(browser_getCallFrame());
 	testFeatures.push(Array.prototype.map);
 
-	testFeatures.forEach(element => {
-		return element || false;
-	});
-
+	for(let i = 0; i < testFeatures.length; i++) {
+		if(!testFeatures[i]) return false;
+	}
 	return true;
 };

@@ -7,7 +7,7 @@ class InventoryState extends GameState {
 		this.x = ((SCREEN_WIDTH / 2)|0) - 250;
 		this.y = 0;
 
-		this.playerAnimLastRotationTime = getTicks();
+		this.playerAnimLastRotationTime = currentTime;
 
 		this.activeItem = -1;
 		this.mouseState = -1;
@@ -50,10 +50,10 @@ class InventoryState extends GameState {
 	};
 
 	update() {
-		if(getTicks() - this.playerAnimLastRotationTime > 350) {
+		if(currentTime - this.playerAnimLastRotationTime > 350) {
 			if(this.playerAnimOrientation < 5) this.playerAnimOrientation++;
 			else this.playerAnimOrientation = 0;
-			this.playerAnimLastRotationTime = getTicks();
+			this.playerAnimLastRotationTime = currentTime;
 		}
 
 		this.activeItem = -1;
