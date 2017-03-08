@@ -1,7 +1,6 @@
 # jsFO
 
 View the online demo at: [http://ajxs.github.io/jsFO](http://ajxs.github.io/jsFO)
-( this online demo is the ES5-legacy version )
 
 jsFO is an open-source port of Interplay's Fallout2 for the browser, written in Javascript, with conversion of assets from the original Fallout2 handled in Python.
 jsFO uses the HTML5 canvas API for rendering, and should be compatible with all modern browsers.
@@ -11,10 +10,8 @@ One end goal is eventually to document the specifics regarding the conversion of
 
 All code for this project is released under the Apache 2.0 license, meaning that you - the end user - are free to do with the software more or less whatever you wish, but you probably won't get far selling it. You're free to deconstruct, reconstruct, repair, retouch, break and bend this software all you want. And I wish you the best of luck in doing so... you'll need it. Feel free to contribute in any way!
 
-##ES6-Compatibility
-After some deliberation I have decided to merge the experimental ES6 branch to main.
-jsFO on the whole can be considered an experiment in itself, and considering it's scope, browser compatibility cannot be considered a short-term priority for the project. If you experience any issues with running jsFO, download a beta version of Chrome or Firefox. If you have any further compatibility issues, feel free to get in contact with us and we'll address those. Otherwise, check out the 'ES5-legacy' branch of the code, which should be fully compatible with the latest non-beta versions of Firefox or Chrome.
-No IE or Safari compatibility tests have been performed, and we do not expect the game to be compatible with either. These browsers are significantly behind Chrome and FF in terms of ES support, so we don't intend to target them in active development.
+##ES6-Standards
+jsFO uses babel-cli together with a GNU make build pipeline for aligning the ES6-compatible src with current web standards. The ES5-compatible branch has been fully deprecaed, and jsFO will now be using babel for transpilation during the build process.
 
 ##Running jsFO
 To run jsFO for yourself, simply download the source files to your computer and run index.html. If you encounter any issues with XSS security in Chrome, you can run chrome with the command line flag --disable-web-security, alternatively running in firefox, or through a simple http host will solve these issues.
