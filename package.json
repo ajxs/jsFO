@@ -7,6 +7,13 @@
 		"name": "ajxs",
 		"email": "ajxscc@gmail.com"
 	}],
+	"devDependencies": {
+    "babel-cli": "6.22.2",
+    "babel-preset-latest": "^6.22.0"
+  },
+  "scripts": {
+    "start": "node src/web/server.js"
+  },
 	"repository": {
 		"type": "git",
 		"url": "https://github.com/ajxs/jsFO"
