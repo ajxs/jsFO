@@ -18,7 +18,7 @@ class CharacterScreenState extends GameState {
 
 		this.interface = new Interface("jsfdata/interface/charScreenInterface.json");
 
-};
+	};
 
 
 

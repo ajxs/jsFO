@@ -1,6 +1,57 @@
 'use strict';
 
-var mapGeometry = {	// struct for map geometry lets/functions
+
+const intersectTest = (ax,ay,aw,ah, bx,by,bw,bh) => {
+	return !(bx > (ax+aw) ||
+	(bx+bw) < ax ||
+	by > (ay+ah) ||
+	(by+bh) < ay);
+};
+
+
+function drawHex(_x,_y,_text,_col = "#00FF00") {
+	_context.beginPath();
+	_context.moveTo(_x+16,_y);
+	_context.lineTo(_x+32,_y+4);
+	_context.lineTo(_x+32,_y+12);
+	_context.lineTo(_x+16,_y+16);
+	_context.lineTo(_x,_y+12);
+	_context.lineTo(_x,_y+4);
+	_context.lineTo(_x+16,_y);
+
+	_context.closePath();
+	_context.lineWidth = 1;
+	_context.strokeStyle = _col;
+	_context.stroke();
+
+	if(_text) {
+		_context.font="8px Georgia";
+		_context.fillStyle = _col;
+		_context.fillText(_text,_x+4,_y+10);
+	}
+};
+
+function drawTile(_x,_y,_text,_col =  "#00FF00") {
+	_context.beginPath();
+	_context.moveTo(_x,_y+12);
+	_context.lineTo(_x+48,_y);
+	_context.lineTo(_x+80,_y+24);
+	_context.lineTo(_x+32,_y+36);
+	_context.lineTo(_x,_y+12);
+
+	_context.closePath();
+	_context.lineWidth = 1;
+	_context.strokeStyle = _col;
+	_context.stroke();
+
+	if(_text) {
+		_context.font="8px Georgia";
+		_context.fillStyle = _col;
+		_context.fillText(_text,_x+4,_y+10);
+	}
+};
+
+const mapGeometry = {	// struct for map geometry lets/functions
 	/* note: Hex and Tile sizes are hardcoded as:
 	hex - w: 32, h: 16
 	tile - w: 80: h: 32 */

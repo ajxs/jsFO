@@ -9,16 +9,6 @@ function browser_getCallFrame() {
 		null;
 };
 
-var browser_getError = function(msg) {
-	if(window.console) {
-		if(window.console.error) {
-			window.console.error(msg);
-		} else if(window.console.log) {
-			window.console.log(msg);
-		}
-	}
-};
-
 function browser_getInfo() {		// returns user-agent info
 	let ua = navigator.userAgent, tem;
 	let M = ua.match(/(opera|chrome|safari|firefox|msie|trident(?=\/))\/?\s*(\d+)/i) || [];
