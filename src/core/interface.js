@@ -2,6 +2,8 @@ class Interface {
 	constructor(file = null) {
 		this.x = 0;
 		this.y = 0;
+		this.elements = [];
+
 		console.log("Interface: loading file:" + file);
 		if(!file) return false;
 		main_loadJsonPayload(file)
@@ -24,7 +26,7 @@ class Interface {
 			this.width, this.height)) {
 				if(_mouse[0]) this.mouseState = 1;
 				else this.mouseState = 0;
-				
+
 				this.elements.forEach((element, index) => {
 					if(intersectTest(_mouse.x, _mouse.y,
 					0,0,

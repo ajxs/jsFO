@@ -1,4 +1,4 @@
-'use strict';
+"use strict";
 
 class MainState extends GameState {
 	constructor() {
@@ -162,7 +162,7 @@ class MainState extends GameState {
 		this.path_f_score = [];
 
 		this.path_g_score[start] = 0;
-		this.path_f_score[start] = mapGeometry.hDistance(start,dest);
+		this.path_f_score[start] = hDistance(start,dest);
 
 		while(this.path_frontier.length) {
 			this.path_current = this.path_frontier[0];
@@ -184,7 +184,7 @@ class MainState extends GameState {
 				return this.path_path;
 			}
 
-			this.path_adjList = mapGeometry.findAdj(this.path_current);
+			this.path_adjList = findAdjacentHexes(this.path_current);
 			this.path_closedSet.push(this.path_frontier.shift());
 
 			for(let i = 0; i < 6; i++) {
@@ -197,12 +197,12 @@ class MainState extends GameState {
 					continue;
 				}
 
-				this.path_tg_score = this.path_g_score[this.path_current] + mapGeometry.hDistance(this.path_current,this.path_next);
+				this.path_tg_score = this.path_g_score[this.path_current] + hDistance(this.path_current,this.path_next);
 
 				if(this.path_frontier.indexOf(this.path_next) == -1 || this.path_tg_score < this.path_g_score[this.path_next]) {
 					this.path_cameFrom[this.path_next] = this.path_current;
 					this.path_g_score[this.path_next] = this.path_tg_score;
-					this.path_f_score[this.path_next] = this.path_g_score[this.path_next] + mapGeometry.hDistance(this.path_next,dest);
+					this.path_f_score[this.path_next] = this.path_g_score[this.path_next] + hDistance(this.path_next,dest);
 					if(this.path_frontier.indexOf(this.path_next) == -1) this.path_frontier.push(this.path_next);
 				}
 			}
@@ -307,7 +307,7 @@ class MainState extends GameState {
 
 		console.log("MainState: init: loading finished");
 
-		this.camera.trackToCoords(mapGeometry.h2s(this.player.hexPosition));
+		this.camera.trackToCoords(convertHexIndexToScreenCoords(this.player.hexPosition));
 
 		return true;
 
@@ -352,7 +352,7 @@ class MainState extends GameState {
 						if(_mouse[2]) return;		// stop mouse2 from triggering commands when in command mode
 						this.objectIndex = this.getObjectIndex();
 						if(this.objectIndex != -1) {		// if object under cursor
-							let objC = mapGeometry.h2s(this.mapObjects[this.player.currentElevation][this.objectIndex].hexPosition);
+							let objC = convertHexIndexToScreenCoords(this.mapObjects[this.player.currentElevation][this.objectIndex].hexPosition);
 							main_gameStateFunction('openContextMenu', {		// Context Menu
 								obj: this.objectIndex,
 								x: objC.x - this.camera.x + 30,
@@ -430,7 +430,7 @@ class MainState extends GameState {
 
 				console.log(targetItem);
 
-				let useAdj = mapGeometry.findAdj(targetItem.hexPosition);
+				let useAdj = findAdjacentHexes(targetItem.hexPosition);
 
 				useDest = useAdj.indexOf(this.player.hexPosition);	// check if player next to item
 				for(let a = 0; a < 6; a++) {
@@ -444,7 +444,7 @@ class MainState extends GameState {
 					case "door":
 						useFunction = function() {
 							//console.log("useFunction: " + targetItem.hexPosition + " / " + mainState.player.hexPosition);
-							this.player.orientation = mapGeometry.findOrientation(this.player.hexPosition, targetItem.hexPosition);
+							this.player.orientation = findOrientation(this.player.hexPosition, targetItem.hexPosition);
 							this.object_playAnim(this.player,"use",0,0,0,false,0, () => {
 								if(targetItem.openState == 0) this.object_openDoor(targetItem);
 								else this.object_closeDoor(targetItem);
@@ -484,7 +484,7 @@ class MainState extends GameState {
 		for(let i = 0, mapObjectsLength = this.mapObjects[this.player.currentElevation].length; i < mapObjectsLength; i++) {
 			this.currentRenderObject = this.mapObjects[this.player.currentElevation][i];
 
-			let c = mapGeometry.h2s(this.currentRenderObject.hexPosition);
+			let c = convertHexIndexToScreenCoords(this.currentRenderObject.hexPosition);
 			this.currentRenderImg = this.currentRenderObject.anim.img.frameInfo[this.currentRenderObject.orientation][this.currentRenderObject.anim.frameNumber];
 
 			let destX = (c.x + 16 - ((this.currentRenderImg.width/2)|0)) + this.currentRenderObject.anim.shiftX - this.camera.x;	// object coords.
@@ -553,7 +553,7 @@ class MainState extends GameState {
 		if(intersectTest(_mouse.x,_mouse.y,0,0, 0,0,SCREEN_WIDTH,SCREEN_HEIGHT) && this.scrollState) {
 			this.inputState = "scroll";
 
-			this.scrollCheckAdj = mapGeometry.findAdj(mapGeometry.s2h( 320 + this.camera.x, 190 + this.camera.y));
+			this.scrollCheckAdj = findAdjacentHexes(convertScreenCoordsToHexIndex( 320 + this.camera.x, 190 + this.camera.y));
 
 			this.scrollStates.xPosBlocked = (this.map.hexMap[this.player.currentElevation][this.scrollCheckAdj[1]].scrollBlock);	// check if these hexes have the scrollBlock attribute.
 			this.scrollStates.yNegBlocked = (this.map.hexMap[this.player.currentElevation][this.scrollCheckAdj[0]].scrollBlock && this.map.hexMap[this.player.currentElevation][this.scrollCheckAdj[5]].scrollBlock);
@@ -574,8 +574,8 @@ class MainState extends GameState {
 			this.inputState = "game";
 
 			if(this.inputState_sub == "move") {
-				this.hIndex = mapGeometry.s2h(_mouse.x + this.camera.x, _mouse.y + this.camera.y);		// hex index calculated here
-				this.hsIndex = mapGeometry.h2s(this.hIndex);
+				this.hIndex = convertScreenCoordsToHexIndex(_mouse.x + this.camera.x, _mouse.y + this.camera.y);		// hex index calculated here
+				this.hsIndex = convertHexIndexToScreenCoords(this.hIndex);
 
 				if(this.cIndex_test != this.hIndex) {		// check if mouse has moved for hover functionality
 					this.cIndex_test = this.hIndex;
@@ -676,7 +676,7 @@ class MainState extends GameState {
 		}	// end mapobjects loop
 
 
-		let playerCoords = mapGeometry.h2s(this.player.hexPosition);
+		let playerCoords = convertHexIndexToScreenCoords(this.player.hexPosition);
 		this.currentRenderImg = this.player.anim.img.frameInfo[this.player.orientation][this.player.anim.frameNumber];
 
 		let playerX = (playerCoords.x + 16 - ((this.currentRenderImg.width/2)|0)) + this.player.anim.shiftX - this.camera.x;	// actual coords of of objects.
@@ -686,7 +686,7 @@ class MainState extends GameState {
 		this.roofRenderState = true;		// check if player is under a roof
 		for(let i = 0; i < 10000; i++) {
 			if(this.map.tileInfo[this.player.currentElevation].roofTiles[i] < 2) continue;
-			let c = mapGeometry.c2s(i);
+			let c = convertTileIndexToScreenCoords(i);
 
 			if(intersectTest(c.x - this.camera.x,		// @TODO : potentially use object buffer here.
 				(c.y - 96) - this.camera.y,
@@ -709,7 +709,7 @@ class MainState extends GameState {
 		this.eggContext.globalCompositeOperation = 'source-over';		// draw egg mask onto egg context.
 		this.eggContext.drawImage(this.transEgg,0,0);
 
-		let playerCoords = mapGeometry.h2s(this.player.hexPosition);
+		let playerCoords = convertHexIndexToScreenCoords(this.player.hexPosition);
 		let playerX = playerCoords.x + 16 + this.player.anim.shiftX - this.camera.x;
 		let playerY = (playerCoords.y + 8) + this.player.anim.shiftY- this.camera.y;
 
@@ -723,7 +723,7 @@ class MainState extends GameState {
 
 			//if(this.map.tileInfo[e].floorTiles[i] < 2) continue;
 
-			let c = mapGeometry.c2s(i);
+			let c = convertTileIndexToScreenCoords(i);
 			if(!intersectTest(c.x, c.y,		// camera test
 				80, 36,
 				this.camera.x,
@@ -771,7 +771,7 @@ class MainState extends GameState {
 
 			this.currentRenderObject = this.mapObjects[e][i];
 
-			let c = mapGeometry.h2s(this.currentRenderObject.hexPosition);
+			let c = convertHexIndexToScreenCoords(this.currentRenderObject.hexPosition);
 			this.currentRenderImg = this.currentRenderObject.anim.img.frameInfo[this.currentRenderObject.orientation][this.currentRenderObject.anim.frameNumber];		//@TODO: clean
 
 			let destX = (c.x + 16 - ((this.currentRenderImg.width/2)|0)) + this.currentRenderObject.anim.shiftX - this.camera.x;	// actual coords of of objects.
@@ -831,7 +831,7 @@ class MainState extends GameState {
 			for(let i = 0; i < 10000; i++) {
 				//if(this.map.tileInfo[e].roofTiles[i] < 2) continue;
 
-				let c = mapGeometry.c2s(i);
+				let c = convertTileIndexToScreenCoords(i);
 				if(!intersectTest(c.x, c.y,
 					80,
 					36,
@@ -843,17 +843,17 @@ class MainState extends GameState {
 				blitFRM(_assets['art/tiles/tiles.lst'][this.map.tileInfo[e].roofTiles[i]].ptr,
 					_context,
 					c.x - this.camera.x,
-					c.y - mapGeometry.m_roofHeight - this.camera.y);
+					c.y - map_roof_height - this.camera.y);
 
 			}
 		}
 
 		if(DEBUG_FLAGS.drawSpecialHexes) {		// Hex debug
-			let centreHex = mapGeometry.h2s(mapGeometry.s2h( 320 + this.camera.x, 190 + this.camera.y));	// hex debug stuff
+			let centreHex = convertHexIndexToScreenCoords(convertScreenCoordsToHexIndex( 320 + this.camera.x, 190 + this.camera.y));	// hex debug stuff
 			drawHex(centreHex.x - this.camera.x, centreHex.y - this.camera.y, "", "#00FFFF");
 
 			for(let h = 0; h < 40000; h++) {
-				let cx = mapGeometry.h2s(h);
+				let cx = convertHexIndexToScreenCoords(h);
 				if(this.map.hexMap[e][h].exitGrid) drawHex(cx.x - this.camera.x, cx.y - this.camera.y, "", "#00FF00");
 				if(this.map.hexMap[e][h].blocked) drawHex(cx.x - this.camera.x, cx.y - this.camera.y, "", "#FF0000");
 				if(this.map.hexMap[e][h].scrollBlock) drawHex(cx.x - this.camera.x, cx.y - this.camera.y, "", "#FFFF00");
@@ -886,7 +886,7 @@ class MainState extends GameState {
 
 				this.currentRenderObject = this.mapObjects[e][i];
 
-				let c = mapGeometry.h2s(this.currentRenderObject.hexPosition);
+				let c = convertHexIndexToScreenCoords(this.currentRenderObject.hexPosition);
 				this.currentRenderImg = this.currentRenderObject.anim.img.frameInfo[this.currentRenderObject.orientation][this.currentRenderObject.anim.frameNumber];		//@TODO: clean
 
 				let destX = (c.x + 16 - ((this.currentRenderImg.width/2)|0)) + this.currentRenderObject.anim.shiftX - this.camera.x;	// actual coords of of objects.
@@ -1254,7 +1254,7 @@ class MainState extends GameState {
 		actor.ai.moveDest = dest;
 
 		actor.ai.moveNext = actor.ai.pathQ.shift();
-		actor.orientation = mapGeometry.findOrientation(actor.hexPosition,actor.ai.moveNext);
+		actor.orientation = findOrientation(actor.hexPosition,actor.ai.moveNext);
 
 		if(actor.ai.runState) {	// run
 			this.object_playAnim(actor,"run",0,2,0,true);
@@ -1278,7 +1278,7 @@ class MainState extends GameState {
 		}
 
 		actor.ai.moveNext = actor.ai.pathQ.shift();
-		actor.orientation = mapGeometry.findOrientation(actor.hexPosition,actor.ai.moveNext);
+		actor.orientation = findOrientation(actor.hexPosition,actor.ai.moveNext);
 
 		actor.anim.shiftX = actor.anim.img.shift[actor.orientation].x;
 		actor.anim.shiftY = actor.anim.img.shift[actor.orientation].y;

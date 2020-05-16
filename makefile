@@ -8,13 +8,14 @@ src_dir   := ./src
 src_files :=                                      \
 	${src_dir}/core/assets.js                       \
 	${src_dir}/core/browser.js                      \
+	${src_dir}/core/debug.js                      \
 	${src_dir}/core/GameState.js                    \
 	${src_dir}/core/geometry.js                     \
 	${src_dir}/core/global.js                       \
 	${src_dir}/core/interface.js                    \
-	${src_dir}/core/main.js                         \
-	${src_dir}/core/mapObjects.js                   \
-	${src_dir}/core/newGame.js                      \
+	${src_dir}/core/map-objects.js                   \
+	${src_dir}/core/new-game.js                      \
+	${src_dir}/gamestate/MainState.js               \
 	${src_dir}/core/renderer.js                     \
 	${src_dir}/core/vm.js                           \
 	${src_dir}/gamestate/CharacterScreenState.js    \
@@ -24,10 +25,10 @@ src_files :=                                      \
 	${src_dir}/gamestate/LoadState.js               \
 	${src_dir}/gamestate/MainLoadState.js           \
 	${src_dir}/gamestate/MainMenuState.js           \
-	${src_dir}/gamestate/MainState.js               \
 	${src_dir}/gamestate/MapscreenState.js          \
 	${src_dir}/gamestate/PipboyState.js             \
-	${src_dir}/gamestate/SkilldexState.js
+	${src_dir}/gamestate/SkilldexState.js \
+	${src_dir}/core/main.js
 
 .PHONY: clean
 

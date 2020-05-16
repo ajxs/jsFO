@@ -1,8 +1,30 @@
 "use strict";
 
-function blitFRM(frm, dest, dx, dy, dir = 0, frame = 0, alpha = 1, outlineColor = null, outlineAlpha = 1) {
-	if(!frm) return;
-	if(alpha < 1) dest.globalAlpha = alpha;
+/**
+ *
+ * @param {*} frm
+ * @param {*} dest
+ * @param {*} dx
+ * @param {*} dy
+ * @param {*} dir
+ * @param {*} frame
+ * @param {*} alpha
+ */
+function blitFRM(frm,
+	dest,
+	dx,
+	dy,
+	dir = 0,
+	frame = 0,
+	alpha = 1)
+{
+	if(!frm) {
+		throw new Error("No FRM provided");
+	}
+
+	// Set destination buffer alpha.
+	dest.globalAlpha = alpha;
+
 	dest.drawImage(frm.img,
 		frm.frameInfo[dir][frame].atlasX,
 	 	frm.frameInfo[dir][frame].atlasY,
@@ -12,66 +34,95 @@ function blitFRM(frm, dest, dx, dy, dir = 0, frame = 0, alpha = 1, outlineColor 
 		dy,
 		frm.frameInfo[dir][frame].width,
 		frm.frameInfo[dir][frame].height);
-	if(alpha < 1) dest.globalAlpha = 1;
 
-	if(outlineColor) {
-		if(outlineAlpha < 1) dest.globalAlpha = outlineAlpha;
-		if(!frm['img_outline_' + outlineColor]) createFRMOutline(frm, outlineColor);
-		dest.drawImage(frm['img_outline_' + outlineColor],
-			frm.frameInfo_outline[dir][frame].atlasX,
-		 	frm.frameInfo_outline[dir][frame].atlasY,
-			frm.frameInfo_outline[dir][frame].width,
-			frm.frameInfo_outline[dir][frame].height,
-			dx - 1,		// offset for outline
-			dy - 1,
-			frm.frameInfo_outline[dir][frame].width,
-			frm.frameInfo_outline[dir][frame].height);
-		if(outlineAlpha < 1) dest.globalAlpha = 1;
+	// Reset destination buffer alpha.
+	dest.globalAlpha = 1;
+}
+
+
+/**
+ *
+ * @param {*} frm
+ * @param {*} dest
+ * @param {*} dx
+ * @param {*} dy
+ * @param {*} dir
+ * @param {*} frame
+ * @param {*} outlineColor
+ * @param {*} outlineAlpha
+ */
+function blitFRMOutline(frm,
+	dest,
+	dx,
+	dy,
+	dir = 0,
+	frame = 0,
+	outlineColor = null,
+	outlineAlpha = 1)
+{
+	if(!frm) {
+		throw new Error("No FRM provided");
 	}
 
+	/** The string used to reference the FRM outline. */
+	const frmString = `img_outline_${outlineColor}`;
 
-};
+	// Set the destination buffer alpha.
+	dest.globalAlpha = outlineAlpha;
 
+	// If the outline does not exist, create it.
+	if(!frm[frmString]) {
+		createFRMOutline(frm, outlineColor);
+	}
 
-function blitFRMOutline(frm, dest, dx, dy, dir = 0, frame = 0, outlineColor = null, outlineAlpha = 1) {
-	if(!frm) return;
-	if(outlineAlpha < 1) dest.globalAlpha = outlineAlpha;
-	if(!frm['img_outline_' + outlineColor]) createFRMOutline(frm, outlineColor);
-	dest.drawImage(frm['img_outline_' + outlineColor],
+	dest.drawImage(frmString,
 		frm.frameInfo_outline[dir][frame].atlasX,
 		frm.frameInfo_outline[dir][frame].atlasY,
 		frm.frameInfo_outline[dir][frame].width,
 		frm.frameInfo_outline[dir][frame].height,
-		dx - 1,		// offset for outline
+		dx - 1,    // Outline is offset by 1 pixel.
 		dy - 1,
 		frm.frameInfo_outline[dir][frame].width,
 		frm.frameInfo_outline[dir][frame].height);
-	if(outlineAlpha < 1) dest.globalAlpha = 1;
-};
+
+	// Reset destination buffer alpha.
+	dest.globalAlpha = 1;
+}
 
 
 const createFRMOutline_shadowColor = 12;
-function createFRMOutline(frm, color = "#FF0000") {
+
+/**
+ *
+ * @param {*} frm
+ * @param {*} color
+ */
+function createFRMOutline(frm, color = "#FF0000")
+{
 	console.log("creating " + color + " outline FRM img for: " + frm);
-	var outlines = new Array(frm.frameInfo.length);
-	var maxHeight = 0, maxWidth = 0;
+	let outlines = new Array(frm.frameInfo.length);
+	let maxHeight = 0;
+	let maxWidth = 0;
 
 	for(let dir = 0; dir < frm.frameInfo.length; dir++) {
 		outlines[dir] = new Array(frm.nFrames);
 
 		for(let f = 0; f < frm.nFrames; f++) {
-			let outlineCanvas = document.createElement('canvas');
+			const outlineCanvas = document.createElement('canvas');
 			outlineCanvas.width = frm.frameInfo[dir][f].width + 2;
 			outlineCanvas.height = frm.frameInfo[dir][f].height + 2;
-			let outlineContext = outlineCanvas.getContext('2d');
+
+			const outlineContext = outlineCanvas.getContext('2d');
 			outlineContext.imageSmoothingEnabled = false;
 
-			let trimmedCanvas = document.createElement('canvas');		// Trim off shadow then reblit
+			const trimmedCanvas = document.createElement('canvas');		// Trim off shadow then reblit
 			trimmedCanvas.width = frm.frameInfo[dir][f].width + 2;
 			trimmedCanvas.height = frm.frameInfo[dir][f].height + 2;
-			let trimmedContext = trimmedCanvas.getContext('2d');
+
+			const trimmedContext = trimmedCanvas.getContext('2d');
 			trimmedCanvas.imageSmoothingEnabled = false;
 			trimmedContext.globalCompositeOperation = 'source-over';
+
 			trimmedContext.drawImage(frm.img,
 				frm.frameInfo[dir][f].atlasX,
 			 	frm.frameInfo[dir][f].atlasY,
@@ -82,11 +133,13 @@ function createFRMOutline(frm, color = "#FF0000") {
 				frm.frameInfo[dir][f].width,
 				frm.frameInfo[dir][f].height);
 
-			let trimmedData = trimmedContext.getImageData(0,0,
+				const trimmedData = trimmedContext.getImageData(0,0,
 				frm.frameInfo[dir][f].width + 2,
 				frm.frameInfo[dir][f].height + 2);
 
-			let x, y;
+			let x = null;
+			let y = null;
+
 			outlineContext.fillStyle = color;
 			for(let i = 0, imgDataLength = trimmedData.data.length; i < imgDataLength; i+=4) {
 				if(trimmedData.data[i+3] > 0) {
@@ -96,7 +149,7 @@ function createFRMOutline(frm, color = "#FF0000") {
 				}
 			}
 
-			let imgData = outlineContext.getImageData(0,0,
+			const imgData = outlineContext.getImageData(0,0,
 				frm.frameInfo[dir][f].width + 2,
 				frm.frameInfo[dir][f].height + 2);
 
@@ -139,19 +192,15 @@ function createFRMOutline(frm, color = "#FF0000") {
 	}
 	frm['img_outline_' + color] = total;
 	frm.frameInfo_outline = outlineInfo;
-};
+}
 
 
-let rF_stringlength = 0;
-let rF_symbolIndex = 0;
-let rF_totalWidth = 0;
-let rF_baseline = 0;
-let rF_img = 0;
-
-
-function createFontOutlineImg(_font, _outlineColor) {
-
-	let maxHeight = 0, maxWidth = 0, currentX = 0;
+function createFontOutlineImg(_font,
+	_outlineColor)
+{
+	let maxHeight = 0;
+	let maxWidth = 0;
+	let currentX = 0;
 	let symbolInfo_outline = _font.symbolInfo.map(function(symbol) {
 		if(symbol.width == 0 || symbol.height == 0) {
 			return {
@@ -160,9 +209,13 @@ function createFontOutlineImg(_font, _outlineColor) {
 			};
 		}
 
-		if((symbol.height+2) > maxHeight) maxHeight = (symbol.height+2);
+		if((symbol.height + 2) > maxHeight) {
+			maxHeight = symbol.height + 2;
+		}
+
 		currentX = maxWidth;
 		maxWidth += symbol.width + 2;
+
 		return {
 			x: currentX,
 			y: 0,
@@ -172,9 +225,9 @@ function createFontOutlineImg(_font, _outlineColor) {
 	});
 
 	let outlineCanvas = document.createElement('canvas');
+	let outlineContext = outlineCanvas.getContext('2d');
 	outlineCanvas.width = maxWidth;
 	outlineCanvas.height = maxHeight;
-	let outlineContext = outlineCanvas.getContext('2d');
 
 	for(let i = 0; i < symbolInfo_outline.length; i++) {
 		outlineContext.drawImage(_font.img,
@@ -188,13 +241,13 @@ function createFontOutlineImg(_font, _outlineColor) {
 		_font.symbolInfo[i].height);
 	}
 
-
-	let imgData = outlineContext.getImageData(0,0,
+	const imgData = outlineContext.getImageData(0,0,
 		outlineCanvas.width,
 		outlineCanvas.height);
 
 	outlineContext.fillStyle = _outlineColor;
-	let x,y;
+	let x;
+	let y;
 	for(let i = 0, imgDataLength = imgData.data.length; i < imgDataLength; i+=4) {
 		if(imgData.data[i+3] > 0) {
 			x = (i/4) % outlineCanvas.width;
@@ -206,37 +259,66 @@ function createFontOutlineImg(_font, _outlineColor) {
 	_font.symbolInfo_outline = symbolInfo_outline;
 	_font["img_outline_" + _outlineColor] = outlineCanvas;
 
-};
+}
 
-function blitFontString(_font, _dest, _string, _x, _y, _color = null, _outlineColor = null) {
 
-	if(_font.img.width == 0 || _font.img.height == 0) return;		// hack fix for firefox race condition bug.
+/**
+ *
+ * @param {*} _font
+ * @param {*} _dest
+ * @param {*} _string
+ * @param {*} _x
+ * @param {*} _y
+ * @param {*} _color
+ * @param {*} _outlineColor
+ */
+function blitFontString(_font,
+	_dest,
+	_string,
+	_x,
+	_y,
+	_color = null,
+	_outlineColor = null)
+{
+	// hack fix for firefox race condition bug.
+	if(_font.img.width == 0 || _font.img.height == 0) {
+		return;
+	}
 
-	rF_stringlength = _string.length;
-	rF_totalWidth = 0;
-	rF_baseline = _y + _font.height;
+	/** The string used to reference the FRM. */
+	const frmString = `img_${_color}`;
+
+	let rF_stringlength = _string.length;
+	let rF_symbolIndex = 0;
+	let rF_totalWidth = 0;
+	let rF_baseline = _y + _font.height;
+	let rF_img = 0;
 
 	if(_color) {
-		if(!_font.hasOwnProperty("img_" + _color)) {
+		// if no colorized img, create one.
+		if(!_font.hasOwnProperty(frmString)) {
 			console.log("Bitmap Font: call to font render for surface without color: ", _color);
-			createFontColorImg(_font, _color);	// if no colorized img, create one.
+			createFontColorImg(_font, _color);
 		}
-		rF_img = _font["img_" + _color];
+		rF_img = _font[frmString];
 	} else rF_img = _font.img;
 
 	if(_outlineColor) {
+		// if no colorized img, create one.
 		if(!_font.hasOwnProperty("img_outline_" + _outlineColor)) {
 			console.log("Bitmap Font: call to font render for surface without outline color: ", _outlineColor);
-			createFontOutlineImg(_font, _outlineColor);	// if no colorized img, create one.
+			createFontOutlineImg(_font, _outlineColor);
 		}
 	}
 
-	for(var i = 0; i < rF_stringlength; i++) {
+	for(let i = 0; i < rF_stringlength; i++) {
 		rF_symbolIndex = _string.charCodeAt(i);
 		if(rF_symbolIndex == 32) {	// space
 			rF_totalWidth += _font.symbolInfo[32].width;
 		} else {
-			if(!_font.symbolInfo[rF_symbolIndex].width) continue;
+			if(!_font.symbolInfo[rF_symbolIndex].width) {
+				continue;
+			}
 
 			if(_outlineColor) {
 				_dest.drawImage(_font["img_outline_" + _outlineColor],
@@ -256,46 +338,60 @@ function blitFontString(_font, _dest, _string, _x, _y, _color = null, _outlineCo
 			rF_totalWidth += (_font.symbolInfo[rF_symbolIndex].width + _font.gapSize);
 		}
 	}
-};
+}
 
 
-function createFontColorImg(_font, _color) {	// creates canvas element with coloured font
-	//@TODO - "create check so that you can't create duplicate rgb(r,g,b) and #rgb versions by accident. - Potentially force hex colors as argument.
-
+/**
+ * Creates canvas element with coloured font.
+ * @TODO - "create check so that you can't create duplicate rgb(r,g,b) and #rgb
+ * versions by accident. Potentially force hex colors as argument.
+ * @param {*} _font
+ * @param {*} _color
+ */
+function createFontColorImg(_font,
+	_color)
+{
 	console.log("Font: Creating color surface: " + _color);
 
-	if(_font["img_" + _color]) return;
+	/** The string used to reference the FRM. */
+	const frmString = `img_${_color}`;
 
-	_font["img_" + _color] = document.createElement("canvas");
-	_font["img_" + _color].width = _font.img.width;
-	_font["img_" + _color].height = _font.img.height;
+	// If the font color image already exists, exit.
+	if(_font[frmString]) {
+		return;
+	}
 
-	var _fontContext = _font["img_" + _color].getContext("2d");
+	// Create the base color image as a canvas element.
+	_font[frmString] = document.createElement("canvas");
+	_font[frmString].width = _font.img.width;
+	_font[frmString].height = _font.img.height;
+
+	const _fontContext = _font[frmString].getContext("2d");
 
 	if(_font.type == "fon") {
 		_fontContext.globalCompositeOperation = "source-over";
 		_fontContext.fillStyle = _color;
-		_fontContext.fillRect(0,0,_font["img_" + _color].width,_font["img_" + _color].height);
+		_fontContext.fillRect(0,0,_font[frmString].width,_font[frmString].height);
 
 		_fontContext.globalCompositeOperation = "destination-in";
 		_fontContext.drawImage(_font.img,0,0);
-
 	} else {
 		_fontContext.globalCompositeOperation = "source-over";
 		_fontContext.drawImage(_font.img,0,0);
 
-		var imgData1 = _fontContext.getImageData(0,0,_font.img.width,_font.img.height);
+		const imgData1 = _fontContext.getImageData(0,0,_font.img.width,_font.img.height);
 
 		_fontContext.globalCompositeOperation = "source-in";
 		_fontContext.fillStyle = _color;
-		_fontContext.fillRect(0,0,_font["img_" + _color].width,_font["img_" + _color].height);
-		var imgData2 = _fontContext.getImageData(0,0,_font.img.width,_font.img.height);
+		_fontContext.fillRect(0,0,_font[frmString].width,_font[frmString].height);
 
-		for(var i=0; i < imgData2.data.length; i+=4) {	// AAF 0-9 values act as alpha blend
+		const imgData2 = _fontContext.getImageData(0,0,_font.img.width,_font.img.height);
+
+		for(let i = 0; i < imgData2.data.length; i += 4) {
+			// AAF 0-9 values act as alpha blend.
 			imgData2.data[i+3] = imgData1.data[i];
 		}
 
 		_fontContext.putImageData(imgData2,0,0);
 	}
-
-};
+}

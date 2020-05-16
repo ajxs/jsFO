@@ -1,4 +1,4 @@
-'use strict';
+"use strict";
 
 function asset_createFRMFromJSON(obj) {
 	let frmItem = obj;

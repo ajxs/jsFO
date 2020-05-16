@@ -1,4 +1,4 @@
-'use strict';
+"use strict";
 
 let _canvas;		// global vars
 let _context;

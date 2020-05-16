@@ -2,14 +2,12 @@
 
 window.addEventListener("load", main_init);
 
-function main_init() {
-
-	if(!browser_test()) {		// test for browser compatibility
-		console.log("main: Browser failed compatibility test");
-
-		return;
+function main_init()
+{
+	// Test for browser compatibility.
+	if(!browser_test()) {
+		throw new Error("Browser failed compatibility test");
 	}
-
 
 	_canvas = document.getElementById('mainCanvas');
 	_canvas.style.cursor = "none";
@@ -38,8 +36,7 @@ function main_init() {
 	};
 
 	if(!CALLFRAME) {
-		console.log("main: frame handler error: No frame handler!");
-		return;
+		throw new Error("No frame handler!");
 	}
 
 	mainState = new MainState();

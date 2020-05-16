@@ -1,4 +1,4 @@
-'use strict';
+"use strict";
 
 const DEBUG_FLAGS = {
 	drawSpecialHexes: false,
