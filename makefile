@@ -1,5 +1,5 @@
 babel       := ./node_modules/.bin/babel
-babel_flags := --presets latest
+babel_flags := --configFile ./src/babel.config.js
 
 dist_dir  := ./dist
 jsfo_dist := ${dist_dir}/jsfo.js

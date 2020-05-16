@@ -10,8 +10,9 @@
 		}
 	],
 	"devDependencies": {
-		"babel-cli": "6.22.2",
-		"babel-preset-latest": "^6.22.0"
+		"@babel/cli": "^7.7.0",
+		"@babel/core": "^7.7.2",
+		"@babel/preset-env": "^7.7.1"
 	},
 	"scripts": {
 		"start": "node src/web/server.js"
