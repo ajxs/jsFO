@@ -1,3 +1,15 @@
+/**
+ * @file interface.js
+ * @author Anthony (ajxs [at] panoptic.online)
+ * @brief Interface class.
+ * Contains the implementation of the Interface class, used to display ingame interfaces.
+ */
+
+"use strict";
+
+/**
+ * Game interface class.
+ */
 class Interface {
 	constructor(file = null) {
 		this.x = 0;
@@ -48,6 +60,4 @@ class Interface {
 		if(this.activeItem != -1) return this.elements[this.activeItem].handle;
 		else return false;
 	};
-
-
 };

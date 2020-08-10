@@ -1,8 +1,23 @@
 "use strict";
 
-window.addEventListener("load", main_init);
+/**
+ * Main game loop function.
+ * This function will execute indefinitely, encapsulating all game engine functionality.
+ * The function will call itself recursively via `requestAnimationFrame`.
+ */
+function main_loop()
+{
+	main_update();
+	main_render();
+	window.requestAnimationFrame(main_loop);
+}
 
-function main_init()
+
+/**
+ * Main game engine initialisation.
+ * This event handler will initialise the game engine.
+ */
+window.addEventListener("load", function initialiseGameEngine()
 {
 	// Test for browser compatibility.
 	if(!browser_test()) {
@@ -29,13 +44,6 @@ function main_init()
 	document.addEventListener('keydown', main_input);	// declare at document scope
 	document.addEventListener('keyup', main_input);
 
-	var main_loop = function() {
-		main_update();
-		main_render();
-		window.requestAnimationFrame(main_loop);
-	};
-
-
 	mainState = new MainState();
 	loadState = new LoadState();
 	mainLoadState = new MainLoadState();
@@ -54,7 +62,7 @@ function main_init()
 	activeGameStates.push(mainLoadState);
 	mainLoadState.init();
 	mainState.console.print("Welcome to jsFO!");
-};
+});
 
 
 function main_menu() {
@@ -76,10 +84,16 @@ function main_menu() {
 	}
 
 	activeGameStates.push(mainMenuState);
-};
+}
 
 
-function main_input(e) {
+/**
+ * Main game engine event handler.
+ * @param {Event} e The Browser event to handle.
+ * @returns Returns a False value to stop event propagation.
+ */
+function main_input(e)
+{
 	e.preventDefault();
 
 	switch(e.type) {
@@ -102,38 +116,60 @@ function main_input(e) {
 			break;
 		case "click":
 			break;
-	};
+	}
 
+	// Process the input event for each active gamestate by calling its
+	// relevant event handler.
 	for(let i = 0; i < activeGameStates.length; i++) {
-		if(!activeGameStates[i].statePause) activeGameStates[i].input.call(activeGameStates[i],e);
+		if(!activeGameStates[i].statePause) {
+			activeGameStates[i].input.call(activeGameStates[i], e);
+		}
 	}
 
 	return false;
-};
+}
 
 
-function main_update() {
+/**
+ * Main game engine update function.
+ * Handles updating all active game states.
+ */
+function main_update()
+{
+	// Set the tick count.
 	fps_currentTime = Date.now();
 
+	// Call the update methods on all active game states.
 	for(let i = 0; i < activeGameStates.length; i++) {
-		if(!activeGameStates[i].statePause) activeGameStates[i].update.call(activeGameStates[i]);
+		// Only update each state if it is not paused.
+		if(!activeGameStates[i].statePause) {
+			activeGameStates[i].update.call(activeGameStates[i]);
+		}
 	}
+}
 
-};
 
+/**
+ * Main game engine render function.
+ * Handles the rendering of all active game states.
+ */
+function main_render()
+{
+	// This is a hack screen clear.
+	// When the canvas dimensions are changed the canvas will be instantly cleared. This
+	// implementation was used due to it being faster than other methods.
+	_canvas.width = SCREEN_WIDTH;
 
-function main_render() {
-	_canvas.width = SCREEN_WIDTH;	// hack clear
-
+	// Call the render methods of all active game states.
 	for(let i = 0; i < activeGameStates.length; i++) {
 		activeGameStates[i].render.call(activeGameStates[i]);
 	}
+}
 
-};
 
-
-function main_loadGame(_saveState) {
-	main_gameStateFunction('closeIngameMenu');
+function main_loadGame(_saveState)
+{
+	main_gameStateFunction("closeIngameMenu");
 
 	let mainMenuState_index = activeGameStates.indexOf(mainMenuState);
 	if(mainMenuState_index > -1) {	//	remove mainState
@@ -162,22 +198,24 @@ function main_openActiveState(state) {
 };
 
 function main_closeActiveState(state) {
-	if(mainState.statePause) mainState.statePause = false;
+	if(mainState.statePause) {
+		mainState.statePause = false;
+	}
+
 	let statePosition = activeGameStates.indexOf(state);
 	if(statePosition) {
 		activeGameStates.splice(activeGameStates.indexOf(state),1);
 	} else {
-		console.log("main_closeActiveState: Invalid state");
+		console.error("main_closeActiveState: Invalid state");
 	}
 };
 
 
 function main_gameStateFunction(f, options) {
 	switch(f) {
-
 		case "main_initGameState":
 			mainState.loadSaveState(options.saveState);
-			activeGameStates.splice(activeGameStates.indexOf(loadState),1);
+			activeGameStates.splice(activeGameStates.indexOf(loadState), 1);
 			activeGameStates.push(mainState);
 			break;
 
@@ -231,15 +269,16 @@ function main_gameStateFunction(f, options) {
 			main_closeActiveState(mapScreenState);
 			break;
 		default:
-			console.log('main_gameStateFunction: improper arguments supplied');
+			console.error("main_gameStateFunction: improper arguments supplied");
 			break;
 	}
-};
+}
 
 
 function main_payloadError(error) {
 	console.log(error);
-};
+}
+
 
 function main_loadJsonPayload(url) {
 	return new Promise((resolve, reject) => {
@@ -254,7 +293,7 @@ function main_loadJsonPayload(url) {
 		};
 
 		payloadXHR.open("GET", url, true);
-		payloadXHR.responseType = 'json';
+		payloadXHR.responseType = "json";
 		payloadXHR.send();
 	});
-};
+}

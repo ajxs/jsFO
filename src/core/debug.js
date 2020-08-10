@@ -8,6 +8,9 @@
 
 "use strict";
 
+/**
+ * Debug flag map.
+ */
 const DEBUG_FLAGS = {
 	drawSpecialHexes: false,
 };

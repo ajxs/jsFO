@@ -37,7 +37,7 @@ src_files :=                                      \
 babel       := ${node_modules_dir}/.bin/babel
 babel_flags := --configFile ${src_dir}/babel.config.js
 
-.PHONY: clean emu
+.PHONY: clean server
 
 all: ${jsfo_dist}
 
