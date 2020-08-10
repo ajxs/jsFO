@@ -1,3 +1,8 @@
+.POSIX:
+.DELETE_ON_ERROR:
+MAKEFLAGS += --warn-undefined-variables
+MAKEFLAGS += --no-builtin-rules
+
 babel       := ./node_modules/.bin/babel
 babel_flags := --configFile ./src/babel.config.js
 
@@ -30,7 +35,7 @@ src_files :=                                      \
 	${src_dir}/gamestate/SkilldexState.js \
 	${src_dir}/core/main.js
 
-.PHONY: clean
+.PHONY: clean emu
 
 all: ${jsfo_dist}
 
@@ -38,7 +43,10 @@ ${jsfo_dist}: ${src_files}
 	${babel} ${src_files} ${babel_flags} --out-file ${jsfo_dist}
 
 clean:
-	rm -rf ${dist_dir}/*.js;
+	rm -f ${jsfo_dist}
 
 watch:
 	while inotifywait -e close_write ${src_dir}/*; do make; done
+
+emu:
+	Python -m SimpleHttpServer

@@ -1,7 +1,14 @@
+/**
+ * @file rendering.js
+ * @author Anthony (ajxs [at] panoptic.online)
+ * @brief Rendering functionality.
+ * Contains functionality related to rendering.
+ */
+
 "use strict";
 
 /**
- *
+ * Blits an FRM to a destination rendering context.
  * @param {*} frm
  * @param {*} dest
  * @param {*} dx
@@ -41,7 +48,7 @@ function blitFRM(frm,
 
 
 /**
- *
+ * Blits an FRM outline to a destination rendering context.
  * @param {*} frm
  * @param {*} dest
  * @param {*} dx
@@ -93,9 +100,9 @@ function blitFRMOutline(frm,
 const createFRMOutline_shadowColor = 12;
 
 /**
- *
- * @param {*} frm
- * @param {*} color
+ * Creates an FRM outline asset for a specified FRM.
+ * @param {*} frm - The FRM to create the outline for.
+ * @param {*} color - The color for the outline.
  */
 function createFRMOutline(frm, color = "#FF0000")
 {
@@ -263,7 +270,7 @@ function createFontOutlineImg(_font,
 
 
 /**
- *
+ * Blits a font string to a destination rendering context.
  * @param {*} _font
  * @param {*} _dest
  * @param {*} _string

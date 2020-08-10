@@ -1,15 +1,19 @@
+/**
+ * @file browser.js
+ * @author Anthony (ajxs [at] panoptic.online)
+ * @brief Browser interface functionality.
+ * Contains functions which are related to interfacing with the web browser.
+ */
+
 "use strict";
 
-function browser_getCallFrame() {
-	return window.requestAnimationFrame ||
-		window.webkitRequestAnimationFrame ||
-		window.mozRequestAnimationFrame    ||
-		window.oRequestAnimationFrame      ||
-		window.msRequestAnimationFrame     ||
-		null;
-};
-
-function browser_getInfo() {		// returns user-agent info
+/**
+ * Returns user-agent info.
+ * Instructs the application as to the browser that it is running in.
+ * @returns An object containing the user-agent info.
+ */
+function browser_getInfo()
+{
 	let ua = navigator.userAgent, tem;
 	let M = ua.match(/(opera|chrome|safari|firefox|msie|trident(?=\/))\/?\s*(\d+)/i) || [];
 	if(/trident/i.test(M[1])){
@@ -32,15 +36,20 @@ function browser_getInfo() {		// returns user-agent info
 		name: M[0],
 		version: M[1]
 	};
-};
+}
 
-function browser_test() {
-	let info = browser_getInfo();
+
+/**
+ * Tests the browser for compatibility.
+ * @returns A boolean indicating compatibility for the app.
+ */
+function browser_test()
+{
+	const info = browser_getInfo();
 	let testFeatures = [];
 
-	testFeatures.push(document.createElement('canvas').getContext('2d'));
+	testFeatures.push(document.createElement("canvas").getContext("2d"));
 	testFeatures.push(new XMLHttpRequest());
-	testFeatures.push(browser_getCallFrame());
 	testFeatures.push(Array.prototype.map);
 
 	testFeatures.forEach(element => {
@@ -48,4 +57,4 @@ function browser_test() {
 	});
 
 	return true;
-};
+}

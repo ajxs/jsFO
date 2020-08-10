@@ -32,12 +32,9 @@ function main_init()
 	var main_loop = function() {
 		main_update();
 		main_render();
-		CALLFRAME(main_loop);
+		window.requestAnimationFrame(main_loop);
 	};
 
-	if(!CALLFRAME) {
-		throw new Error("No frame handler!");
-	}
 
 	mainState = new MainState();
 	loadState = new LoadState();
@@ -51,7 +48,7 @@ function main_init()
 	pipboyState = new PipboyState();
 	mapScreenState = new MapScreenState();
 
-	CALLFRAME(main_loop);	// init loop
+	window.requestAnimationFrame(main_loop);	// init loop
 	_canvas.focus();
 
 	activeGameStates.push(mainLoadState);
