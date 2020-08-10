@@ -2,7 +2,7 @@
 
 View the online demo at: [http://ajxs.github.io/jsFO](http://ajxs.github.io/jsFO)
 
-##Current Status
+## Current Status
 Development on jsFO has unfortunately ceased some time ago. This project began in the early 2010s as a hobby project for myself learning game development in C/SDL. Not too long after, the web as a multimedia platform entered into a brand new renaissance with the release of the HTML5 canvas API. This would provide an amazing platform for web development, making projects like this possible. I decided to embark upon a fun experiment to see if it was possible to run a game like Fallout in the browser. This project served as a fantastic learning experience for me.
 
 In the intervening years since 2014 when this project began, the web technology ecosystem has come a long way. This project predates the wide adoption of Node.js, predates ES6, predates WebAssembly. Many design decisions in jsFO were made around problems that these technologies would later address. And certainly not to mention the fact that my skill as a developer has come a long, long way since I began this project. Looking back on some of the code quality, and lack of documentation/testing I'm more than a little embarassed.
@@ -17,7 +17,7 @@ One bad design decision that haunted jsFO was to use Python scripts to interpret
 If you, or anyone else, wanted any information on how the engine worked, or to work on the project as it exists now in any capacity I would be more than happy to assist.
 
 
-##About
+## About
 
 jsFO is an open-source port of Interplay's Fallout2 for the browser, written in Javascript, with conversion of assets from the original Fallout2 handled in Python.
 jsFO uses the HTML5 canvas API for rendering, and should be compatible with all modern browsers.
@@ -27,10 +27,10 @@ One end goal is eventually to document the specifics regarding the conversion of
 
 All code for this project is released under the Apache 2.0 license, meaning that you - the end user - are free to do with the software more or less whatever you wish, but you probably won't get far selling it. You're free to deconstruct, reconstruct, repair, retouch, break and bend this software all you want. And I wish you the best of luck in doing so... you'll need it. Feel free to contribute in any way!
 
-##ES6-Standards
+## ES6-Standards
 jsFO uses `babel-cli` together with a GNU make build pipeline for aligning the ES6-compatible src with current web standards. The ES5-compatible branch has been fully deprecaed, and jsFO will now be using babel for transpilation during the build process.
 
-##Running jsFO
+## Running jsFO
 
 ### Dependencies
 - The Node.js runtime
