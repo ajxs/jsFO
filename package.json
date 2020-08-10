@@ -1,21 +1,18 @@
 {
-	"name": "jsFO",
+	"name": "jsfo",
 	"version": "0.0.1",
 	"description": "Browser based javascript port of Fallout 2",
-	"author": "ajxs <ajxscc@gmail.com>",
+	"author": "ajxs <ajxs@panoptic.online>",
 	"contributors": [
 		{
 			"name": "ajxs",
-			"email": "ajxscc@gmail.com"
+			"email": "ajxs@panoptic.online"
 		}
 	],
 	"devDependencies": {
 		"@babel/cli": "^7.7.0",
 		"@babel/core": "^7.7.2",
 		"@babel/preset-env": "^7.7.1"
-	},
-	"scripts": {
-		"start": "node src/web/server.js"
 	},
 	"repository": {
 		"type": "git",

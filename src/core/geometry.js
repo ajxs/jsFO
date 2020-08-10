@@ -1,11 +1,15 @@
-"use strict";
-
 /**
+ * @file geometry.js
+ * @author Anthony (ajxs [at] panoptic.online)
+ * @brief Geometry constants and functionality.
+ * Constains functions and constants for working with ingame geometry.
  * note: Hex and Tile sizes are hardcoded as:
  * hex - w: 32, h: 16
  * tile - w: 80: h: 32
  */
 
+
+"use strict";
 
 /** The number of square tiles in a map row. */
 const map_tile_width = 100;
