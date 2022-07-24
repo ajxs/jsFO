@@ -796,9 +796,13 @@ class MainState extends GameState {
 							this.currentRenderObject.anim.shiftY -= this.currentRenderImg.frameInfo[this.currentRenderObject.orientation][this.currentRenderObject.anim.frameNumber].offsetY;
 							this.currentRenderObject.anim.frameNumber--;
 						}
+						
+						let eachActionFrame = Math.floor(this.currentRenderObject.anim.frameNumber / this.currentRenderObject.anim.actionFrame);
+
+						let isActionFrame = this.currentRenderObject.anim.frameNumber == this.currentRenderObject.anim.actionFrame * eachActionFrame;
 
 						// If action frame.
-						if(this.currentRenderObject.anim.frameNumber == this.currentRenderObject.anim.actionFrame) {
+						if(isActionFrame) {
 							this.actor_nextAction(this.currentRenderObject, "onActionFrame");
 						}
 					} else {
@@ -1525,26 +1529,6 @@ class MainState extends GameState {
 
 		actor.anim.shiftX = actor.anim.img.shift[actor.orientation].x;
 		actor.anim.shiftY = actor.anim.img.shift[actor.orientation].y;
-
-		if(actor.ai.runState) {
-			switch(actor.anim.actionFrame) {
-				case 2:
-					actor.anim.actionFrame = 4;
-					break;
-				case 4:
-					actor.anim.actionFrame = 6;
-					break;
-				case 6:
-					actor.anim.actionFrame = 8;
-					break;
-				case 8:
-					actor.anim.actionFrame = 10;	// never reached, anim resets before this point.
-					break;
-				case 10:		// this will be reset on animation end
-					actor.anim.actionFrame = 2;
-					break;
-			}
-		}
 
 		this.actor_addActionToFront(actor,
 			this.actor_moveStep.bind(this, actor),
