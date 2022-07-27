@@ -35,7 +35,7 @@ jsFO uses `babel-cli` together with a GNU make build pipeline for aligning the E
 ### Dependencies
 - The Node.js runtime
 - NPM
-- Phyton
+- Python
 - GNU Make
 
 To run jsFO for yourself, download the game sources to your hard drive and run `make`. This will download the required Node.js modules to build the game's distributable and then build the distributable artefact. A local server can be initiated for running the game by invoking `make server`. This requires the presence of Python on the system.
